@@ -386,12 +386,21 @@ namespace StylizedWater2
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button(new GUIContent("Enable", EditorGUIUtility.IconContent("d_tab_next").image), GUILayout.Width(60)))
                     {
-                        GraphicsSettings.GetRenderPipelineSettings<RenderGraphSettings>().enableRenderCompatibilityMode = true;
-
-                        EditorUtility.DisplayDialog($"{AssetInfo.ASSET_NAME} v{AssetInfo.INSTALLED_VERSION}", 
-                            "Please note that this fallback option will be removed in a future Unity version, this version of Stylized Water will no longer be completely functional then." +
-                            "\n\n" +
-                            "A license upgrade for Unity 6+ supported version may be available, please check the documentation for current information.", "OK");
+                        #if URP_COMPATIBILITY_MODE
+                                                GraphicsSettings.GetRenderPipelineSettings<RenderGraphSettings>().enableRenderCompatibilityMode = true;
+                        
+                                                EditorUtility.DisplayDialog($"{AssetInfo.ASSET_NAME} v{AssetInfo.INSTALLED_VERSION}", 
+                                                    "Please note that this fallback option will be removed in a future Unity version, this version of Stylized Water will no longer be completely functional then." +
+                                                    "\n\n" +
+                                                    "A license upgrade for Unity 6+ supported version may be available, please check the documentation for current information.", "OK");
+                        #else
+                                                // The setter for enableRenderCompatibilityMode is obsolete / not accessible without URP_COMPATIBILITY_MODE.
+                                                // Inform the user that enabling compatibility mode can't be done automatically in this build.
+                                                EditorUtility.DisplayDialog($"{AssetInfo.ASSET_NAME} v{AssetInfo.INSTALLED_VERSION}",
+                                                    "Automatic enabling of Render Graph compatibility mode is not available in this Unity build.\n\n" +
+                                                    "If you require this fallback, define URP_COMPATIBILITY_MODE in your project scripting defines or enable the compatibility option in the render pipeline settings if available. " +
+                                                    "See the asset documentation for more information.", "OK");
+                        #endif
                     }
                     GUILayout.Space(8);
                 }

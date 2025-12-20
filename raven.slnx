@@ -1,0 +1,22 @@
+﻿<Solution>
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="NaughtyAttributes.Test.csproj" />
+  <Project Path="Zenject.csproj" />
+  <Project Path="sc.stylizedwater2.editor.csproj" />
+  <Project Path="Boxophobic.Utils.Editor.csproj" />
+  <Project Path="Zenject-UnitTests-Editor.csproj" />
+  <Project Path="NaughtyAttributes.Core.csproj" />
+  <Project Path="Zenject-IntegrationTests-Editor.csproj" />
+  <Project Path="Zenject-IntegrationTests.csproj" />
+  <Project Path="NaughtyAttributes.Editor.csproj" />
+  <Project Path="Boxophobic.Utils.Scripts.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="Zenject-TestFramework.csproj" />
+  <Project Path="Zenject-Editor.csproj" />
+  <Project Path="Zenject-PoolMonitor-Editor.csproj" />
+  <Project Path="Boxophobic.PolyverseSkies.Editor.csproj" />
+  <Project Path="Zenject-ReflectionBaking-Editor.csproj" />
+  <Project Path="sc.stylizedwater2.runtime.csproj" />
+  <Project Path="Boxophobic.PolyverseSkies.Scripts.csproj" />
+  <Project Path="Boxophobic.PolyverseSkies.Runtime.csproj" />
+</Solution>
