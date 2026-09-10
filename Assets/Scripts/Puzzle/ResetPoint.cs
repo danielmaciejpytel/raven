@@ -41,9 +41,12 @@ public class ResetPoint : MonoBehaviour
             ResetPanel.SetTrigger("FadeIn");
             _inputManager.CanInput = false;
             _playerDataManager.TakeDamage(_damage);
-            _audiosource.Play();
+            if (_audiosource != null && _audiosource.enabled && _audiosource.gameObject.activeInHierarchy)
+            {
+                _audiosource.Play();
+            }
             _active = true;
-        }    
+        }
     }
 
     private void OnTriggerExit(Collider other)

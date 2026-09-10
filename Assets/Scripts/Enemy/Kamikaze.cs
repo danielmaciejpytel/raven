@@ -104,9 +104,15 @@ namespace Raven.Enemy
 
         private void Charge()
         {
-            if (_audioSource[0].clip != _audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Charge).AudioClip)
+            var source = (_audioSource != null && _audioSource.Length > 0) ? _audioSource[0] : null;
+
+            if (source != null && _audioManager != null)
             {
-                _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Charge), _audioSource[0]);
+                var chargeClip = _audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Charge);
+                if (chargeClip != null && source.clip != chargeClip.AudioClip)
+                {
+                    _audioManager.PlaySound(chargeClip, source);
+                }
             }
 
             if (_chargeTimer < _enemyConfig.ChargeTime)
@@ -116,7 +122,10 @@ namespace Raven.Enemy
             }
             else
             {
-                _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Idle), _audioSource[0]);
+                if (source != null && _audioManager != null)
+                {
+                    _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Idle), source);
+                }
                 _charge = false;
                 _chargeTimer = 0;
                 GfxReturnPosition();

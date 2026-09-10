@@ -23,12 +23,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 886876678055664423}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0.001399, z: 0.00174}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3101485445023235255}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2324244680228152845
 GameObject:
@@ -44,7 +45,7 @@ GameObject:
   - component: {fileID: 3206573832579882698}
   - component: {fileID: 1192892203519859731}
   m_Layer: 8
-  m_Name: GFX
+  m_Name: VFX(Standing)
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -57,14 +58,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2324244680228152845}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.00151, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 886876678055664422}
   - {fileID: 747687605945611105}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2064173657141834514
 MeshFilter:
@@ -85,11 +87,17 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -111,9 +119,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!135 &3206573832579882698
 SphereCollider:
@@ -123,9 +133,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2324244680228152845}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.0019560428
   m_Center: {x: 0.000002432207, y: -0.00039504218, z: 0.00010072498}
 --- !u!114 &1192892203519859731
@@ -146,6 +164,11 @@ MonoBehaviour:
   _effectPosition: {fileID: 3101485445023235255}
   _effectOnEnemy: 1
   _config: {fileID: 11400000, guid: 48260839878081f4e8fdac6ba51b51e5, type: 2}
+  _explodeClip:
+    AudioName: 0
+    AudioClip: {fileID: 0}
+    Volume: 1
+    Loop: 0
 --- !u!1 &8463776584370424805
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,12 +193,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8463776584370424805}
+  serializedVersion: 2
   m_LocalRotation: {x: -0.0027696828, y: 0.91542715, z: -0.003870154, w: 0.4024556}
   m_LocalPosition: {x: 0, y: -0.013499998, z: -0.0885}
   m_LocalScale: {x: 0.5, y: 0.5000001, z: 0.49999997}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 747687605945611105}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!108 &5461330614261419437
 Light:
@@ -185,15 +209,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8463776584370424805}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 12
   m_Type: 2
-  m_Shape: 0
   m_Color: {r: 1, g: 0.654902, b: 0, a: 1}
   m_Intensity: 2.5
   m_Range: 7.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -237,13 +260,18 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1001 &1002869606406476938
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 3101485445023235255}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 5916bf7e7bc72154cb885d64e1696ba3, type: 3}
@@ -315,6 +343,15 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5916bf7e7bc72154cb885d64e1696ba3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7782104760313271184}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5916bf7e7bc72154cb885d64e1696ba3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4102060671265067504}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5916bf7e7bc72154cb885d64e1696ba3, type: 3}
 --- !u!4 &747687605945611105 stripped
 Transform:
@@ -326,6 +363,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 747687605945611105}
     m_Modifications:
     - target: {fileID: 922935591134124209, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
@@ -377,4 +415,12 @@ PrefabInstance:
       value: VFX(FlyingShootingSkull)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
+--- !u!4 &4102060671265067504 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2583660977209223689, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
+  m_PrefabInstance: {fileID: 1960881725034920953}
+  m_PrefabAsset: {fileID: 0}

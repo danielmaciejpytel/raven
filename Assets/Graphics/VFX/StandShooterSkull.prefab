@@ -184,9 +184,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1453004569648582534}
   - {fileID: 508912519174333471}
   - {fileID: 5745693205173426718}
+  - {fileID: 4269402597790137662}
   m_Father: {fileID: 2872977118757517662}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &2872977119519449587
@@ -265,7 +265,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5863476601211504496}
+  m_Father: {fileID: 4269402597790137662}
   m_LocalEulerAnglesHint: {x: 270.0198, y: 0, z: 0}
 --- !u!198 &7729495788653464479
 ParticleSystem:
@@ -4815,7 +4815,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &248038816331754545
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4834,6 +4834,8 @@ ParticleSystemRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4855,9 +4857,11 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -4889,7 +4893,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!114 &5765030033451749043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5358,19 +5361,14 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5313040389122805831, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 2583660977209223689, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5620692135406689284}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
---- !u!4 &1453004569648582534 stripped
+--- !u!4 &4269402597790137662 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 922935591134124209, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
-  m_PrefabInstance: {fileID: 1793830073308092215}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &5863476601211504496 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5313040389122805831, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2583660977209223689, guid: 719126d3ec66ef341acc3a468e4f547c, type: 3}
   m_PrefabInstance: {fileID: 1793830073308092215}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2800347864252056987

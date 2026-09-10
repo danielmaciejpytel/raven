@@ -1,5 +1,5 @@
 //KriptoFX
-	sampler2D _GrabTexture;
+	sampler2D _CameraOpaqueTexture;
 	sampler2D _MainTex;
 	sampler2D _NormalTex;
 	float4 _NormalTex_ST;
@@ -226,7 +226,7 @@
 		offset *= alphaBump;
 #endif
 		i.uvgrab.xy = offset * i.color.a + i.uvgrab.xy;
-		half4 grabColor = tex2Dlod(_GrabTexture, float4(i.uvgrab.xy / i.uvgrab.w, 0, 0));
+		half4 grabColor = tex2Dlod(_CameraOpaqueTexture, float4(i.uvgrab.xy / i.uvgrab.w, 0, 0));
 		
 		half4 result = 1;
 		result.rgb = grabColor.rgb * lerp(float3(1, 1, 1), _MainColor.rgb,  i.color.a) + fresnelCol.rgb * grabColor.rgb + cutoutCol.rgb;

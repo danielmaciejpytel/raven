@@ -43,6 +43,11 @@ namespace Raven.Core
 
         public void PlaySound(AudioClipConditions p_clipOptions, AudioSource p_audioSource)
         {
+            if (p_clipOptions == null || p_audioSource == null || p_clipOptions.AudioClip == null)
+            {
+                return;
+            }
+
             p_audioSource.Stop();
             p_audioSource.loop = p_clipOptions.Loop;
             p_audioSource.clip = p_clipOptions.AudioClip;
@@ -52,7 +57,8 @@ namespace Raven.Core
 
         public AudioClipConditions GetCurrenAudioClipConditions(AudioClipConditions[] p_audioClips, AudioNames p_clipName)
         {
-            return p_audioClips.First(x => x.AudioName == p_clipName);
+            if (p_audioClips == null) return null;
+            return p_audioClips.FirstOrDefault(x => x != null && x.AudioName == p_clipName);
         }
 
         private void PlayWalk(float p_speed)

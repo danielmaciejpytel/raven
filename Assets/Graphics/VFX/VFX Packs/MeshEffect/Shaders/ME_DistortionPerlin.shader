@@ -19,9 +19,6 @@ Shader "KriptoFX/ME/DistortionPerlin" {
 						Cull Back
 
 			SubShader {
-				GrabPass {
-					"_GrabTexture"
-				}
 				Pass {
 					CGPROGRAM
 					#pragma vertex vert
@@ -32,9 +29,9 @@ Shader "KriptoFX/ME/DistortionPerlin" {
 
 					sampler2D _BumpMap;
 					sampler2D _PerlinNoise;
-					sampler2D _GrabTexture;
+					sampler2D _CameraOpaqueTexture;
 
-					float4 _GrabTexture_TexelSize;
+					float4 _CameraOpaqueTexture_TexelSize;
 					float4 _TintColor;
 					float4 _RimColor;
 					float4 _Speed;
@@ -116,9 +113,9 @@ Shader "KriptoFX/ME/DistortionPerlin" {
 						fresnelRim = saturate(_R0 + (1.0 - _R0) * fresnelRim);
 						fresnelRim = fresnelRim*fresnelRim + fresnelRim;
 
-						half2 offset = normal.rg * _BumpAmt * _GrabTexture_TexelSize.xy * i.color.a;
+						half2 offset = normal.rg * _BumpAmt * _CameraOpaqueTexture_TexelSize.xy * i.color.a;
 						i.grab.xy = offset * i.grab.z + i.grab.xy;
-						half4 col = tex2Dproj(_GrabTexture, UNITY_PROJ_COORD(i.grab));
+						half4 col = tex2Dproj(_CameraOpaqueTexture, UNITY_PROJ_COORD(i.grab));
 						half3 emission = _RimColor * i.color.rgb * 2;
 						emission = lerp(col.xyz * _TintColor.xyz, col.xyz * emission + emission / 2, saturate(fresnelRim));
 						return fixed4(emission, _TintColor.a * i.color.a);

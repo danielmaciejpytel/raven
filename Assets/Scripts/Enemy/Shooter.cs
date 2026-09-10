@@ -70,7 +70,13 @@ namespace Raven.Enemy
             }
             else
             {
-                _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Shoot), _audioSource[1]);
+                var source = (_audioSource != null && _audioSource.Length > 1 && _audioSource[1] != null) 
+                    ? _audioSource[1] 
+                    : (_audioSource != null && _audioSource.Length > 0 ? _audioSource[0] : null);
+                if (source != null && _audioManager != null)
+                {
+                    _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Shoot), source);
+                }
                 var obj = Object.Instantiate(_enemyConfig.Bullet, _shootPoint.position, _shootPoint.rotation);
                 obj.GetComponent<Bullet>().Initialization(_enemyConfig.BulletSpeed, _playerDataManager, _enemyConfig, _gfxTransform.gameObject);
                 _timer = 0;

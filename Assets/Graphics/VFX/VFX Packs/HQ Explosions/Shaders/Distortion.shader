@@ -17,7 +17,6 @@ Shader "Hovl/Particles/Distortion"
 			Lighting Off 
 			ZWrite Off
 			Fog { Mode Off}
-			GrabPass{ }
 
 			Pass {		
 				CGPROGRAM
@@ -28,11 +27,11 @@ Shader "Hovl/Particles/Distortion"
 				#include "UnityCG.cginc"
 				uniform sampler2D_float _CameraDepthTexture;
 				uniform float _InvFade;
-				uniform sampler2D _GrabTexture;
+				uniform sampler2D _CameraOpaqueTexture;
 				uniform sampler2D _NormalMap;
 				uniform float4 _NormalMap_ST;
 				uniform float _Distortionpower;	
-				uniform float4 _GrabTexture_TexelSize;	
+				uniform float4 _CameraOpaqueTexture_TexelSize;	
 
 				struct appdata_t 
 				{
@@ -89,9 +88,9 @@ Shader "Hovl/Particles/Distortion"
 					half3 tex2DNode14 = UnpackNormal(tex2D( _NormalMap, i.texcoord2));
 					half2 screenColor29 = tex2DNode14.rg;
 					half clampResult89 = (abs(tex2DNode14.r) + abs(tex2DNode14.g) * 30) - 0.03;
-					screenColor29 = screenColor29 * _GrabTexture_TexelSize.xy * _Distortionpower * i.color.a;
+					screenColor29 = screenColor29 * _CameraOpaqueTexture_TexelSize.xy * _Distortionpower * i.color.a;
 					i.texcoord.xy = screenColor29 * i.texcoord.z + i.texcoord.xy;
-					half4 col = tex2Dproj( _GrabTexture, UNITY_PROJ_COORD(i.texcoord));
+					half4 col = tex2Dproj( _CameraOpaqueTexture, UNITY_PROJ_COORD(i.texcoord));
 					col.a = saturate(col.a * clampResult89);
 					return col;
 				}

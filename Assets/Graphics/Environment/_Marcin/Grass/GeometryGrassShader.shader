@@ -277,39 +277,37 @@ Shader "Custom/GeometryGrass"
 	{
 		float4 shadowCoord = TransformWorldToShadowCoord(i.worldPos);
 	#if _MAIN_LIGHT_SHADOWS_CASCADE || _MAIN_LIGHT_SHADOWS
-	Light mainLight = GetMainLight(shadowCoord);
-#else
-	Light mainLight = GetMainLight();
-#endif
-	float shadow = mainLight.shadowAttenuation;
+		Light mainLight = GetMainLight(shadowCoord);
+	#else
+		Light mainLight = GetMainLight();
+	#endif
+		float shadow = mainLight.shadowAttenuation;
 
-	// extra point lights support
-	float3 extraLights;
-	int pixelLightCount = GetAdditionalLightsCount();
-	for (int j = 0; j < pixelLightCount; ++j) {
-		Light light = GetAdditionalLight(j, i.worldPos, half4(1, 1, 1, 1));
-		float3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation);
-		extraLights += attenuatedLightColor;
+		// extra point lights support
+		float3 extraLights = float3(0, 0, 0);
+	#if defined(_ADDITIONAL_LIGHTS) || defined(_ADDITIONAL_LIGHTS_VERTEX)
+		int pixelLightCount = GetAdditionalLightsCount();
+		for (int j = 0; j < pixelLightCount; ++j) {
+			Light light = GetAdditionalLight(j, i.worldPos, half4(1, 1, 1, 1));
+			float3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation);
+			extraLights += attenuatedLightColor;
+		}
+	#endif
+		float4 baseColor = lerp(_BottomColor, _TopColor, saturate(i.uv.y)) * float4(i.diffuseColor, 1);
+
+		// calculate diffuse lighting: main directional light (with shadow) + additional lights modulated with base color
+		float3 totalLight = mainLight.color * shadow + extraLights;
+		float3 finalRgb = baseColor.rgb * totalLight;
+
+		// add ambient lighting
+		finalRgb += (unity_AmbientSky.rgb * _AmbientStrength) * baseColor.rgb;
+
+		// fog
+		float fogFactor = i.fogFactor;
+		finalRgb = MixFog(finalRgb, fogFactor);
+
+		return float4(finalRgb, 1.0);
 	}
-	float4 baseColor = lerp(_BottomColor, _TopColor, saturate(i.uv.y)) * float4(i.diffuseColor, 1);
-
-	// multiply with lighting color
-	float4 litColor = (baseColor * float4(mainLight.color,1));
-
-	litColor += float4(extraLights,1);
-	// multiply with vertex color, and shadows
-	float4 final = litColor * shadow;
-	// add in basecolor when lights turned down
-	final += saturate((1 - shadow) * baseColor * 0.2);
-	// fog
-	float fogFactor = i.fogFactor;
-
-	// Mix the pixel color with fogColor. 
-	final.rgb = MixFog(final.rgb, fogFactor);
-	// add in ambient color
-	final += (unity_AmbientSky * _AmbientStrength);
-   return final;
-   }
 	   ENDHLSL
    }
 		// shadow casting pass with empty fragment

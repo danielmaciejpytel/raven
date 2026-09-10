@@ -57,7 +57,10 @@ namespace Raven.Manager
         {
             NavMeshAgent navMesh = GetComponent<NavMeshAgent>();
 
-            _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClips, AudioNames.Idle), _audioSource[0]);
+            if (_audioManager != null && _audioSource != null && _audioSource.Length > 0 && _audioSource[0] != null)
+            {
+                _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClips, AudioNames.Idle), _audioSource[0]);
+            }
 
             switch (_enemyConfig.EnemyType)
             {
@@ -88,18 +91,22 @@ namespace Raven.Manager
 
             Collider[] hit = Physics.OverlapSphere(_enemyGfxTransform.position, _activateRadius, _whatCanSee);
 
-            if (hit.Length == 0)
+            if (hit == null || hit.Length == 0)
             {
                 return;
             }
 
-            if (hit[0].tag == "Player")
+            for (int i = 0; i < hit.Length; i++)
             {
-                Vector3 povDir = hit[0].transform.position - _enemyGfxTransform.position;
-
-                if (Vector3.Angle(povDir, _enemyGfxTransform.forward) <= _activateAngle / 2)
+                if (hit[i] != null && hit[i].CompareTag("Player"))
                 {
-                    _active = true;
+                    Vector3 povDir = hit[i].transform.position - _enemyGfxTransform.position;
+
+                    if (Vector3.Angle(povDir, _enemyGfxTransform.forward) <= _activateAngle / 2)
+                    {
+                        _active = true;
+                        break;
+                    }
                 }
             }
         }
@@ -112,15 +119,19 @@ namespace Raven.Manager
             }
 
             _currentHealth -= p_value;
-            _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClips, AudioNames.Inpact), _audioSource[0]);
+            if (_audioManager != null && _audioSource != null && _audioSource.Length > 0 && _audioSource[0] != null)
+            {
+                _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClips, AudioNames.Inpact), _audioSource[0]);
+            }
             _changeColorTimer = 0;
             _changeColor = true;
 
             if (_currentHealth <= 0)
             {
-                if (_enemyConfig.ExplodeAfterDead)
+                if (_enemyConfig.ExplodeAfterDead && _enemyGfxTransform != null)
                 {
-                    _enemyGfxTransform.GetComponent<Explode>().ExplodeBehaviour();
+                    var explode = _enemyGfxTransform.GetComponent<Explode>();
+                    if (explode != null) explode.ExplodeBehaviour();
                 }
 
                 Dead();
@@ -129,7 +140,10 @@ namespace Raven.Manager
 
         private void Dead()
         {
-            _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClips, AudioNames.Dead), _audioSource[0]);
+            if (_audioManager != null && _audioSource != null && _audioSource.Length > 0 && _audioSource[0] != null)
+            {
+                _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClips, AudioNames.Dead), _audioSource[0]);
+            }
             Destroy(this.gameObject);
         }
 
