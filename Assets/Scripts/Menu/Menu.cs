@@ -38,13 +38,15 @@ namespace Raven.Core
             if (_playerHud.GetCurrentAnimatorStateInfo(0).IsTag("End"))
             {           
                 _inputManager.CanInput = true;
+                if (_menuCam != null) _menuCam.SetActive(false);
+                if (_storyPanel != null) _storyPanel.gameObject.SetActive(false);
                 this.enabled = false;
             }
 
             if (_storyPanel.GetCurrentAnimatorStateInfo(0).IsTag("End"))
             {
-                _menuCam.SetActive(false);
-                _storyPanel.gameObject.SetActive(false);
+                if (_menuCam != null) _menuCam.SetActive(false);
+                if (_storyPanel != null) _storyPanel.gameObject.SetActive(false);
             }
         }
 

@@ -1,6 +1,6 @@
 using Raven.Input;
 using System;
-using Cinemachine;
+using Unity.Cinemachine;
 using Raven.Config;
 using UnityEngine;
 using Zenject;
@@ -11,7 +11,8 @@ namespace Raven.Manager
     {
         private InputManager _inputManager;
         private GameObject _shootCamera;
-        private CinemachineFreeLook _tppCamera;
+        private CinemachineCamera _tppCamera;
+        private CinemachineOrbitalFollow _tppOrbital;
         private Transform _playerTransform;
         private Transform _mainCamera;
         private MovementConfig _movementConfig;
@@ -24,13 +25,17 @@ namespace Raven.Manager
 
         public event Action<bool> OnAimChange;
 
-        public CameraManager(InputManager pInputManager, GameObject p_shootCamera, CinemachineFreeLook p_tppCamera,
+        public CameraManager(InputManager pInputManager, GameObject p_shootCamera, CinemachineCamera p_tppCamera,
             GameObject p_player, Transform p_mainCamera, GameObject p_ShootCameraLock, MovementConfig p_movementConfig)
         {
             _movementConfig = p_movementConfig;
             _inputManager = pInputManager;
             _shootCamera = p_shootCamera;
             _tppCamera = p_tppCamera;
+            if (_tppCamera != null)
+            {
+                _tppOrbital = _tppCamera.GetComponent<CinemachineOrbitalFollow>();
+            }
             _playerTransform = p_player.GetComponent<Transform>();
             _mainCamera = p_mainCamera;
             ShootCameraLock = p_ShootCameraLock;
@@ -59,7 +64,10 @@ namespace Raven.Manager
                 else
                 {
                     ShootCameraRotation();
-                    _tppCamera.m_XAxis.Value = _playerTransform.eulerAngles.y;
+                    if (_tppOrbital != null)
+                    {
+                        _tppOrbital.HorizontalAxis.Value = _playerTransform.eulerAngles.y;
+                    }
                 }
             }
             else

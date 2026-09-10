@@ -1,4 +1,4 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using Raven.Config;
 using Raven.Container;
 using Raven.Manager;
@@ -19,7 +19,7 @@ namespace Raven.Core.Installer
         [SerializeField] private PlayerReferences _playerReferences;
         [SerializeField] private Transform _mainCameraTransform;   
         [SerializeField] private GameObject _shootCamera;
-        [SerializeField] private CinemachineFreeLook _tppCamera;    
+        [SerializeField] private CinemachineCamera _tppCamera;    
         [SerializeField] private GameObject _rigTarget;
         [SerializeField] private GameObject _shootCameraLock;      
         [SerializeField] private PlayerHudReferences _hudReferences;
