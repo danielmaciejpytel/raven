@@ -28,14 +28,15 @@ Shader "Custom/GeometryGrass"
 #pragma vertex vert
 		// This line defines the name of the fragment shader. 
 #pragma fragment frag
+#pragma target 4.0
 #pragma require geometry
 #pragma geometry geom
 
 #define GrassSegments 5 // segments per blade
 #define GrassBlades 4 // blades per vertex
 
-#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+
 
 #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
 #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
@@ -94,6 +95,8 @@ Shader "Custom/GeometryGrass"
 	float _MinDist, _MaxDist;
 
 	uniform float3 _PositionMoving;
+    float3 _LightDirection;
+    float3 _LightPosition;
 
 	v2g vert(Attributes v)
 	{
@@ -151,13 +154,18 @@ Shader "Custom/GeometryGrass"
 		float3 positionWS = TransformObjectToWorld(input.xyz);
 		float3 normalWS = TransformObjectToWorldNormal(normal);
 
-		float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, 0));
+		#if defined(_CASTING_PUNCTUAL_LIGHT_SHADOW)
+        float3 lightDirectionWS = normalize(_LightPosition - positionWS);
+#else
+        float3 lightDirectionWS = _LightDirection;
+#endif
+        float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, lightDirectionWS));
 
 
 #if UNITY_REVERSED_Z
-		positionCS.z = min(positionCS.z, UNITY_NEAR_CLIP_VALUE);
+		positionCS.z = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
 #else
-		positionCS.z = max(positionCS.z, UNITY_NEAR_CLIP_VALUE);
+		positionCS.z = max(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
 #endif
 		return positionCS;
 	}
@@ -168,11 +176,15 @@ Shader "Custom/GeometryGrass"
 		float3 offsetvertices = vertexPos + mul(rotation, float3(width, height, curve) + float3(0, 0, offset));
 
 
-		OUT.pos = GetShadowPositionHClip(offsetvertices, faceNormal);
+		#if defined(UNITY_PASS_SHADOWCASTER)
+        OUT.pos = GetShadowPositionHClip(offsetvertices, faceNormal);
+#else
+        OUT.pos = TransformObjectToHClip(offsetvertices);
+#endif
 		OUT.norm = faceNormal;
 		OUT.diffuseColor = color;
 		OUT.uv = uv;
-		VertexPositionInputs vertexInput = GetVertexPositionInputs(vertexPos + mul(rotation, float3(width, height, curve)));
+		VertexPositionInputs vertexInput = GetVertexPositionInputs(offsetvertices);
 		OUT.worldPos = vertexInput.positionWS;
 		float fogFactor = ComputeFogFactor(OUT.pos.z);
 		OUT.fogFactor = fogFactor;
@@ -181,7 +193,7 @@ Shader "Custom/GeometryGrass"
 
 	// wind and basic grassblade setup from https://roystan.net/articles/grass-shader.html
 	// limit for vertices
-	[maxvertexcount(48)]
+	[maxvertexcount(GrassBlades * (GrassSegments * 2 + 1))]
 	void geom(point v2g IN[1], inout TriangleStream<g2f> triStream)
 	{
 		float forward = rand(IN[0].pos.yyz) * _BladeForward;
@@ -190,7 +202,7 @@ Shader "Custom/GeometryGrass"
 		float3 worldPos = TransformObjectToWorld(IN[0].pos.xyz);
 		// camera distance for culling 
 		float distanceFromCamera = distance(worldPos, _WorldSpaceCameraPos);
-		float distanceFade = 1 - saturate((distanceFromCamera - _MinDist) / _MaxDist);
+		float distanceFade = 1 - saturate((distanceFromCamera - _MinDist) / max(_MaxDist - _MinDist, 0.001));
 		// wind
 		float3 v0 = IN[0].pos.xyz;
 		float3 wind1 = float3(sin(_Time.x * _WindSpeed + v0.x) + sin(_Time.x * _WindSpeed + v0.z * 2) + sin(_Time.x * _WindSpeed * 0.1 + v0.x), 0,
@@ -199,7 +211,7 @@ Shader "Custom/GeometryGrass"
 
 		// Interactivity
 		float3 dis = distance(_PositionMoving, worldPos); // distance for radius
-		float3 radius = 1 - saturate(dis / _Radius); // in world radius based on objects interaction radius
+		float3 radius = 1 - saturate(dis / max(_Radius, 0.001)); // in world radius based on objects interaction radius
 		float3 sphereDisp = worldPos - _PositionMoving; // position comparison
 		sphereDisp *= radius; // position multiplied by radius for falloff
 							  // increase strength
@@ -208,9 +220,9 @@ Shader "Custom/GeometryGrass"
 		// set vertex color
 		float3 color = (IN[0].color).rgb;
 		// set grass height from tool, uncomment if youre not using the tool!
-		_GrassHeight *= IN[0].uv.y;
-		_GrassWidth *= IN[0].uv.x;
-		_GrassHeight *= clamp(rand(IN[0].pos.xyz), 1 - _RandomHeight, 1 + _RandomHeight);
+		float grassHeight = _GrassHeight * IN[0].uv.y;
+		float grassWidth = _GrassWidth * IN[0].uv.x;
+		grassHeight *= clamp(rand(IN[0].pos.xyz), 1 - _RandomHeight, 1 + _RandomHeight);
 
 		// grassblades geometry
 		for (int j = 0; j < (GrassBlades * distanceFade); j++)
@@ -227,11 +239,11 @@ Shader "Custom/GeometryGrass"
 			{
 				// taper width, increase height;
 				float t = i / (float)GrassSegments;
-				float segmentHeight = _GrassHeight * t;
-				float segmentWidth = _GrassWidth * (1 - t);
+				float segmentHeight = grassHeight * t;
+				float segmentWidth = grassWidth * (1 - t);
 
 				// the first (0) grass segment is thinner
-				segmentWidth = i == 0 ? _GrassWidth * 0.3 : segmentWidth;
+				segmentWidth = i == 0 ? grassWidth * 0.3 : segmentWidth;
 
 				float segmentForward = pow(abs(t), _BladeCurve) * forward;
 
@@ -249,7 +261,7 @@ Shader "Custom/GeometryGrass"
 
 			}
 			// Add just below the loop to insert the vertex at the tip of the blade.
-			triStream.Append(GrassVertex(v0 + float3(sphereDisp.x * 1.5, sphereDisp.y, sphereDisp.z * 1.5) + wind1, 0, _GrassHeight, offset, forward, float2(0.5, 1), transformationMatrix, faceNormal, color));
+			triStream.Append(GrassVertex(v0 + float3(sphereDisp.x * 1.5, sphereDisp.y, sphereDisp.z * 1.5) + wind1, 0, grassHeight, offset, forward, float2(0.5, 1), transformationMatrix, faceNormal, color));
 			// restart the strip to start another grass blade
 			triStream.RestartStrip();
 		}
@@ -260,13 +272,14 @@ Shader "Custom/GeometryGrass"
 		// color pass
 		SubShader
 	{
-		Tags{ "RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline" }
+		Tags{ "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" }
 
 		Cull Off
 		Pass
-	{
-
-		HLSLPROGRAM
+    {
+        Name "ForwardLit"
+        Tags { "LightMode" = "UniversalForwardOnly" }
+        HLSLPROGRAM
 
 	float4 _TopColor;
 	float4 _BottomColor;
@@ -275,8 +288,12 @@ Shader "Custom/GeometryGrass"
 	// The fragment shader definition.            
 	half4 frag(g2f i) : SV_Target
 	{
-		float4 shadowCoord = TransformWorldToShadowCoord(i.worldPos);
-	#if _MAIN_LIGHT_SHADOWS_CASCADE || _MAIN_LIGHT_SHADOWS
+		#if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
+        float4 shadowCoord = ComputeScreenPos(TransformWorldToHClip(i.worldPos));
+#else
+        float4 shadowCoord = TransformWorldToShadowCoord(i.worldPos);
+#endif
+	#if defined(_MAIN_LIGHT_SHADOWS_CASCADE) || defined(_MAIN_LIGHT_SHADOWS) || defined(_MAIN_LIGHT_SHADOWS_SCREEN)
 		Light mainLight = GetMainLight(shadowCoord);
 	#else
 		Light mainLight = GetMainLight();
@@ -320,7 +337,7 @@ Shader "Custom/GeometryGrass"
 
 		HLSLPROGRAM
 
-		#define SHADERPASS_SHADOWCASTER
+		#pragma multi_compile _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
 		#pragma shader_feature_local _ DISTANCE_DETAIL
 

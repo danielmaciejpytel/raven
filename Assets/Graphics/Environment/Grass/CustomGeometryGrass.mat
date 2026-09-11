@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_GeometryGrass
+  m_Name: CustomGeometryGrass
   m_Shader: {fileID: 4800000, guid: 35f99c6b12c5bc94fab9e401c6a2d042, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -27,17 +27,17 @@ Material:
     m_Floats:
     - _AmbientStrength: 0.25
     - _BladeCurve: 4
-    - _BladeForward: 0.38
-    - _GrassHeight: 0.55
-    - _GrassWidth: 0.0485
+    - _BladeForward: 0.325
+    - _GrassHeight: 0.75
+    - _GrassWidth: 0.0525
     - _MaxDist: 100
     - _MinDist: 0
     - _Rad: 0.25
     - _Radius: 0.5
-    - _RandomHeight: 0.275
+    - _RandomHeight: 0.325
     - _Strength: 3
-    - _WindSpeed: 25
-    - _WindStrength: 0.035
+    - _WindSpeed: 12.5
+    - _WindStrength: 0.025
     m_Colors:
     - _BottomColor: {r: 0.11575799, g: 0.3301887, b: 0.086181305, a: 1}
     - _TopColor: {r: 0.4262444, g: 0.5754717, b: 0.090482935, a: 1}
