@@ -1,6 +1,6 @@
 <h1>Raven: Skull Island</h1>
 
-![Preview](Assets/Graphics/GitHub/raven_wyspa_czaszki_logo.png)
+![Preview](Assets/Graphics/GitHub/RavenWyspaCzaszkiLogo.png)
 
 **Raven: Skull Island** is a third-person action-adventure game with puzzle-solving elements, set on a mysterious and cursed island.
 
@@ -8,7 +8,7 @@ You play as Raven, a young pirate who miraculously survives a shipwreck caused b
 
 Face the mystery, survive the curse, and fight to escape Skull Island before it consumes you completely.
 
-![Preview](Assets/Graphics/GitHub/team_logo.png)
+![Preview](Assets/Graphics/GitHub/TeamLogo.png)
 
 ## Project Origins
 
@@ -22,11 +22,11 @@ The game was originally developed by a 6-person team as part of a graduation pro
 
 The initial commit reflects the exact [state](https://www.youtube.com/watch?v=zeqDeDUHbcQ) of the project at the time it was submitted for evaluation at Game Dev School.
 
-![Preview](Assets/Graphics/GitHub/wip_screenshot_01.png)
-![Preview](Assets/Graphics/GitHub/wip_screenshot_02.png)
-![Preview](Assets/Graphics/GitHub/wip_screenshot_03.png)
-![Preview](Assets/Graphics/GitHub/wip_screenshot_04.png)
-![Preview](Assets/Graphics/GitHub/wip_screenshot_05.png)
+![Preview](Assets/Graphics/GitHub/WipScreenshot01.png)
+![Preview](Assets/Graphics/GitHub/WipScreenshot02.png)
+![Preview](Assets/Graphics/GitHub/WipScreenshot03.png)
+![Preview](Assets/Graphics/GitHub/WipScreenshot04.png)
+![Preview](Assets/Graphics/GitHub/WipScreenshot005.png)
 
 ## Continuing Development
 
