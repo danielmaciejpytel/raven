@@ -281,6 +281,9 @@ Shader "Custom/GeometryGrass"
         Tags { "LightMode" = "UniversalForwardOnly" }
         HLSLPROGRAM
 
+        // URP 17.3 / Unity 6.3 replaces _FORWARD_PLUS with _CLUSTER_LIGHT_LOOP.
+        #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
+
 	float4 _TopColor;
 	float4 _BottomColor;
 	float _AmbientStrength;
@@ -300,17 +303,38 @@ Shader "Custom/GeometryGrass"
 	#endif
 		float shadow = mainLight.shadowAttenuation;
 
-		// extra point lights support
-		float3 extraLights = float3(0, 0, 0);
-	#if defined(_ADDITIONAL_LIGHTS) || defined(_ADDITIONAL_LIGHTS_VERTEX)
-		int pixelLightCount = GetAdditionalLightsCount();
-		for (int j = 0; j < pixelLightCount; ++j) {
-			Light light = GetAdditionalLight(j, i.worldPos, half4(1, 1, 1, 1));
-			float3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation);
-			extraLights += attenuatedLightColor;
-		}
-	#endif
-		float4 baseColor = lerp(_BottomColor, _TopColor, saturate(i.uv.y)) * float4(i.diffuseColor, 1);
+		// Keep the original stylized response (no NdotL/specular term).
+        // GetAdditionalLight supplies range AND spot-cone attenuation, plus shadows.
+        float3 extraLights = float3(0, 0, 0);
+    #if defined(_ADDITIONAL_LIGHTS) || defined(_ADDITIONAL_LIGHTS_VERTEX) || USE_CLUSTER_LIGHT_LOOP
+        // LIGHT_LOOP_BEGIN requires this exact variable name in Forward+.
+        InputData inputData = (InputData)0;
+        inputData.positionWS = i.worldPos;
+        inputData.normalWS = normalize(i.norm);
+        inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(i.worldPos);
+        inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(i.pos);
+
+        // Clustered punctual-light lists exclude additional directional lights.
+        #if USE_CLUSTER_LIGHT_LOOP
+        UNITY_LOOP for (uint lightIndex = 0u;
+            lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS);
+            ++lightIndex)
+        {
+            CLUSTER_LIGHT_LOOP_SUBTRACTIVE_LIGHT_CHECK
+            Light light = GetAdditionalLight(lightIndex, inputData.positionWS, half4(1, 1, 1, 1));
+            extraLights += light.color * (light.distanceAttenuation * light.shadowAttenuation);
+        }
+        #endif
+
+        // Zero in Forward+: the macro traverses the pixel's cluster instead.
+        // Forward retains the original per-object light list and count.
+        uint pixelLightCount = GetAdditionalLightsCount();
+        LIGHT_LOOP_BEGIN(pixelLightCount)
+            Light light = GetAdditionalLight(lightIndex, inputData.positionWS, half4(1, 1, 1, 1));
+            extraLights += light.color * (light.distanceAttenuation * light.shadowAttenuation);
+        LIGHT_LOOP_END
+    #endif
+        float4 baseColor = lerp(_BottomColor, _TopColor, saturate(i.uv.y)) * float4(i.diffuseColor, 1);
 
 		// calculate diffuse lighting: main directional light (with shadow) + additional lights modulated with base color
 		float3 totalLight = mainLight.color * shadow + extraLights;

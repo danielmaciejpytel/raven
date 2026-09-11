@@ -179,8 +179,8 @@ Shader "SNB_Nature/SNB_Foliage"
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
 
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+			#pragma multi_compile _ _CLUSTER_LIGHT_LOOP
 			#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile _ _SHADOWS_SOFT
@@ -546,7 +546,9 @@ Shader "SNB_Nature/SNB_Foliage"
 					clip(Alpha - AlphaClipThreshold);
 				#endif
 
-				InputData inputData;
+				InputData inputData = (InputData)0;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(IN.clipPos);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(IN.lightmapUVOrVertexSH.xy);
 				inputData.positionWS = WorldPosition;
 				inputData.viewDirectionWS = WorldViewDirection;
 				inputData.shadowCoord = ShadowCoords;
@@ -599,18 +601,29 @@ Shader "SNB_Nature/SNB_Foliage"
 					half3 mainTransmission = max(0 , -dot(inputData.normalWS, mainLight.direction)) * mainAtten * Transmission;
 					color.rgb += Albedo * mainTransmission;
 
-					#ifdef _ADDITIONAL_LIGHTS
-						int transPixelLightCount = GetAdditionalLightsCount();
-						for (int i = 0; i < transPixelLightCount; ++i)
-						{
-							Light light = GetAdditionalLight(i, inputData.positionWS);
+                    #if defined(_ADDITIONAL_LIGHTS) || USE_CLUSTER_LIGHT_LOOP
+                        #if USE_CLUSTER_LIGHT_LOOP
+                        UNITY_LOOP for (uint lightIndex = 0u; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); ++lightIndex)
+                        {
+                            CLUSTER_LIGHT_LOOP_SUBTRACTIVE_LIGHT_CHECK
+							Light light = GetAdditionalLight(lightIndex, inputData.positionWS, inputData.shadowMask);
 							float3 atten = light.color * light.distanceAttenuation;
 							atten = lerp( atten, atten * light.shadowAttenuation, shadow );
 
 							half3 transmission = max(0 , -dot(inputData.normalWS, light.direction)) * atten * Transmission;
 							color.rgb += Albedo * transmission;
-						}
-					#endif
+                        }
+                        #endif
+                        uint transPixelLightCount = GetAdditionalLightsCount();
+                        LIGHT_LOOP_BEGIN(transPixelLightCount)
+							Light light = GetAdditionalLight(lightIndex, inputData.positionWS, inputData.shadowMask);
+							float3 atten = light.color * light.distanceAttenuation;
+							atten = lerp( atten, atten * light.shadowAttenuation, shadow );
+
+							half3 transmission = max(0 , -dot(inputData.normalWS, light.direction)) * atten * Transmission;
+							color.rgb += Albedo * transmission;
+                        LIGHT_LOOP_END
+                    #endif
 				}
 				#endif
 
@@ -632,11 +645,12 @@ Shader "SNB_Nature/SNB_Foliage"
 					half3 mainTranslucency = mainAtten * ( mainVdotL * direct + inputData.bakedGI * ambient ) * Translucency;
 					color.rgb += Albedo * mainTranslucency * strength;
 
-					#ifdef _ADDITIONAL_LIGHTS
-						int transPixelLightCount = GetAdditionalLightsCount();
-						for (int i = 0; i < transPixelLightCount; ++i)
-						{
-							Light light = GetAdditionalLight(i, inputData.positionWS);
+                    #if defined(_ADDITIONAL_LIGHTS) || USE_CLUSTER_LIGHT_LOOP
+                        #if USE_CLUSTER_LIGHT_LOOP
+                        UNITY_LOOP for (uint lightIndex = 0u; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); ++lightIndex)
+                        {
+                            CLUSTER_LIGHT_LOOP_SUBTRACTIVE_LIGHT_CHECK
+							Light light = GetAdditionalLight(lightIndex, inputData.positionWS, inputData.shadowMask);
 							float3 atten = light.color * light.distanceAttenuation;
 							atten = lerp( atten, atten * light.shadowAttenuation, shadow );
 
@@ -644,8 +658,20 @@ Shader "SNB_Nature/SNB_Foliage"
 							half VdotL = pow( saturate( dot( inputData.viewDirectionWS, -lightDir ) ), scattering );
 							half3 translucency = atten * ( VdotL * direct + inputData.bakedGI * ambient ) * Translucency;
 							color.rgb += Albedo * translucency * strength;
-						}
-					#endif
+                        }
+                        #endif
+                        uint transPixelLightCount = GetAdditionalLightsCount();
+                        LIGHT_LOOP_BEGIN(transPixelLightCount)
+							Light light = GetAdditionalLight(lightIndex, inputData.positionWS, inputData.shadowMask);
+							float3 atten = light.color * light.distanceAttenuation;
+							atten = lerp( atten, atten * light.shadowAttenuation, shadow );
+
+							half3 lightDir = light.direction + inputData.normalWS * normal;
+							half VdotL = pow( saturate( dot( inputData.viewDirectionWS, -lightDir ) ), scattering );
+							half3 translucency = atten * ( VdotL * direct + inputData.bakedGI * ambient ) * Translucency;
+							color.rgb += Albedo * translucency * strength;
+                        LIGHT_LOOP_END
+                    #endif
 				}
 				#endif
 

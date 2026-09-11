@@ -159,45 +159,17 @@ float3 SpecularReflection(Light light, float3 viewDirectionWS, float3 geometryNo
 	return specColor;
 }
 
-//Based on UniversalFragmentBlinnPhong (no BRDF)
-float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Light mainLight, InputData inputData, WaterSurface water, TranslucencyData translucencyData, float shadowStrength, float vFace)
+// Share the existing water response between clustered directionals and punctual lights.
+#if defined(LIT) && (defined(_ADDITIONAL_LIGHTS) || USE_CLUSTER_LIGHT_LOOP)
+void AccumulateAdditionalWaterLight(Light light, InputData inputData, WaterSurface water,
+    TranslucencyData translucencyData, float shadowStrength, float vFace, bool directionalLight,
+    inout SurfaceData surfaceData, inout half3 diffuseColor, inout float causticsAttentuation)
 {
-	ApplyTranslucency(translucencyData, surfaceData.emission.rgb);
-
-	#if _CAUSTICS
-	float causticsAttentuation = 1.0;
-	#endif
-	
-#ifdef LIT
-	#if _CAUSTICS && !defined(LIGHTMAP_ON)
-	causticsAttentuation = GetLightIntensity(mainLight) * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
-	#endif
-	
-	//Allow shadow strength to be overridden.
-	AdjustShadowStrength(mainLight, shadowStrength, vFace);
-	
-	half3 attenuatedLightColor = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
-
-	MixRealtimeAndBakedGI(mainLight, water.diffuseNormal, inputData.bakedGI, shadowStrength.xxxx);
-
-	/*
-	//PBR shading
-	BRDFData brdfData;
-	InitializeBRDFData(surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.alpha, brdfData);
-
-	half3 diffuseColor = GlobalIllumination(brdfData, inputData.bakedGI, shadowStrength, inputData.water.diffuseNormal, inputData.viewDirectionWS);
-	diffuseColor += LightingPhysicallyBased(brdfData, mainLight, water.diffuseNormal, inputData.viewDirectionWS);
-	*/
-
-	half3 diffuseColor = inputData.bakedGI + LightingLambert(attenuatedLightColor, mainLight.direction, water.diffuseNormal);
-	
-#if _ADDITIONAL_LIGHTS //Per pixel lights
 	#ifndef _SPECULARHIGHLIGHTS_OFF
 	half specularPower = (_PointSpotLightReflectionSize * SPECULAR_POWER_RCP);
 	specularPower = lerp(8.0, 1.0, _PointSpotLightReflectionSize) * _PointSpotLightReflectionStrength;
 	#endif
 	
-	uint pixelLightCount = GetAdditionalLightsCount();
 	#if _LIGHT_LAYERS && UNITY_VERSION >= 202220
 	uint meshRenderingLayers = GetMeshRenderingLayer();
 	#endif
@@ -207,12 +179,6 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 	float translucencyExp = translucencyData.exponent;
 	#endif
 	
-	LIGHT_LOOP_BEGIN(pixelLightCount)
-		#if UNITY_VERSION >= 202110 //URP 11+
-		Light light = GetAdditionalLight(lightIndex, inputData.positionWS, shadowStrength.xxxx);	
-		#else
-		Light light = GetAdditionalLight(lightIndex, inputData.positionWS);
-		#endif
 
 		#if _LIGHT_LAYERS && UNITY_VERSION >= 202220
 		if (IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
@@ -226,7 +192,7 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 			
 			#if _TRANSLUCENCY
 			//Keep settings from main light pass, but override these
-			translucencyData.directionalLight = false;
+			translucencyData.directionalLight = directionalLight;
 			if(water.vFace > 0)
 			{
 				translucencyData.lightDir = light.direction;
@@ -251,7 +217,55 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 			surfaceData.specular += SpecularReflection(light, normalize(GetWorldSpaceViewDir(inputData.positionWS)), water.waveNormal, water.tangentWorldNormal, _PointSpotLightReflectionDistortion, lerp(4096, 64, _PointSpotLightReflectionSize), specularPower);
 		#endif
 	}
-	LIGHT_LOOP_END
+}
+#endif
+
+//Based on UniversalFragmentBlinnPhong (no BRDF)
+float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Light mainLight, InputData inputData, WaterSurface water, TranslucencyData translucencyData, float shadowStrength, float vFace)
+{
+	ApplyTranslucency(translucencyData, surfaceData.emission.rgb);
+
+	float causticsAttentuation = 1.0;
+
+#ifdef LIT
+	#if _CAUSTICS && !defined(LIGHTMAP_ON)
+	causticsAttentuation = GetLightIntensity(mainLight) * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
+	#endif
+
+	//Allow shadow strength to be overridden.
+	AdjustShadowStrength(mainLight, shadowStrength, vFace);
+
+	half3 attenuatedLightColor = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
+
+	MixRealtimeAndBakedGI(mainLight, water.diffuseNormal, inputData.bakedGI, shadowStrength.xxxx);
+
+	/*
+	//PBR shading
+	BRDFData brdfData;
+	InitializeBRDFData(surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.alpha, brdfData);
+
+	half3 diffuseColor = GlobalIllumination(brdfData, inputData.bakedGI, shadowStrength, inputData.water.diffuseNormal, inputData.viewDirectionWS);
+	diffuseColor += LightingPhysicallyBased(brdfData, mainLight, water.diffuseNormal, inputData.viewDirectionWS);
+	*/
+
+	half3 diffuseColor = inputData.bakedGI + LightingLambert(attenuatedLightColor, mainLight.direction, water.diffuseNormal);
+
+#if defined(_ADDITIONAL_LIGHTS) || USE_CLUSTER_LIGHT_LOOP
+    #if USE_CLUSTER_LIGHT_LOOP
+    UNITY_LOOP for (uint lightIndex = 0u; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); ++lightIndex)
+    {
+        CLUSTER_LIGHT_LOOP_SUBTRACTIVE_LIGHT_CHECK
+        Light light = GetAdditionalLight(lightIndex, inputData.positionWS, shadowStrength.xxxx);
+        AccumulateAdditionalWaterLight(light, inputData, water, translucencyData, shadowStrength,
+            vFace, true, surfaceData, diffuseColor, causticsAttentuation);
+    }
+    #endif
+    uint pixelLightCount = GetAdditionalLightsCount();
+    LIGHT_LOOP_BEGIN(pixelLightCount)
+        Light light = GetAdditionalLight(lightIndex, inputData.positionWS, shadowStrength.xxxx);
+        AccumulateAdditionalWaterLight(light, inputData, water, translucencyData, shadowStrength,
+            vFace, false, surfaceData, diffuseColor, causticsAttentuation);
+    LIGHT_LOOP_END
 #endif
 
 #ifdef _ADDITIONAL_LIGHTS_VERTEX //Previous calculated in vertex stage
