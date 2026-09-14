@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Raven.Enemy;
 using UnityEngine;
 
@@ -13,6 +11,7 @@ namespace Raven.Puzzle
 
         private Collider _collider;
         private Explode _explode;
+        private bool _exploded;
 
         private void Awake()
         {
@@ -23,8 +22,9 @@ namespace Raven.Puzzle
 
         private void OnTriggerEnter(Collider p_other)
         {
-            if (p_other.tag == "Bullet" || p_other.tag == "FireBullet")
+            if (!_exploded && (p_other.CompareTag("Bullet") || p_other.CompareTag("FireBullet")))
             {
+                _exploded = true;
                 _explode.ExplodeBehaviour();
 
                 for (int i = 0; i < _destroyable.Length; i++)

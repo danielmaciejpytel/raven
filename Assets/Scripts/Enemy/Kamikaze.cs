@@ -22,10 +22,12 @@ namespace Raven.Enemy
         private float _timer;
         private List<Vector3> _gfxTarget = new List<Vector3>();
         private Vector3 _currentGfxTarget;
+        private readonly Vector3 _gfxRestPosition;
         private int _lastIndex = 0;
         private bool _dodge;
         private float _chargeTimer;
         private bool _charge = true;
+        private bool _charging;
         private AudioManager _audioManager;
         private AudioClipConditions[] _audioClipConditions;
         private AudioSource[] _audioSource;
@@ -44,9 +46,10 @@ namespace Raven.Enemy
             _playerTransform = p_player;
             _navMesh.speed = _enemyConfig.MoveSpeed;
 
-            _gfxTarget.Add(new Vector3(-0.00754f, 0.00151f, 0));
-            _gfxTarget.Add(new Vector3(0.00754f, 0.00151f, 0));
-            _gfxTarget.Add(new Vector3(0, 0.00151f, 0));
+            _gfxRestPosition = _gfxTransform.localPosition;
+            _gfxTarget.Add(_gfxRestPosition + new Vector3(-0.00754f, 0f, 0f));
+            _gfxTarget.Add(_gfxRestPosition + new Vector3(0.00754f, 0f, 0f));
+            _gfxTarget.Add(_gfxRestPosition);
             _currentGfxTarget = _gfxTarget[0];
 
             _coroutinesManager.StartCoroutine(DodgeWaitCoroutine(), _enemy);
@@ -54,14 +57,21 @@ namespace Raven.Enemy
 
         public void Behaviour()
         {
+            if (Time.deltaTime <= 0f || _playerTransform == null || !_navMesh.isActiveAndEnabled || !_navMesh.isOnNavMesh) return;
+
             float distance = Vector3.Distance(_enemy.transform.position, _playerTransform.position);
             Vector3 lookAtVector3 = _playerTransform.position;
             lookAtVector3.y += 1.62f;
 
             _gfxTransform.LookAt(lookAtVector3);
 
-            if (distance > _enemyConfig.ChargeDistance || (distance <= _enemyConfig.ChargeDistance && !_charge))
+            if (_charging)
             {
+                Charge();
+            }
+            else if (distance > _enemyConfig.ChargeDistance || !_charge)
+            {
+                _navMesh.isStopped = false;
                 _navMesh.SetDestination(_playerTransform.position);
 
                 if (_dodge)
@@ -71,10 +81,10 @@ namespace Raven.Enemy
             }
             else
             {
-                if (_charge)
-                {
-                    Charge();
-                }
+                _charging = true;
+                _navMesh.ResetPath();
+                _navMesh.isStopped = true;
+                Charge();
             }
         }
 
@@ -117,8 +127,11 @@ namespace Raven.Enemy
 
             if (_chargeTimer < _enemyConfig.ChargeTime)
             {
-                _chargeTimer += Time.deltaTime;
-                _gfxTransform.position += _gfxTransform.forward * _enemyConfig.MoveSpeed * _enemyConfig.ChargeSpeedModifier * Time.deltaTime;
+                float stepTime = Mathf.Min(Time.deltaTime, _enemyConfig.ChargeTime - _chargeTimer);
+                _chargeTimer += stepTime;
+                Vector3 direction = _gfxTransform.forward;
+                direction.y = 0f;
+                _navMesh.Move(direction.normalized * _enemyConfig.MoveSpeed * _enemyConfig.ChargeSpeedModifier * stepTime);
             }
             else
             {
@@ -127,16 +140,12 @@ namespace Raven.Enemy
                     _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Idle), source);
                 }
                 _charge = false;
+                _charging = false;
                 _chargeTimer = 0;
-                GfxReturnPosition();
+                _gfxTransform.localPosition = _gfxRestPosition;
+                _navMesh.isStopped = false;
                 _coroutinesManager.StartCoroutine(ChargeWaitCoroutine(), _enemy);
             }
-        }
-
-        private void GfxReturnPosition()
-        {
-            _enemy.transform.position = _gfxTransform.position;
-            _gfxTransform.position = _gfxTarget[_gfxTarget.Count - 1];
         }
 
         private IEnumerator DodgeWaitCoroutine()

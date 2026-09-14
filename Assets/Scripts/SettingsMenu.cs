@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.UI;
 
 public class SettingsMenu : MonoBehaviour
 {
@@ -15,35 +13,41 @@ public class SettingsMenu : MonoBehaviour
     {
         resolutions = Screen.resolutions;
 
+        if (resolutionDropdown == null) return;
+
         resolutionDropdown.ClearOptions();
 
         List<string> options = new List<string>();
 
         int currentResolutionIndex = 0;
 
+        double bestRefreshDifference = double.MaxValue;
         for (int i = 0; i < resolutions.Length; i++)
         {
-            // Przeliczamy refreshRate na Hz, dzieląc przez 1000, a potem zaokrąglamy
-            int refreshRate = Mathf.RoundToInt(resolutions[i].refreshRateRatio.numerator / 1000f);
+            int refreshRate = Mathf.RoundToInt((float)resolutions[i].refreshRateRatio.value);
 
             string option = resolutions[i].width + " x " + resolutions[i].height + " / " + refreshRate + "Hz";
             options.Add(option);
 
-            if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height)
+            double refreshDifference = System.Math.Abs(resolutions[i].refreshRateRatio.value - Screen.currentResolution.refreshRateRatio.value);
+            if (resolutions[i].width == Screen.width && resolutions[i].height == Screen.height && refreshDifference < bestRefreshDifference)
             {
                 currentResolutionIndex = i;
+                bestRefreshDifference = refreshDifference;
             }
         }
 
         resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = currentResolutionIndex;
+        resolutionDropdown.interactable = resolutions.Length > 0;
+        resolutionDropdown.SetValueWithoutNotify(currentResolutionIndex);
         resolutionDropdown.RefreshShownValue();
     }
 
     public void SetResolution(int resolutionIndex)
     {
+        if (resolutions == null || resolutionIndex < 0 || resolutionIndex >= resolutions.Length) return;
         Resolution resolution = resolutions[resolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode, resolution.refreshRateRatio);
     }
 
     public void SetVolume(float volume)

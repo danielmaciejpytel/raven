@@ -1,14 +1,12 @@
 using Raven.Input;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-using TMPro;
 
 public class PauseEndPanel : MonoBehaviour
 {
     [SerializeField] private GameObject _coreText;
     [SerializeField] private GameObject _pauseText;
+    [UnityEngine.Serialization.FormerlySerializedAs("_reastartButton")]
     [SerializeField] private GameObject _resumeButton;
     [SerializeField] private GameObject _menu;
     [SerializeField] private GameObject _HUD;
@@ -19,6 +17,11 @@ public class PauseEndPanel : MonoBehaviour
     private Animator _animator;
 
     private bool _panelActive;
+    private bool _ownsPause;
+    private bool _hudWasActive;
+    private bool _cursorWasVisible;
+    private CursorLockMode _previousCursorLock;
+    private float _previousTimeScale = 1f;
 
     [Inject]
     public void Construct(InputManager p_inputManager)
@@ -46,7 +49,7 @@ public class PauseEndPanel : MonoBehaviour
         {
             if (!_panelActive)
             {
-                if (_menuCamera == null || !_menuCamera.activeSelf)
+                if (_inputManager.GameplayInputEnabled && (_menuCamera == null || !_menuCamera.activeSelf))
                 {
                     PauseGame();
                 }
@@ -60,6 +63,14 @@ public class PauseEndPanel : MonoBehaviour
 
     public void PauseGame()
     {
+        if (_panelActive) return;
+
+        ResetSubmenus();
+        _previousTimeScale = Time.timeScale;
+        _ownsPause = true;
+        _hudWasActive = _HUD != null && _HUD.activeSelf;
+        _cursorWasVisible = Cursor.visible;
+        _previousCursorLock = Cursor.lockState;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
@@ -77,11 +88,33 @@ public class PauseEndPanel : MonoBehaviour
 
     public void BUTTON_Resume() // Wznowienie gry
     {
-        Time.timeScale = 1;
+        RestorePause();
+    }
 
-        // Ukrywamy i blokujemy kursor po wznowieniu gry
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+    private void ResetSubmenus()
+    {
+        foreach (var settings in GetComponentsInChildren<SettingsMenu>(true))
+        {
+            foreach (var dropdown in settings.GetComponentsInChildren<TMPro.TMP_Dropdown>(true))
+                dropdown.Hide();
+            settings.gameObject.SetActive(false);
+        }
+        if (UnityEngine.EventSystems.EventSystem.current != null)
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    private void OnDisable()
+    {
+        RestorePause();
+    }
+
+    private void RestorePause()
+    {
+        if (!_ownsPause) return;
+        _ownsPause = false;
+        Time.timeScale = _previousTimeScale;
+        Cursor.lockState = _previousCursorLock;
+        Cursor.visible = _cursorWasVisible;
 
         if (_canvasGroup != null)
         {
@@ -91,7 +124,7 @@ public class PauseEndPanel : MonoBehaviour
         }
         if (_pauseText != null) _pauseText.SetActive(false);
         _panelActive = false;
-        if (_HUD != null) _HUD.SetActive(true);
+        if (_HUD != null) _HUD.SetActive(_hudWasActive);
     }
 
     public void BUTTON_Exit()
@@ -101,6 +134,8 @@ public class PauseEndPanel : MonoBehaviour
 
     public void SetCoreTextActive()
     {
+        if (_panelActive) return;
+        if (_inputManager != null) _inputManager.CanInput = false;
         _animator.enabled = true;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;

@@ -7,7 +7,6 @@ using Raven.Player;
 using UnityEngine;
 using UnityEngine.AI;
 using Zenject;
-using System.Collections.Generic;
 
 namespace Raven.Manager
 {
@@ -28,7 +27,7 @@ namespace Raven.Manager
         [Space]
         [SerializeField, BoxGroup("-----Audio-----")] private AudioClipConditions[] _audioClips;
 
-        private bool _isShooter => _enemyConfig.EnemyType == EnemyType.Shooter;
+        private bool _isShooter => _enemyConfig != null && _enemyConfig.EnemyType == EnemyType.Shooter;
 
         private AudioManager _audioManager;
         private Transform _player;
@@ -39,6 +38,7 @@ namespace Raven.Manager
         private float _currentHealth;
         private float _changeColorTimer = 0;
         private bool _changeColor;
+        private Collider[] _activationHits = new Collider[16];
 
         [SerializeField] private AudioSource[] _audioSource;
 
@@ -75,32 +75,36 @@ namespace Raven.Manager
                     break;
             }
 
-            if (_changeColor)
-            {
-                TakeDameageChangeColorTimer();
-            }
         }
 
         private void Update()
         {
+            if (_currentHealth <= 0f || Time.deltaTime <= 0f) return;
+
+            if (_changeColor)
+            {
+                TakeDameageChangeColorTimer();
+            }
+
             if (_active)
             {
                 _enemyBehaviour.Behaviour();
                 return;
             }
 
-            Collider[] hit = Physics.OverlapSphere(_enemyGfxTransform.position, _activateRadius, _whatCanSee);
+            int hitCount = PhysicsQueries.OverlapSphere(_enemyGfxTransform.position, _activateRadius, ref _activationHits, _whatCanSee, QueryTriggerInteraction.Ignore);
 
-            if (hit == null || hit.Length == 0)
+            if (hitCount == 0)
             {
                 return;
             }
 
-            for (int i = 0; i < hit.Length; i++)
+            for (int i = 0; i < hitCount; i++)
             {
-                if (hit[i] != null && hit[i].CompareTag("Player"))
+                Collider hit = _activationHits[i];
+                if (hit != null && (hit.transform == _player || hit.transform.IsChildOf(_player)))
                 {
-                    Vector3 povDir = hit[i].transform.position - _enemyGfxTransform.position;
+                    Vector3 povDir = hit.transform.position - _enemyGfxTransform.position;
 
                     if (Vector3.Angle(povDir, _enemyGfxTransform.forward) <= _activateAngle / 2)
                     {
@@ -113,7 +117,7 @@ namespace Raven.Manager
 
         public void TakeDamage(float p_value)
         {
-            if (_currentHealth <= 0)
+            if (_currentHealth <= 0 || p_value <= 0f)
             {
                 return;
             }
@@ -149,6 +153,12 @@ namespace Raven.Manager
 
         private void TakeDameageChangeColorTimer()
         {
+            if (_gfxSkinnedMesh == null)
+            {
+                _changeColor = false;
+                return;
+            }
+
             _gfxSkinnedMesh.material.color = Color.red;
             _changeColorTimer += Time.deltaTime;
 
@@ -156,6 +166,14 @@ namespace Raven.Manager
             {
                 _gfxSkinnedMesh.material.color = Color.white;
                 _changeColor = false;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (_coroutinesManager != null)
+            {
+                _coroutinesManager.StopAllCoroutines(gameObject);
             }
         }
 

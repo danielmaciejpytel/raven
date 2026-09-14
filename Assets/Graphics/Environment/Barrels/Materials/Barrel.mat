@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: barrel
+  m_Name: Barrel
   m_Shader: {fileID: -6465566751694194690, guid: 983df4ae08d2b8e4b8b851719366d15b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -109,7 +109,7 @@ Material:
     m_Ints: []
     m_Floats:
     - Vector1_8ccf55bc95274fa187ef03a2395563fd: 18.5
-    - Vector1_97adbfa3a5274559b16844f6e57db8a9: 0.275
+    - Vector1_97adbfa3a5274559b16844f6e57db8a9: 0
     - Vector1_dc78599a53ab433db82632a6c7115339: 1
     - Vector1_e44338b922284e49997412378b32664d: 0.25
     - _AlphaClip: 0

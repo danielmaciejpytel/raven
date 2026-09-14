@@ -84,6 +84,9 @@ Shader "KriptoFX/RFX4/Distortion"
 
 
 				sampler2D _CameraOpaqueTexture;
+                sampler2D _RavenAfterSSGITexture;
+                float4 _RavenAfterSSGITexture_TexelSize;
+                float _RavenAfterSSGIReady;
 				sampler2D _MainTex;
 				sampler2D _NormalTex;
 				float4 _NormalTex_ST;
@@ -256,7 +259,7 @@ Shader "KriptoFX/RFX4/Distortion"
 					o.viewDir = normalize(ObjSpaceViewDir(v.vertex));
 	#else
 					o.fresnel = (_FresnelInvert - abs(dot(normalize(v.normal), normalize(ObjSpaceViewDir(v.vertex)))));
-					o.fresnel = pow(o.fresnel, _FresnelPow);
+						o.fresnel = pow(saturate(o.fresnel), _FresnelPow);
 					o.fresnel = saturate(_FresnelR0 + (1.0 - _FresnelR0) * o.fresnel);
 	#endif
 	#endif
@@ -298,7 +301,8 @@ Shader "KriptoFX/RFX4/Distortion"
 
 #endif
 
-				half2 offset = dist.rg * UNITY_ACCESS_INSTANCED_PROP(_Distortion_arr, _Distortion) * _CameraOpaqueTexture_TexelSize.xy * i.color.a * fade;
+				float2 sceneTexelSize = _RavenAfterSSGIReady > 0.5 ? _RavenAfterSSGITexture_TexelSize.xy : _CameraOpaqueTexture_TexelSize.xy;
+                half2 offset = dist.rg * UNITY_ACCESS_INSTANCED_PROP(_Distortion_arr, _Distortion) * sceneTexelSize * i.color.a * fade;
 
 				half3 fresnelCol = 0;
 	#ifdef USE_FRESNEL
@@ -310,12 +314,12 @@ Shader "KriptoFX/RFX4/Distortion"
 				half3 n = normalize(cross(ddx(i.localPos.xyz), -ddy(i.localPos.xyz) * _ProjectionParams.x));
 	#endif
 				half fresnel = (_FresnelInvert - dot(n, i.viewDir));
-				fresnel = pow(fresnel, _FresnelPow);
+					fresnel = pow(saturate(fresnel), _FresnelPow);
 				fresnel = saturate(_FresnelR0 + (1.0 - _FresnelR0) * fresnel);
-				offset += fresnel * _CameraOpaqueTexture_TexelSize.xy * _FresnelDistort * dist.rg;
+				offset += fresnel * sceneTexelSize * _FresnelDistort * dist.rg;
 				fresnelCol = _FresnelColor * fresnel * abs(dist.r + dist.g) * 2 * i.color.rgb * i.color.a;
 	#else
-				offset += i.fresnel * _CameraOpaqueTexture_TexelSize.xy * _FresnelDistort * dist.rg;
+				offset += i.fresnel * sceneTexelSize * _FresnelDistort * dist.rg;
 				fresnelCol = _FresnelColor * i.fresnel * abs(dist.r + dist.g) * 2 * i.color.rgb * i.color.a;
 	#endif
 
@@ -343,7 +347,7 @@ Shader "KriptoFX/RFX4/Distortion"
 	#endif
 
 				i.uvgrab.xy = offset * i.color.a + i.uvgrab.xy;
-				half4 grabColor = tex2Dproj(_CameraOpaqueTexture, UNITY_PROJ_COORD(i.uvgrab));;
+				half4 grabColor = _RavenAfterSSGIReady > 0.5 ? tex2Dproj(_RavenAfterSSGITexture, UNITY_PROJ_COORD(i.uvgrab)) : tex2Dproj(_CameraOpaqueTexture, UNITY_PROJ_COORD(i.uvgrab));
 
 				half4 result;
 				half4 mainCol = UNITY_ACCESS_INSTANCED_PROP(_MainColor_arr, _MainColor);

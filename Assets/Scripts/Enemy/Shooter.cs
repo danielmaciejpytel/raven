@@ -39,6 +39,8 @@ namespace Raven.Enemy
 
         public void Behaviour()
         {
+            if (Time.deltaTime <= 0f || _playerTransform == null) return;
+
             float distance = Vector3.Distance(_enemy.transform.position, _playerTransform.position);
             Vector3 lookAtVector3 = _playerTransform.position;
             lookAtVector3.y += 1.62f;
@@ -49,15 +51,16 @@ namespace Raven.Enemy
             {
                 _timer = float.MaxValue;
 
-                if (!_enemyConfig.IsStatic)
+                if (!_enemyConfig.IsStatic && _navMesh.isActiveAndEnabled && _navMesh.isOnNavMesh)
                 {
+                    _navMesh.isStopped = false;
                     _navMesh.speed = _enemyConfig.MoveSpeed;
                     _navMesh.SetDestination(_playerTransform.position);
                 }
             }
             else
             {
-                _navMesh.speed = 0;
+                if (_navMesh.isActiveAndEnabled && _navMesh.isOnNavMesh) _navMesh.isStopped = true;
                 Shoot();
             }
         }
@@ -78,7 +81,7 @@ namespace Raven.Enemy
                     _audioManager.PlaySound(_audioManager.GetCurrenAudioClipConditions(_audioClipConditions, AudioNames.Shoot), source);
                 }
                 var obj = Object.Instantiate(_enemyConfig.Bullet, _shootPoint.position, _shootPoint.rotation);
-                obj.GetComponent<Bullet>().Initialization(_enemyConfig.BulletSpeed, _playerDataManager, _enemyConfig, _gfxTransform.gameObject);
+                obj.GetComponent<Bullet>().Initialization(_enemyConfig.BulletSpeed, _playerDataManager, _enemyConfig, _enemy);
                 _timer = 0;
             }
         }

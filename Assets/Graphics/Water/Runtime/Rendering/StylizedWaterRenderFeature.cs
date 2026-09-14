@@ -1,6 +1,7 @@
-﻿#if URP
+#if URP
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace StylizedWater2
@@ -28,20 +29,16 @@ namespace StylizedWater2
         public DisplacementPrePass.Settings displacementPrePassSettings = new DisplacementPrePass.Settings();
         
         private SetupConstants constantsSetup;
+        #if UNITY_6000_0_OR_NEWER
+        private SetupConstants.ResetGraphConstants reset = new SetupConstants.ResetGraphConstants();
+        #endif
         private DisplacementPrePass displacementPass;
 
-        void OnEnable()
-        {
-            #if UNITY_6000_0_OR_NEWER && UNITY_EDITOR
-            if (PipelineUtilities.RenderGraphEnabled())
-            {
-                Debug.LogError($"[{this.name}] Render Graph is enabled but is not supported. Enable \"Compatibility Mode\" in your project's Graphics Settings as a workaround.");
-            }
-            #endif
-        }
-        
         public override void Create()
         {
+            constantsSetup?.Dispose();
+            displacementPass?.Dispose();
+
             constantsSetup = new SetupConstants
             {
                 renderPassEvent = RenderPassEvent.BeforeRendering
@@ -57,6 +54,13 @@ namespace StylizedWater2
         {
             constantsSetup.Setup(this);
             renderer.EnqueuePass(constantsSetup);
+            #if UNITY_6000_0_OR_NEWER
+            var renderGraphSettings = GraphicsSettings.GetRenderPipelineSettings<RenderGraphSettings>();
+            if (renderGraphSettings != null && !renderGraphSettings.enableRenderCompatibilityMode)
+            {
+                renderer.EnqueuePass(reset);
+            }
+            #endif
             
             if (displacementPrePassSettings.enable)
             {
@@ -65,10 +69,17 @@ namespace StylizedWater2
             }
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            displacementPass?.Dispose();
+            displacementPass = null;
+            constantsSetup?.Dispose();
+            constantsSetup = null;
+        }
+
         private void OnDestroy()
         {
-            displacementPass.Dispose();
-            constantsSetup.Dispose();
+            Dispose();
         }
     }
 }

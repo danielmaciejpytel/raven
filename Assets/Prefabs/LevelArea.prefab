@@ -1580,7 +1580,7 @@ GameObject:
   m_Component:
   - component: {fileID: 505760255512730078}
   m_Layer: 7
-  m_Name: Level Area
+  m_Name: LevelArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26796,7 +26796,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8932848422486758057, guid: 985099a533486f649b9699dec0124413, type: 3}
       propertyPath: m_Name
-      value: PalmBaby (5)
+      value: BabyPalm (5)
       objectReference: {fileID: 0}
     - target: {fileID: 8932848422486758057, guid: 985099a533486f649b9699dec0124413, type: 3}
       propertyPath: m_Layer
@@ -42075,7 +42075,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8932848422486758057, guid: 985099a533486f649b9699dec0124413, type: 3}
       propertyPath: m_Name
-      value: PalmBaby (1)
+      value: BabyPalm (1)
       objectReference: {fileID: 0}
     - target: {fileID: 8932848422486758057, guid: 985099a533486f649b9699dec0124413, type: 3}
       propertyPath: m_Layer
@@ -80511,7 +80511,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8932848422486758057, guid: 985099a533486f649b9699dec0124413, type: 3}
       propertyPath: m_Name
-      value: PalmBaby (2)
+      value: BabyPalm (2)
       objectReference: {fileID: 0}
     - target: {fileID: 8932848422486758057, guid: 985099a533486f649b9699dec0124413, type: 3}
       propertyPath: m_Layer

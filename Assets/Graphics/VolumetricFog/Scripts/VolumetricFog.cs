@@ -1,6 +1,5 @@
 //------------------------------------------------------------------------------------------------------------------
 // Volumetric Fog & Mist 2
-// Created by Kronnect
 //------------------------------------------------------------------------------------------------------------------
 
 using System.Collections.Generic;
@@ -93,18 +92,24 @@ namespace VolumetricFogAndMist2 {
         }
 
         private void OnDestroy() {
-            if (rtNoise != null) {
-                rtNoise.Release();
-            }
-            if (rtTurbulence != null) {
-                rtTurbulence.Release();
-            }
-            if (fogMat != null) {
-                DestroyImmediate(fogMat);
-                fogMat = null;
-            }
+            ReleaseOwnedTexture(ref rtNoise);
+            ReleaseOwnedTexture(ref rtTurbulence);
+            UnityEngine.Rendering.CoreUtils.Destroy(fogMat);
+            UnityEngine.Rendering.CoreUtils.Destroy(noiseMat);
+            UnityEngine.Rendering.CoreUtils.Destroy(turbulenceMat);
+            UnityEngine.Rendering.CoreUtils.Destroy(fogMat2D);
+            UnityEngine.Rendering.CoreUtils.Destroy(noiseMat2D);
+            UnityEngine.Rendering.CoreUtils.Destroy(turbulenceMat2D);
+            UnityEngine.Rendering.CoreUtils.Destroy(fogDebugMat);
             FogOfWarDestroy();
             DisposeSurfaceCapture();
+        }
+
+        static void ReleaseOwnedTexture(ref RenderTexture texture) {
+            if (texture == null) return;
+            texture.Release();
+            UnityEngine.Rendering.CoreUtils.Destroy(texture);
+            texture = null;
         }
 
         void OnDrawGizmosSelected() {
@@ -148,6 +153,7 @@ namespace VolumetricFogAndMist2 {
             fogMat.SetVector(ShaderParams.BoundsExtents, extents);
             fogMat.SetVector(ShaderParams.BoundsBorder, border);
             fogMat.SetFloat(ShaderParams.BoundsVerticalOffset, activeProfile.verticalOffset);
+            UpdateHeightMapMaterial();
 
             VolumetricFogManager globalManager = VolumetricFogManager.instance;
             Light sun = globalManager.sun;
@@ -215,6 +221,7 @@ namespace VolumetricFogAndMist2 {
             if (noiseTex == null) return;
 
             if (rtTurbulence == null || rtTurbulence.width != noiseTex.width) {
+                ReleaseOwnedTexture(ref rtTurbulence);
                 RenderTextureDescriptor desc = new RenderTextureDescriptor(noiseTex.width, noiseTex.height, RenderTextureFormat.ARGB32, 0);
                 rtTurbulence = new RenderTexture(desc);
                 rtTurbulence.wrapMode = TextureWrapMode.Repeat;
@@ -227,6 +234,7 @@ namespace VolumetricFogAndMist2 {
             Graphics.Blit(noiseTex, rtTurbulence, turbulenceMat);
 
             if (rtNoise == null || rtNoise.width != noiseTex.width) {
+                ReleaseOwnedTexture(ref rtNoise);
                 RenderTextureDescriptor desc = new RenderTextureDescriptor(noiseTex.width, noiseTex.height, RenderTextureFormat.ARGB32, 0);
                 rtNoise = new RenderTexture(desc);
                 rtNoise.wrapMode = TextureWrapMode.Repeat;
@@ -445,6 +453,7 @@ namespace VolumetricFogAndMist2 {
                 shaderKeywords.Add(ShaderParams.SKW_SURFACE);
             }
             fogMat.shaderKeywords = shaderKeywords.ToArray();
+            UpdateHeightMapMaterial();
         }
 
         /// <summary>

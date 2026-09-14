@@ -1,4 +1,4 @@
-﻿//Stylized Water 2
+//Stylized Water 2
 //Staggart Creations (http://staggart.xyz)
 //Copyright protected under Unity Asset Store EULA
 
@@ -33,13 +33,13 @@ namespace StylizedWater2
         //Handles correct behaviour when double-clicking a .watermesh asset assigned to a field
         //Otherwise the OS prompts to open it
         [UnityEditor.Callbacks.OnOpenAsset]
-        public static bool OnOpenAsset(int instanceID, int line)
+        public static bool OnOpenAsset(EntityId instanceID, int line)
         {
-            Object target = EditorUtility.InstanceIDToObject(instanceID);
+            Object target = EditorUtility.EntityIdToObject(instanceID);
 
             if (target is Mesh)
             {
-                var path = AssetDatabase.GetAssetPath(instanceID);
+                var path = AssetDatabase.GetAssetPath(target);
                 
                 if (Path.GetExtension(path) != "." + FILE_EXTENSION) return false;
 

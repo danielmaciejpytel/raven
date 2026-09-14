@@ -15,6 +15,7 @@ Shader "VolumetricFog2/VolumetricFog2DURP"
 		[HideInInspector] _RayMarchSettings("Raymarch Settings", Vector) = (2, 0.01, 1.0, 0.1)
 		[HideInInspector] _SunDir("Sun Direction", Vector) = (1,0,0)
 		[HideInInspector] _FogOfWar("Fog Of War", 2D) = "white" {}
+        [HideInInspector] _FogHeightMap("Local Height Map", 2D) = "black" {}
 		[HideInInspector] _BoundsCenter("Bounds Center", Vector) = (0,0,0)
 		[HideInInspector] _BoundsExtents("Bounds Size", Vector) = (0,0,0)
 		[HideInInspector] _BoundsBorder("Bounds Border", Vector) = (0,1,0)
@@ -44,6 +45,7 @@ Shader "VolumetricFog2/VolumetricFog2DURP"
 				#pragma multi_compile_local _ VF2_POINT_LIGHTS
 				#pragma multi_compile_local _ VF2_VOIDS
 				#pragma multi_compile_local _ VF2_FOW
+                #pragma multi_compile_local _ VF2_HEIGHT_MAP
 				#pragma multi_compile_local _ VF2_RECEIVE_SHADOWS
 				#pragma multi_compile_local _ VF2_DISTANCE
 				#pragma multi_compile_local V2F_SHAPE_BOX V2F_SHAPE_SPHERE

@@ -1,6 +1,5 @@
 //------------------------------------------------------------------------------------------------------------------
 // Volumetric Fog & Mist 2
-// Created by Kronnect
 //------------------------------------------------------------------------------------------------------------------
 using UnityEngine;
 using System.Collections.Generic;
@@ -12,7 +11,9 @@ namespace VolumetricFogAndMist2 {
     public enum MASK_TEXTURE_BRUSH_MODE {
         AddFog = 0,
         RemoveFog = 1,
-        ColorFog = 2
+        ColorFog = 2,
+        HeightFog = 3,
+        ResetHeight = 4
     }
 
 
@@ -103,12 +104,10 @@ namespace VolumetricFogAndMist2 {
             if (canDestroyFOWTexture) {
                 DestroyImmediate(_fogOfWarTexture);
             }
-            if (fowBlur1 != null) {
-                fowBlur1.Release();
-            }
-            if (fowBlur2 != null) {
-                fowBlur2.Release();
-            }
+            ReleaseOwnedTexture(ref fowBlur1);
+            ReleaseOwnedTexture(ref fowBlur2);
+            UnityEngine.Rendering.CoreUtils.Destroy(fowBlur);
+            fowBlur = null;
         }
 
         /// <summary>
@@ -224,12 +223,8 @@ namespace VolumetricFogAndMist2 {
 
 
         void CreateFoWBlurRTs() {
-            if (fowBlur1 != null) {
-                fowBlur1.Release();
-            }
-            if (fowBlur2 != null) {
-                fowBlur2.Release();
-            }
+            ReleaseOwnedTexture(ref fowBlur1);
+            ReleaseOwnedTexture(ref fowBlur2);
             RenderTextureDescriptor desc = new RenderTextureDescriptor(_fogOfWarTexture.width, _fogOfWarTexture.height, RenderTextureFormat.ARGB32, 0);
             fowBlur1 = new RenderTexture(desc);
             fowBlur2 = new RenderTexture(desc);

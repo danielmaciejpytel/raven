@@ -31,22 +31,11 @@ Shader "Custom/GeometryGrass"
 #pragma target 4.0
 #pragma require geometry
 #pragma geometry geom
+#pragma multi_compile_instancing
+#include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
 
 #define GrassSegments 5 // segments per blade
 #define GrassBlades 4 // blades per vertex
-
-#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
-
-
-#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-#pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
-#pragma multi_compile_fragment _ _SHADOWS_SOFT
-#pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
-#pragma multi_compile _ SHADOWS_SHADOWMASK
-#pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
-#pragma multi_compile_fog   
-#pragma multi_compile _ DIRLIGHTMAP_COMBINED
-#pragma multi_compile _ LIGHTMAP_ON
 
 		// The Core.hlsl file contains definitions of frequently used HLSL
 		// macros and functions, and also contains #include references to other
@@ -68,6 +57,7 @@ Shader "Custom/GeometryGrass"
 		float2 texcoord : TEXCOORD0;
 		float4 color : COLOR;
 		float4 tangent :TANGENT;
+		UNITY_VERTEX_INPUT_INSTANCE_ID
 	};
 
 	struct v2g
@@ -77,10 +67,16 @@ Shader "Custom/GeometryGrass"
 		float2 uv : TEXCOORD0;
 		float4 color : COLOR;
 		float4 tangent : TANGENT;
+		UNITY_VERTEX_INPUT_INSTANCE_ID
 
 
 	};
 
+	// Keep the same material buffer layout in every pass for the SRP Batcher.
+	CBUFFER_START(UnityPerMaterial)
+	float4 _TopColor;
+	float4 _BottomColor;
+	float _AmbientStrength;
 	half _GrassHeight;
 	half _GrassWidth;
 	half _WindSpeed;
@@ -93,16 +89,20 @@ Shader "Custom/GeometryGrass"
 	float _BladeCurve;
 
 	float _MinDist, _MaxDist;
+	CBUFFER_END
 
 	uniform float3 _PositionMoving;
+	float _RavenGrassBakedProbes;
     float3 _LightDirection;
     float3 _LightPosition;
 
 	v2g vert(Attributes v)
 	{
+		UNITY_SETUP_INSTANCE_ID(v);
 		float3 v0 = v.positionOS.xyz;
 
 		v2g OUT;
+		UNITY_TRANSFER_INSTANCE_ID(v, OUT);
 		OUT.pos = v.positionOS;
 		OUT.norm = v.normal;
 		OUT.uv = v.texcoord;
@@ -121,6 +121,7 @@ Shader "Custom/GeometryGrass"
 		float3 diffuseColor : COLOR;
 		float3 worldPos : TEXCOORD3;
 		float fogFactor : TEXCOORD5;
+		UNITY_VERTEX_INPUT_INSTANCE_ID
 
 	};
 
@@ -171,8 +172,9 @@ Shader "Custom/GeometryGrass"
 	}
 
 	// per new grass vertex
-	g2f GrassVertex(float3 vertexPos, float width, float height, float offset, float curve, float2 uv, float3x3 rotation, float3 faceNormal, float3 color) {
+	g2f GrassVertex(float3 vertexPos, float width, float height, float offset, float curve, float2 uv, float3x3 rotation, float3 faceNormal, float3 color, v2g seed) {
 		g2f OUT;
+		UNITY_TRANSFER_INSTANCE_ID(seed, OUT);
 		float3 offsetvertices = vertexPos + mul(rotation, float3(width, height, curve) + float3(0, 0, offset));
 
 
@@ -196,6 +198,8 @@ Shader "Custom/GeometryGrass"
 	[maxvertexcount(GrassBlades * (GrassSegments * 2 + 1))]
 	void geom(point v2g IN[1], inout TriangleStream<g2f> triStream)
 	{
+		// Geometry runs in a separate stage: restore this cell's instance transform.
+		UNITY_SETUP_INSTANCE_ID(IN[0]);
 		float forward = rand(IN[0].pos.yyz) * _BladeForward;
 		// just use an up facing normal, works nicest
 		float3 faceNormal = float3(0, 1, 0);
@@ -203,6 +207,9 @@ Shader "Custom/GeometryGrass"
 		// camera distance for culling 
 		float distanceFromCamera = distance(worldPos, _WorldSpaceCameraPos);
 		float distanceFade = 1 - saturate((distanceFromCamera - _MinDist) / max(_MaxDist - _MinDist, 0.001));
+        // Zero fade already emits no blades. Skip the remaining setup as well.
+        if (distanceFade <= 0.0)
+            return;
 		// wind
 		float3 v0 = IN[0].pos.xyz;
 		float3 wind1 = float3(sin(_Time.x * _WindSpeed + v0.x) + sin(_Time.x * _WindSpeed + v0.z * 2) + sin(_Time.x * _WindSpeed * 0.1 + v0.x), 0,
@@ -254,14 +261,14 @@ Shader "Custom/GeometryGrass"
 				float3 newPos = i == 0 ? v0 : v0 + ((float3(sphereDisp.x, sphereDisp.y, sphereDisp.z) + wind1) * t);
 
 				// every segment adds 2 new triangles
-				triStream.Append(GrassVertex(newPos, segmentWidth, segmentHeight, offset, segmentForward, float2(0, t), transformMatrix, faceNormal, color));
-				triStream.Append(GrassVertex(newPos, -segmentWidth, segmentHeight, offset, segmentForward, float2(1, t), transformMatrix, faceNormal, color));
+				triStream.Append(GrassVertex(newPos, segmentWidth, segmentHeight, offset, segmentForward, float2(0, t), transformMatrix, faceNormal, color, IN[0]));
+				triStream.Append(GrassVertex(newPos, -segmentWidth, segmentHeight, offset, segmentForward, float2(1, t), transformMatrix, faceNormal, color, IN[0]));
 
 
 
 			}
 			// Add just below the loop to insert the vertex at the tip of the blade.
-			triStream.Append(GrassVertex(v0 + float3(sphereDisp.x * 1.5, sphereDisp.y, sphereDisp.z * 1.5) + wind1, 0, grassHeight, offset, forward, float2(0.5, 1), transformationMatrix, faceNormal, color));
+			triStream.Append(GrassVertex(v0 + float3(sphereDisp.x * 1.5, sphereDisp.y, sphereDisp.z * 1.5) + wind1, 0, grassHeight, offset, forward, float2(0.5, 1), transformationMatrix, faceNormal, color, IN[0]));
 			// restart the strip to start another grass blade
 			triStream.RestartStrip();
 		}
@@ -281,16 +288,26 @@ Shader "Custom/GeometryGrass"
         Tags { "LightMode" = "UniversalForwardOnly" }
         HLSLPROGRAM
 
+        // Lighting variants are only needed by the forward pass.
+        #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+        #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+        #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+        #pragma multi_compile_fragment _ _LIGHT_LAYERS
+        #pragma multi_compile_fragment _ _SHADOWS_SOFT
+        #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+        #pragma multi_compile _ SHADOWS_SHADOWMASK
+        #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+        #pragma multi_compile_fog
+        #pragma multi_compile _ DIRLIGHTMAP_COMBINED
+        #pragma multi_compile _ LIGHTMAP_ON
+
         // URP 17.3 / Unity 6.3 replaces _FORWARD_PLUS with _CLUSTER_LIGHT_LOOP.
         #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
-
-	float4 _TopColor;
-	float4 _BottomColor;
-	float _AmbientStrength;
 
 	// The fragment shader definition.            
 	half4 frag(g2f i) : SV_Target
 	{
+		UNITY_SETUP_INSTANCE_ID(i);
 		#if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
         float4 shadowCoord = ComputeScreenPos(TransformWorldToHClip(i.worldPos));
 #else
@@ -322,6 +339,9 @@ Shader "Custom/GeometryGrass"
         {
             CLUSTER_LIGHT_LOOP_SUBTRACTIVE_LIGHT_CHECK
             Light light = GetAdditionalLight(lightIndex, inputData.positionWS, half4(1, 1, 1, 1));
+            #if defined(_LIGHT_LAYERS)
+            if (!IsMatchingLightLayer(light.layerMask, GetMeshRenderingLayer())) continue;
+            #endif
             extraLights += light.color * (light.distanceAttenuation * light.shadowAttenuation);
         }
         #endif
@@ -331,6 +351,9 @@ Shader "Custom/GeometryGrass"
         uint pixelLightCount = GetAdditionalLightsCount();
         LIGHT_LOOP_BEGIN(pixelLightCount)
             Light light = GetAdditionalLight(lightIndex, inputData.positionWS, half4(1, 1, 1, 1));
+            #if defined(_LIGHT_LAYERS)
+            if (!IsMatchingLightLayer(light.layerMask, GetMeshRenderingLayer())) continue;
+            #endif
             extraLights += light.color * (light.distanceAttenuation * light.shadowAttenuation);
         LIGHT_LOOP_END
     #endif
@@ -341,7 +364,11 @@ Shader "Custom/GeometryGrass"
 		float3 finalRgb = baseColor.rgb * totalLight;
 
 		// add ambient lighting
-		finalRgb += (unity_AmbientSky.rgb * _AmbientStrength) * baseColor.rgb;
+		// BlendProbes supplies baked SH per grass cell, including in DOTS instances.
+		float3 ambientLighting = unity_AmbientSky.rgb;
+		if (_RavenGrassBakedProbes > 0.5)
+			ambientLighting = SampleSH(normalize(i.norm));
+		finalRgb += (ambientLighting * _AmbientStrength) * baseColor.rgb;
 
 		// fog
 		float fogFactor = i.fogFactor;
@@ -362,8 +389,6 @@ Shader "Custom/GeometryGrass"
 		HLSLPROGRAM
 
 		#pragma multi_compile _ _CASTING_PUNCTUAL_LIGHT_SHADOW
-
-		#pragma shader_feature_local _ DISTANCE_DETAIL
 
 		half4 frag(g2f input) : SV_TARGET{
 			return 1;

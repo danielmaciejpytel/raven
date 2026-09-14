@@ -1,7 +1,6 @@
 using Raven.Input;
+using Raven.Manager;
 using Raven.Player;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -9,62 +8,40 @@ public class ResetPoint : MonoBehaviour
 {
     private InputManager _inputManager;
     private PlayerDataManager _playerDataManager;
-
-    [SerializeField] private int _damage = 10;
-    
-    private AudioSource _audiosource;
+    private PlayerMovementManager _playerMovementManager;
+    private AudioSource _audioSource;
 
     public Vector3 ResetPosition { get; set; }
-    public Quaternion ResetRotation { get; set; }
+    public Quaternion ResetRotation { get; set; } = Quaternion.identity;
     public Transform PlayerTransform { get; set; }
     public Animator ResetPanel { get; set; }
 
-    private bool _active;
-
-
     [Inject]
-    public void Construct(InputManager p_inputManager, PlayerDataManager p_playerDataManager)
+    public void Construct(InputManager inputManager, PlayerDataManager playerDataManager, PlayerMovementManager playerMovementManager)
     {
-        _inputManager = p_inputManager;
-        _playerDataManager = p_playerDataManager;
+        _inputManager = inputManager;
+        _playerDataManager = playerDataManager;
+        _playerMovementManager = playerMovementManager;
     }
 
-    private void Awake()
+    private void Start()
     {
-        _audiosource = GetComponent<AudioSource>();
+        _audioSource = GetComponent<AudioSource>();
+        if (PlayerTransform == null)
+        {
+            PlayerTransform = _playerMovementManager.PlayerTransform;
+            ResetPosition = PlayerTransform.position;
+            ResetRotation = PlayerTransform.rotation;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Player")
-        {
-            ResetPanel.SetTrigger("FadeIn");
-            _inputManager.CanInput = false;
-            _playerDataManager.TakeDamage(_damage);
-            if (_audiosource != null && _audiosource.enabled && _audiosource.gameObject.activeInHierarchy)
-            {
-                _audiosource.Play();
-            }
-            _active = true;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        _active = false;
-    }
-
-    private void Update()
-    {
-        if (PlayerTransform == null || !_active)
-        {
-            return;
-        }
-
-        if (ResetPanel.GetCurrentAnimatorStateInfo(0).IsTag("FadeOut"))
-        {
-            PlayerTransform.position = ResetPosition;
-            PlayerTransform.rotation = ResetRotation;
-        }
+        if (!_inputManager.GameplayInputEnabled) return;
+        Transform player = _playerMovementManager.PlayerTransform;
+        if (other.transform != player && !other.transform.IsChildOf(player)) return;
+        if (_audioSource != null && _audioSource.isActiveAndEnabled) _audioSource.Play();
+        _playerDataManager.SetCheckpoint(ResetPosition, ResetRotation);
+        _playerDataManager.LoseLife();
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NaughtyAttributes;
 using Raven.Input;
 using Raven.UI;
@@ -24,6 +25,9 @@ namespace Raven.Player
         private PlayerHudManager _playerHudManager; 
         private InputManager _inputManager;
         private bool _canTake;
+        private bool _collected;
+        private Camera _camera;
+        private readonly HashSet<Collider> _playerColliders = new HashSet<Collider>();
 
         public event Action<CollectibleName> OnUnlock;
 
@@ -34,46 +38,58 @@ namespace Raven.Player
             _playerStatesManager = p_playerStatesManager;
             _playerHudManager = p_playerHudManager;
 
-            _infoUiTransform.position = Camera.main.WorldToScreenPoint(_infoUiLockTransform.position);
+            _camera = Camera.main;
         }
 
         public void Update()
         {
-            if (_collectibleName != CollectibleName.AddHpEnergy)
+            if (_collected || !_canTake || !_inputManager.TakeButtonPressed()) return;
+
+            _collected = true;
+            if (_collectibleName == CollectibleName.AddHpEnergy)
             {
-                if (_canTake && _inputManager.TakeButtonPressed())
-                {
-                    _playerStatesManager.UnlockState(_collectibleName);
-                    OnUnlock?.Invoke(_collectibleName);
-                    Destroy(this.gameObject);
-                }
+                _playerHudManager.AddMaxHelthEnergy(_hpValue, _energyValue);
             }
             else
             {
-                if (_canTake && _inputManager.TakeButtonPressed())
-                {
-                    _playerHudManager.AddMaxHelthEnergy(_hpValue, _energyValue);
-                    Destroy(this.gameObject);
-                }
+                _playerStatesManager.UnlockState(_collectibleName);
+                OnUnlock?.Invoke(_collectibleName);
             }
+            Destroy(this.gameObject);
+        }
+
+        private void LateUpdate()
+        {
+            if (!_canTake || _infoUiTransform == null || _infoUiLockTransform == null) return;
+            if (_camera == null) _camera = Camera.main;
+            if (_camera != null) _infoUiTransform.position = _camera.WorldToScreenPoint(_infoUiLockTransform.position);
         }
 
         private void OnTriggerEnter(Collider p_collider)
         {
-            if (p_collider.tag == "Player")
+            CharacterController player = p_collider.GetComponentInParent<CharacterController>();
+            if (p_collider.CompareTag("Player") || (player != null && player.CompareTag("Player")))
             {
-                _canvas.SetActive(true);
+                _playerColliders.Add(p_collider);
+                if (_canvas != null) _canvas.SetActive(true);
                 _canTake = true;
             }
         }
 
         private void OnTriggerExit(Collider p_collider)
         {
-            if (p_collider.tag == "Player")
+            if (_playerColliders.Remove(p_collider) && _playerColliders.Count == 0)
             {
-                _canvas.SetActive(false);
+                if (_canvas != null) _canvas.SetActive(false);
                 _canTake = false;
             }
+        }
+
+        private void OnDisable()
+        {
+            _playerColliders.Clear();
+            _canTake = false;
+            if (_canvas != null) _canvas.SetActive(false);
         }
     }
 }

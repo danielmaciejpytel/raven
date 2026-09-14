@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: barrel_rings
+  m_Name: BarrelRings
   m_Shader: {fileID: -6465566751694194690, guid: 983df4ae08d2b8e4b8b851719366d15b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

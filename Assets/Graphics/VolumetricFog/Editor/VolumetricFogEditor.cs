@@ -50,6 +50,7 @@ namespace VolumetricFogAndMist2 {
             showBoundary = serializedObject.FindProperty("showBoundary");
 
             fog = (VolumetricFog)target;
+            Undo.undoRedoPerformed += OnHeightUndoRedo;
         }
 
 
@@ -66,6 +67,8 @@ namespace VolumetricFogAndMist2 {
 
             if (profile.objectReferenceValue != null) {
                 if (cachedProfile != profile.objectReferenceValue) {
+                    if (cachedProfileEditor != null) DestroyImmediate(cachedProfileEditor);
+                    cachedProfileEditor = null;
                     cachedProfile = null;
                 }
                 if (cachedProfile == null) {
@@ -78,6 +81,9 @@ namespace VolumetricFogAndMist2 {
                 cachedProfileEditor.OnInspectorGUI();
                 EditorGUILayout.EndVertical();
             } else {
+                if (cachedProfileEditor != null) DestroyImmediate(cachedProfileEditor);
+                cachedProfileEditor = null;
+                cachedProfile = null;
                 EditorGUILayout.HelpBox("Create or assign a fog profile.", MessageType.Info);
                 if (GUILayout.Button("New Fog Profile")) {
                     CreateFogProfile();
@@ -126,11 +132,20 @@ namespace VolumetricFogAndMist2 {
                 EditorGUILayout.PropertyField(fogOfWarRestoreDuration, new GUIContent("Restore Duration"));
                 EditorGUILayout.PropertyField(fogOfWarSmoothness, new GUIContent("Border Smoothness"));
                 EditorGUILayout.PropertyField(fogOfWarBlur, new GUIContent("Blur"));
+                DrawHeightControls();
 
                 EditorGUILayout.Separator();
                 EditorGUILayout.PropertyField(maskEditorEnabled, new GUIContent("Fog Of War Editor", "Activates terrain brush to paint/remove fog of war at custom locations."));
 
                 if (maskEditorEnabled.boolValue) {
+                    var sceneView = SceneView.lastActiveSceneView;
+                    if (sceneView != null && !sceneView.drawGizmos) {
+                        EditorGUILayout.HelpBox("Enable Scene View Gizmos to display and use the fog brush.", MessageType.Info);
+                        if (GUILayout.Button("Enable Scene View Gizmos")) {
+                            sceneView.drawGizmos = true;
+                            sceneView.Repaint();
+                        }
+                    }
                     if (GUILayout.Button("Create New Mask Texture")) {
                         if (EditorUtility.DisplayDialog("Create Mask Texture", "A texture asset will be created with the size specified in current profile (" + fog.fogOfWarTextureSize + "x" + fog.fogOfWarTextureSize + ").\n\nContinue?", "Ok", "Cancel")) {
                             CreateNewMaskTexture();
@@ -163,6 +178,18 @@ namespace VolumetricFogAndMist2 {
                         EditorGUILayout.EndHorizontal();
                         if (maskBrushMode.intValue == (int)MASK_TEXTURE_BRUSH_MODE.ColorFog) {
                             EditorGUILayout.PropertyField(maskBrushColor, new GUIContent("   Color", "Brush color."));
+                        }
+                        if (maskBrushMode.intValue == (int)MASK_TEXTURE_BRUSH_MODE.AddFog && fog.enableHeightMap) {
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty("maskBrushPaintHeight"), new GUIContent("   Paint Height Too"));
+                        }
+                        if (maskBrushMode.intValue == (int)MASK_TEXTURE_BRUSH_MODE.HeightFog ||
+                            (maskBrushMode.intValue == (int)MASK_TEXTURE_BRUSH_MODE.AddFog && serializedObject.FindProperty("maskBrushPaintHeight").boolValue)) {
+                            EditorGUILayout.Slider(serializedObject.FindProperty("maskBrushHeight"), 0.05f, 100f,
+                                new GUIContent("   Height (m)", "Target vertical reach of the fog above terrain."));
+                        }
+                        if (maskBrushMode.intValue >= (int)MASK_TEXTURE_BRUSH_MODE.HeightFog &&
+                            (!fog.enableHeightMap || fog.fogHeightMap == null)) {
+                            EditorGUILayout.HelpBox("Enable Local Fog Height and create a Height Map first.", MessageType.Warning);
                         }
                         EditorGUILayout.PropertyField(maskBrushWidth, new GUIContent("   Width", "Width of the snow editor brush."));
                         EditorGUILayout.PropertyField(maskBrushFuzziness, new GUIContent("   Fuzziness", "Solid vs spray brush."));

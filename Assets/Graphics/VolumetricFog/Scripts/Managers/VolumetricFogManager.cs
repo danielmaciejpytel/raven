@@ -10,7 +10,7 @@ namespace VolumetricFogAndMist2 {
 
         public string managerName {
             get {
-                return "Volumetric Fog Manager";
+                return "VolumetricFogManager";
             }
         }
 

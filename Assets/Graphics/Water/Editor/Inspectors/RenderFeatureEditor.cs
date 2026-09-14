@@ -1,4 +1,4 @@
-﻿#if URP
+#if URP
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -51,6 +51,9 @@ namespace StylizedWater2
             EditorGUILayout.Space();
             
             EditorGUILayout.PropertyField(displacementPrePassSettings);
+            #if UNITY_6000_0_OR_NEWER
+            if (displacementPrePassSettings.FindPropertyRelative("enable").boolValue && PipelineUtilities.RenderGraphEnabled()) EditorGUILayout.HelpBox("The optional displacement height prepass is not implemented for Render Graph. Directional Caustics and SSR work without it.", MessageType.Warning);
+            #endif
             if (displacementPrePassSettings.isExpanded)
             {
                 EditorGUILayout.HelpBox("This will pre-render all the water geometry's height (including any displacement effects) into a buffer. Allowing other shaders to access this information." +

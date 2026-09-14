@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Raven.Input
 {
@@ -10,9 +9,12 @@ namespace Raven.Input
 
         public bool CanInput;
 
+        public bool GameplayInputEnabled => CanInput && isActiveAndEnabled && Time.timeScale > 0f;
+        public bool IsPointerLook => _controls?.Player.CameraLook.activeControl?.device is Pointer;
+
         private void Awake()
         {
-            _controls = new Controls();
+            if (_controls == null) _controls = new Controls();
         }
 
         private void OnEnable()
@@ -22,7 +24,13 @@ namespace Raven.Input
 
         private void OnDisable()
         {
-            _controls.Disable();
+            _controls?.Disable();
+        }
+
+        private void OnDestroy()
+        {
+            _controls?.Dispose();
+            _controls = null;
         }
 
         public bool EscTrigerred()
@@ -32,7 +40,7 @@ namespace Raven.Input
 
         public Vector2 GetMovementAxis()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return Vector2.zero;
             }
@@ -42,7 +50,7 @@ namespace Raven.Input
 
         public Vector2 GetMouseDelta()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return Vector2.zero;
             }
@@ -52,7 +60,7 @@ namespace Raven.Input
 
         public bool DashButtonPressed()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return false;
             }
@@ -62,19 +70,17 @@ namespace Raven.Input
 
         public bool AimButtonHold()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return false;
             }
 
-            float x = _controls.Player.Aim.ReadValue<float>();
-
-            return x == 1;
+            return _controls.Player.Aim.IsPressed();
         }
 
         public bool ActiveStateButtonPressed()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return false;
             }
@@ -84,19 +90,17 @@ namespace Raven.Input
 
         public bool DashButtonHold()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return false;
             }
 
-            float x = _controls.Player.DashHold.ReadValue<float>();
-
-            return x == 1;
+            return _controls.Player.DashHold.IsPressed();
         }
 
         public bool ShootButtonPressed()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return false;
             }
@@ -106,7 +110,7 @@ namespace Raven.Input
 
         public bool TakeButtonPressed()
         {
-            if (!CanInput)
+            if (!GameplayInputEnabled)
             {
                 return false;
             }

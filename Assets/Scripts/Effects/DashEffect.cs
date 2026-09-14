@@ -19,20 +19,13 @@ namespace Raven.Player
         public void Update()
         {
             _timer += Time.deltaTime;
-            RaycastHit[] colliders = Physics.SphereCastAll(transform.position, _config.EffectRadius,transform.forward);
 
             if (_timer > _config.EffectTime)
             {
                 Destroy(this.gameObject);
             }
 
-            if (colliders.Length > 0)
-            {
-                foreach (var VARIABLE in colliders)
-                {
-                    Debug.Log($"Fire effect hit {VARIABLE.collider.gameObject.name}"); //TODO add hit function
-                }
-            }
+            // TODO: Apply fire damage within the effect radius.
         }
 
 #if UNITY_EDITOR

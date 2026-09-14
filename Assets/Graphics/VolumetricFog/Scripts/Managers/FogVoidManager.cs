@@ -8,7 +8,7 @@ namespace VolumetricFogAndMist2 {
 
         public string managerName {
             get {
-                return "Fog Void Manager";
+                return "FogVoidManager";
             }
         }
 

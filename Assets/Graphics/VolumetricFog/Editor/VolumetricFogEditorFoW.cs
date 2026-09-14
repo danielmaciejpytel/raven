@@ -7,30 +7,55 @@ namespace VolumetricFogAndMist2 {
     public partial class VolumetricFogEditor {
 
         bool mouseIsDown;
+        int brushControl;
+
+        void OnDisable() {
+            FinishHeightStroke();
+            Undo.undoRedoPerformed -= OnHeightUndoRedo;
+            if (brushControl != 0 && GUIUtility.hotControl == brushControl) GUIUtility.hotControl = 0;
+            mouseIsDown = false;
+            if (cachedProfileEditor != null) DestroyImmediate(cachedProfileEditor);
+            cachedProfileEditor = null;
+            cachedProfile = null;
+        }
 
         private void OnSceneGUI() {
 
             Event e = Event.current;
+            // Release even when the cursor leaves the volume during a stroke.
+            if (e != null && e.type == EventType.MouseUp && e.button == 0 && mouseIsDown) {
+                if (GUIUtility.hotControl == brushControl) GUIUtility.hotControl = 0;
+                mouseIsDown = false;
+                FinishHeightStroke();
+                e.Use();
+                return;
+            }
             if (fog == null || !fog.enableFogOfWar || !maskEditorEnabled.boolValue || e == null || fog.fogOfWarTexture == null) {
                 return;
             }
 
             Camera sceneCamera = null;
-            SceneView sceneView = SceneView.lastActiveSceneView;
+            SceneView sceneView = SceneView.currentDrawingSceneView;
             if (sceneView != null) sceneCamera = sceneView.camera;
             if (sceneCamera == null) return;
 
             Vector2 mousePos = Event.current.mousePosition;
             if (mousePos.x < 0 || mousePos.x > sceneCamera.pixelWidth || mousePos.y < 0 || mousePos.y > sceneCamera.pixelHeight) return;
 
-            Selection.activeGameObject = fog.gameObject;
-            fog.UpdateMaterialProperties();
+            if (e.alt || UnityEditor.Tools.viewToolActive) return;
+            brushControl = GUIUtility.GetControlID("VolumetricFogMaskBrush".GetHashCode(), FocusType.Passive);
 
             Ray ray = HandleUtility.GUIPointToWorldRay(mousePos);
-            Bounds bounds = new Bounds(fog.transform.position, new Vector3(fog.transform.localScale.x, 0.01f, fog.transform.localScale.z));
+            Bounds bounds = new Bounds(fog.transform.position, new Vector3(fog.transform.lossyScale.x, 0.01f, fog.transform.lossyScale.z));
             float distance;
             if (bounds.IntersectRay(ray, out distance)) {
+                if (e.type == EventType.Layout) HandleUtility.AddDefaultControl(brushControl);
                 Vector3 hitPoint = ray.origin + ray.direction * distance;
+                if (PaintsHeight && fog.profile != null && fog.profile.terrainFit &&
+                    Physics.Raycast(ray, out RaycastHit terrainHit, sceneCamera.farClipPlane,
+                        fog.profile.terrainLayerMask, QueryTriggerInteraction.Ignore)) {
+                    hitPoint = terrainHit.point;
+                }
                 float handleSize = HandleUtility.GetHandleSize(hitPoint) * 0.5f;
                 Handles.color = new Color(0, 0, 1, 0.5f);
                 Handles.SphereHandleCap(0, hitPoint, Quaternion.identity, handleSize, EventType.Repaint);
@@ -40,18 +65,28 @@ namespace VolumetricFogAndMist2 {
                 Handles.DrawWireDisc(hitPoint, Vector3.up, maskBrushWidth.intValue * 0.995f);
                 Handles.color = new Color(0, 0, 1, 0.85f);
                 Handles.DrawWireDisc(hitPoint, Vector3.up, maskBrushWidth.intValue);
+                if (PaintsHeight) {
+                    float height = fog.maskBrushMode == MASK_TEXTURE_BRUSH_MODE.ResetHeight ? fog.DefaultPaintHeight : fog.maskBrushHeight;
+                    Vector3 top = hitPoint + Vector3.up * height;
+                    Handles.color = Color.cyan;
+                    Handles.DrawLine(hitPoint, top);
+                    Handles.DrawWireDisc(top, Vector3.up, maskBrushWidth.intValue);
+                    Handles.Label(top, height.ToString("0.00") + " m");
+                }
 
                 if (e.isMouse && e.button == 0) {
-                    int controlID = GUIUtility.GetControlID(FocusType.Passive);
+                    int controlID = brushControl;
                     EventType eventType = e.GetTypeForControl(controlID);
 
                     if (eventType == EventType.MouseDown) {
                         GUIUtility.hotControl = controlID;
                         mouseIsDown = true;
+                        BeginHeightStroke();
                         PaintOnMaskPosition(hitPoint);
                     } else if (eventType == EventType.MouseUp) {
-                        GUIUtility.hotControl = controlID;
+                        GUIUtility.hotControl = 0;
                         mouseIsDown = false;
+                        FinishHeightStroke();
                     }
 
                     if (mouseIsDown && eventType == EventType.MouseDrag) {
@@ -87,10 +122,15 @@ namespace VolumetricFogAndMist2 {
         }
 
         void PaintOnMaskPosition(Vector3 pos) {
+            if (IsHeightBrush) {
+                PaintHeightOnMaskPosition(pos);
+                return;
+            }
             if (maskBrushMode.intValue == (int)MASK_TEXTURE_BRUSH_MODE.ColorFog) {
                 PaintColorOnMaskPosition(pos);
             } else {
                 PaintAlphaOnMaskPosition(pos);
+                if (PaintsHeight) PaintHeightOnMaskPosition(pos);
             }
         }
 

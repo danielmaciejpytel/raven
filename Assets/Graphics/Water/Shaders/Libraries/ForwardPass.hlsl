@@ -784,6 +784,8 @@ float4 ForwardPassFragment(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRO
 
 	//https://github.com/Unity-Technologies/Graphics/blob/31106afc882d7d1d7e3c0a51835df39c6f5e3073/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl#L34
 	InputData inputData = (InputData)0;
+	// Forward+ needs the current pixel for its clustered light lookup, also outside DEBUG_DISPLAY.
+	inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
 	inputData.positionWS = positionWS;
 	inputData.viewDirectionWS = water.viewDir;
 	inputData.shadowCoord = shadowCoords;
@@ -834,7 +836,6 @@ float4 ForwardPassFragment(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRO
 	#else
 	inputData.tangentToWorld = 0;
 	#endif
-	inputData.normalizedScreenSpaceUV = scene.positionSS.xy / scene.positionSS.w;
 	inputData.shadowMask = water.shadowMask.xxxx;
 	#if defined(DYNAMICLIGHTMAP_ON)
 	inputData.dynamicLightmapUV = input.dynamicLightmapUV;
@@ -869,6 +870,7 @@ float4 ForwardPassFragment(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRO
 	#endif
 
 	float4 finalColor = float4(ApplyLighting(surfaceData, scene.color, mainLight, inputData, water, translucencyData, _ShadowStrength, water.vFace), water.alpha);
+	finalColor.rgb = RavenComposeWaterSurface(finalColor.rgb, -TransformWorldToView(positionWS).z);
 	
 	#if _REFRACTION
 	finalColor.rgb = lerp(scene.color.rgb, finalColor.rgb, saturate(water.fog + water.intersection + water.foam));

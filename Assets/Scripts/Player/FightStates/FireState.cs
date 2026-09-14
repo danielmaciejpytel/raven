@@ -13,8 +13,6 @@ namespace Raven.Player
         private PlayerHudManager _hudManager;
         private PlayerStatesManager _playerStatesManager;
 
-        private float _dashTimer;
-
         public void Initialize(InputManager pInputManager, PlayerHudManager p_hudManager,
             PlayerStatesManager p_playerStatesManager)
         {
@@ -38,53 +36,26 @@ namespace Raven.Player
                 if (!_inputManager.DashButtonPressed()) return;
                 if (!_hudManager.TrySubtractEnergy(_playerStatesManager.CurrentConfig.DashCost)) return;
 
-                p_movementManager.Dash = true;
-                p_movementManager.OnDash?.Invoke(true);
+                p_movementManager.BeginDash(this, _playerStatesManager.CurrentConfig);
             }
         }
 
         public void Dash(PlayerMovementManager p_movementManager)
         {
-            _dashTimer += Time.deltaTime;
-            p_movementManager.GravityBool = false;
-
-            if (_dashTimer > _playerStatesManager.CurrentConfig.DashTime)
+            PlayerStateConfig config = p_movementManager.DashConfig;
+            if (p_movementManager.MoveDash())
             {
-                p_movementManager.Dash = false;
-                p_movementManager.GravityBool = true;
-                _dashTimer = 0f;
-                p_movementManager.OnDash?.Invoke(false);
-                GenerateEffect(p_movementManager);
-            }
-
-            DashMove(p_movementManager);
-        }
-
-        private void DashMove(PlayerMovementManager p_movementManager)
-        {
-            if (p_movementManager.MoveVector.magnitude > 0)
-            {
-                if (p_movementManager.Fpp)
-                {
-                    p_movementManager.FppMove(p_movementManager.MoveVector, _playerStatesManager.CurrentConfig.DashSpeed);
-                }
-                else
-                {
-                    p_movementManager.TppMovement(p_movementManager.MoveVector, _playerStatesManager.CurrentConfig.DashSpeed);
-                }
-            }
-            else
-            {
-                p_movementManager.PlayerController.Move(p_movementManager.PlayerTransform.forward *
-                                                        _playerStatesManager.CurrentConfig.DashSpeed * Time.deltaTime);
+                GenerateEffect(p_movementManager, config);
             }
         }
 
-        private void GenerateEffect(PlayerMovementManager p_movementManager)
+        private void GenerateEffect(PlayerMovementManager p_movementManager, PlayerStateConfig p_config)
         {
-            var obj = GameObject.Instantiate(_playerStatesManager.CurrentConfig.EffectPrefab);
-            obj.transform.position = p_movementManager.PlayerTransform.position;
-            obj.GetComponent<DashEffect>().Initialize(_playerStatesManager.CurrentConfig);
+            if (p_config.EffectPrefab == null) return;
+
+            var obj = GameObject.Instantiate(p_config.EffectPrefab, p_movementManager.PlayerTransform.position,
+                p_config.EffectPrefab.transform.rotation);
+            obj.GetComponent<DashEffect>().Initialize(p_config);
         }
     }
 }

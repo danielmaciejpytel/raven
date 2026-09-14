@@ -3,6 +3,7 @@ using Raven.Config;
 using Raven.Core;
 using Raven.Manager;
 using Raven.Player;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -20,9 +21,9 @@ namespace Raven.Enemy
 
         private PlayerDataManager _playerDataManager;
         private float _currentPower;
-        private Vector3 _currentEffectPosition;
         private float _currentExplodeRadius;
         private AudioManager _audioManager;
+        private bool _exploded;
 
         [Inject]
         public void Construct(PlayerDataManager p_playerDataManager, AudioManager p_audioManager)
@@ -37,7 +38,6 @@ namespace Raven.Enemy
             }
             else
             {
-                _currentEffectPosition = _effectPosition.position;
                 _currentPower = _power;
                 _currentExplodeRadius = _explodeRadius;
             }
@@ -45,34 +45,53 @@ namespace Raven.Enemy
 
         private void OnTriggerEnter(Collider other)
         {
-            if (_effectOnEnemy && other.tag == "Player")
+            CharacterController player = other.GetComponentInParent<CharacterController>();
+            if (_effectOnEnemy && (other.CompareTag("Player") || (player != null && player.CompareTag("Player"))))
             {
-                GetComponentInParent<EnemyController>().TakeDamage(_config.MaxHealth);
+                EnemyController enemy = GetComponentInParent<EnemyController>();
+                if (enemy != null) enemy.TakeDamage(_config.MaxHealth);
             }
         }
 
         public void ExplodeBehaviour()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, _currentExplodeRadius);
+            if (_exploded) return;
+            _exploded = true;
 
-            var obj = Instantiate(_effectPrefab);
-            obj.transform.position = _effectPosition.position;
-            obj.GetComponent<ExplodeEffect>().Init(_audioManager);
+            Collider[] hits = Physics.OverlapSphere(transform.position, _currentExplodeRadius);
+            EnemyController owner = GetComponentInParent<EnemyController>();
+            var damagedEnemies = new HashSet<EnemyController>();
+            bool playerDamaged = false;
+
+            if (_effectPrefab != null)
+            {
+                Vector3 position = _effectPosition != null ? _effectPosition.position : transform.position;
+                var obj = Instantiate(_effectPrefab, position, _effectPrefab.transform.rotation);
+                ExplodeEffect effect = obj.GetComponent<ExplodeEffect>();
+                if (effect != null && _audioManager != null) effect.Init(_audioManager);
+            }
 
             for (int i = 0; i < hits.Length; i++)
             {
-                if (hits[i].tag == "Enemy" && hits[i].gameObject != this.gameObject)
+                Collider hit = hits[i];
+                if (hit == null) continue;
+
+                EnemyController enemy = hit.GetComponentInParent<EnemyController>();
+                if (enemy != null)
                 {
-                    if (hits[i].gameObject.GetComponent<EnemyController>())
+                    if (enemy != owner && damagedEnemies.Add(enemy))
                     {
-                        hits[i].gameObject.GetComponent<EnemyController>().TakeDamage(_currentPower);
+                        enemy.TakeDamage(_currentPower);
                     }
                 }
-                else if (hits[i].tag == "Player")
+                else if (!playerDamaged && _playerDataManager != null)
                 {
-                    if (_effectOnEnemy) _currentEffectPosition = transform.position;
-
-                    _playerDataManager.TakeDamage(_currentPower);
+                    CharacterController player = hit.GetComponentInParent<CharacterController>();
+                    if (hit.CompareTag("Player") || (player != null && player.CompareTag("Player")))
+                    {
+                        playerDamaged = true;
+                        _playerDataManager.TakeDamage(_currentPower);
+                    }
                 }
             }
         }
@@ -80,7 +99,7 @@ namespace Raven.Enemy
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (_effectOnEnemy && !_config.ExplodeAfterDead)
+            if (_effectOnEnemy && (_config == null || !_config.ExplodeAfterDead))
             {
                 return;
             }

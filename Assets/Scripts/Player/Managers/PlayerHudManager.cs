@@ -23,8 +23,20 @@ namespace Raven.UI
 
         private bool _regenerateEnergy;
         private GameObject _rigTarget;
+        private Coroutine _viewFinderCoroutine;
+        private Coroutine _popUpCoroutine;
 
         public event Action<float> OnAddHealth;
+
+        public void SetLives(int remaining, int total) => _playerHudReferences.SetLives(remaining, total);
+        public IEnumerator ShowDeath(bool gameOver)
+        {
+            SetViewFinder(false);
+            return _playerHudReferences.ShowDeath(gameOver);
+        }
+        public IEnumerator HideDeath() => _playerHudReferences.HideDeath();
+        public void RestoreHealth() => _playerHudReferences.HealthSlider.value = _playerHudReferences.HealthSlider.maxValue;
+        public float MaxHealth => _playerHudReferences.HealthSlider.maxValue;
 
         public PlayerHudManager(PlayerHudReferences p_hudReferences,PlayerDataConfig p_playerDataConfig, CameraManager p_cameraManager, CoroutinesManager p_coroutinesManager,
                                 Player.Collectible[] p_collectibles, PlayerRigManager p_playerRigManager)
@@ -37,6 +49,7 @@ namespace Raven.UI
             _collectibles = p_collectibles;
 
             SetSlidersValues();
+            SetViewFinder(false);
 
             _cameraManager.OnAimChange += SetViewFinder;
 
@@ -49,6 +62,9 @@ namespace Raven.UI
         public void Dispose()
         {
             _cameraManager.OnAimChange -= SetViewFinder;
+            _coroutinesManager.StopAllCoroutines(this);
+            _viewFinderCoroutine = null;
+            _popUpCoroutine = null;
 
             for (int i = 0; i < _collectibles.Length; i++)
             {
@@ -67,8 +83,8 @@ namespace Raven.UI
                 EnergyRegeneration();
             }
 
-            _playerHudReferences.HealthCounterText.SetText($"{ _playerHudReferences.HealthSlider.value}/{ _playerHudReferences.HealthSlider.maxValue}");
-            _playerHudReferences.EnergyCounterText.SetText($"{ _playerHudReferences.EnergySlider.value}/{ _playerHudReferences.EnergySlider.maxValue}");
+            _playerHudReferences.HealthCounterText.SetText("{0:0}/{1:0}", _playerHudReferences.HealthSlider.value, _playerHudReferences.HealthSlider.maxValue);
+            _playerHudReferences.EnergyCounterText.SetText("{0:0}/{1:0}", _playerHudReferences.EnergySlider.value, _playerHudReferences.EnergySlider.maxValue);
         }
 
         public bool TrySubtractEnergy(float p_value)
@@ -133,6 +149,8 @@ namespace Raven.UI
             _playerHudReferences.HealthSlider.value = maxH;
             _playerHudReferences.EnergySlider.maxValue = maxE;
             _playerHudReferences.EnergySlider.value = maxE;
+
+            OnAddHealth?.Invoke(_playerHudReferences.HealthSlider.value);
         }
 
         public void ChangeStateImage(PlayerStateName p_playerStateName)
@@ -187,13 +205,14 @@ namespace Raven.UI
 
         private void SetViewFinder(bool p_aim)
         {
+            _coroutinesManager.StopCoroutine(_viewFinderCoroutine, this);
+            _viewFinderCoroutine = null;
             if (p_aim)
             {
-                _coroutinesManager.StartCoroutine(SetViewFinderCoroutine(), _playerHudReferences.ViewFinder.gameObject);
+                _viewFinderCoroutine = _coroutinesManager.StartCoroutine(SetViewFinderCoroutine(), this);
             }
             else
             {
-                _coroutinesManager.StopAllCoroutines(_playerHudReferences.ViewFinder.gameObject);
                 _playerHudReferences.ViewFinder.gameObject.SetActive(false);
             }
         }
@@ -201,7 +220,8 @@ namespace Raven.UI
         private IEnumerator SetViewFinderCoroutine()
         {
             yield return new WaitForSeconds(0.25f);
-            _playerHudReferences.ViewFinder.gameObject.SetActive(true);
+            _viewFinderCoroutine = null;
+            _playerHudReferences.ViewFinder.gameObject.SetActive(_cameraManager.IsAiming);
         }
 
         private void UnlockHud(CollectibleName p_collectibleName)
@@ -211,20 +231,26 @@ namespace Raven.UI
                 case CollectibleName.Dash:
                     _playerHudReferences.DashImage.sprite = _playerHudReferences.DashSprite;
                     _playerHudReferences.DashLocked.SetActive(false);
-                    _coroutinesManager.StartCoroutine(PopUpCoroutine("Dash unlocked"),this);
+                    ShowPopUp("Dash unlocked");
                     break;
                 case CollectibleName.FireState:
                     _playerHudReferences.StateImage.sprite = _playerHudReferences.FireSprite;
                     _playerHudReferences.StateLocked.SetActive(false);
-                    _coroutinesManager.StartCoroutine(PopUpCoroutine("Fire state unlocked"), this);
+                    ShowPopUp("Fire state unlocked");
                     break;
                 case CollectibleName.SecondWeapon:
                     _playerHudReferences.Weapon2Image.color = Color.white;
-                    _coroutinesManager.StartCoroutine(PopUpCoroutine("Second pistol picked up"), this);
+                    ShowPopUp("Second pistol picked up");
                     break;
                 default:
                     break;
             }
+        }
+
+        private void ShowPopUp(string text)
+        {
+            _coroutinesManager.StopCoroutine(_popUpCoroutine, this);
+            _popUpCoroutine = _coroutinesManager.StartCoroutine(PopUpCoroutine(text), this);
         }
 
         private IEnumerator PopUpCoroutine(string p_text)
@@ -233,6 +259,7 @@ namespace Raven.UI
             _playerHudReferences.PopUp.SetActive(true);
 
             yield return new WaitForSeconds(2f);
+            _popUpCoroutine = null;
             _playerHudReferences.PopUp.SetActive(false);
         }
     }

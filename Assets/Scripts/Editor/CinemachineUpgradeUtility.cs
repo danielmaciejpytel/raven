@@ -9,6 +9,13 @@ namespace Raven.Editor
 {
     public static class CinemachineUpgradeUtility
     {
+        private static Transform FindSceneCamera(string currentName, string legacyName)
+        {
+            foreach (var camera in Object.FindObjectsByType<CinemachineCamera>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (camera.gameObject.scene == UnityEngine.SceneManagement.SceneManager.GetActiveScene()
+                    && (camera.name == currentName || camera.name == legacyName)) return camera.transform;
+            return null;
+        }
         [MenuItem("Tools/Upgrade Cinemachine Cameras")]
         public static void PerformUpgrade()
         {
@@ -24,7 +31,7 @@ namespace Raven.Editor
             }
             Debug.Log($"Found Player/CameraLook action ref: {lookActionRef != null}");
 
-            var mainCamGO = GameObject.Find("Main Camera");
+            var mainCamGO = (GameObject.Find("MainCamera") ?? GameObject.Find("Main Camera"));
             var playerGO = GameObject.Find("Player");
             var tppCameraLookGO = GameObject.Find("TppCameraLook");
             var shootLockGO = GameObject.Find("ShootCameraLock");
@@ -46,7 +53,7 @@ namespace Raven.Editor
 
             if (mainCamGO != null)
             {
-                var shootCamTr = mainCamGO.transform.Find("Shoot Camera");
+                var shootCamTr = FindSceneCamera("ShootCamera", "Shoot Camera");
                 if (shootCamTr != null)
                 {
                     var shootCamGO = shootCamTr.gameObject;
@@ -75,7 +82,7 @@ namespace Raven.Editor
                     Debug.Log("Shoot Camera configured in scene.");
                 }
 
-                var tppCamTr = mainCamGO.transform.Find("Tpp Virtual Camera");
+                var tppCamTr = FindSceneCamera("TppVirtualCamera", "Tpp Virtual Camera");
                 if (tppCamTr != null)
                 {
                     var tppCamGO = tppCamTr.gameObject;
@@ -339,13 +346,13 @@ namespace Raven.Editor
         [MenuItem("Tools/Validate Cinemachine Setup")]
         public static void ValidateSetup()
         {
-            var mainCam = GameObject.Find("Main Camera");
+            var mainCam = (GameObject.Find("MainCamera") ?? GameObject.Find("Main Camera"));
             if (mainCam != null)
             {
                 var brain = mainCam.GetComponent<CinemachineBrain>();
                 Debug.Log($"[Validation] Main Camera Brain: {(brain != null ? brain.GetType().FullName : "null")}");
 
-                var tpp = mainCam.transform.Find("Tpp Virtual Camera");
+                var tpp = FindSceneCamera("TppVirtualCamera", "Tpp Virtual Camera");
                 if (tpp != null)
                 {
                     Debug.Log($"[Validation] Tpp Virtual Camera child count: {tpp.childCount}");
@@ -377,7 +384,7 @@ namespace Raven.Editor
                     }
                 }
 
-                var shoot = mainCam.transform.Find("Shoot Camera");
+                var shoot = FindSceneCamera("ShootCamera", "Shoot Camera");
                 if (shoot != null)
                 {
                     Debug.Log($"[Validation] Shoot Camera activeSelf: {shoot.gameObject.activeSelf}");

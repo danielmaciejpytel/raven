@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Security.Cryptography.X509Certificates;
 using Raven.Config;
 using Raven.Container;
 using Raven.Core.Interface;
@@ -15,11 +12,10 @@ using Zenject;
 
 namespace Raven.Player
 {
-    public class PlayerStatesManager : ITickable
+    public class PlayerStatesManager : ITickable, IDisposable
     {
         private readonly PlayerStatesContainer _playerStatesContainer;
         private readonly InputManager _inputManager;
-        private readonly CoroutinesManager _coroutinesManager;
         private readonly NormalState _normalState;
         private readonly FireState _fireState;
         private readonly PlayerRigManager _playerRigManager;
@@ -30,9 +26,10 @@ namespace Raven.Player
         private IPlayerState _currentBehaviour;
         private bool _canShoot;
         private bool _leftHandShoot;
-
-        private GameObject[] _fireStateVfx;
-        private GameObject[] _normalStateVfx;
+        private float _shootDelayRemaining;
+        private bool _alternateHandsAfterShot;
+        private float _energySubtractTimer;
+        private bool _disposed;
 
         private Dictionary<CollectibleName, bool> _unlockedStates = new Dictionary<CollectibleName, bool>();
 
@@ -44,7 +41,7 @@ namespace Raven.Player
         public event Action<PlayerStateName> OnChangeState;
 
         public PlayerStatesManager(PlayerStatesContainer p_playerStatesContainer, InputManager pInputManager,
-            NormalState p_normalState, FireState p_fireState, PlayerHudManager p_hudManager, CoroutinesManager p_coroutinesManager,
+            NormalState p_normalState, FireState p_fireState, PlayerHudManager p_hudManager,
             PlayerRigManager p_playerRigManager, PlayerReferences p_playerReferences)
         {
             _playerReferences = p_playerReferences;
@@ -52,7 +49,6 @@ namespace Raven.Player
             _inputManager = pInputManager;
             _normalState = p_normalState;
             _fireState = p_fireState;
-            _coroutinesManager = p_coroutinesManager;
             _playerRigManager = p_playerRigManager;
             _playerHudManager = p_hudManager;
 
@@ -70,8 +66,21 @@ namespace Raven.Player
             SetStateVfx(PlayerStateName.Normal);
         }
 
+        public void Dispose()
+        {
+            _disposed = true;
+            _canShoot = false;
+            _shootDelayRemaining = 0f;
+            _energySubtractTimer = 0f;
+        }
+
         public void Tick()
         {
+            if (_disposed || !IsPlayerActive()) return;
+
+            UpdateShootDelay();
+            UpdateEnergyDrain();
+
             if (_inputManager.ActiveStateButtonPressed() && _unlockedStates[CollectibleName.FireState])
             {
                 ChangeState();
@@ -84,7 +93,9 @@ namespace Raven.Player
 
             if (_inputManager.ShootButtonPressed() && _inputManager.AimButtonHold() && _canShoot)
             {
-                _coroutinesManager.StartCoroutine(ShootDelay(), _playerReferences.Player);
+                _canShoot = false;
+                _alternateHandsAfterShot = _unlockedStates[CollectibleName.SecondWeapon];
+                _shootDelayRemaining = _alternateHandsAfterShot ? _currentConfig.TwoHandsDelay : _currentConfig.OneHandDelay;
 
                 if (_unlockedStates[CollectibleName.SecondWeapon])
                 {
@@ -106,30 +117,33 @@ namespace Raven.Player
             }
         }
 
-        private IEnumerator ShootDelay()
+        private void UpdateShootDelay()
         {
-            _canShoot = false;
+            if (_canShoot) return;
 
-            if (_unlockedStates[CollectibleName.SecondWeapon])
+            _shootDelayRemaining -= Time.deltaTime;
+            if (_shootDelayRemaining > 0f) return;
+
+            if (_alternateHandsAfterShot)
             {
-                yield return new WaitForSeconds(_currentConfig.TwoHandsDelay);
-                _leftHandShoot = _leftHandShoot == false ? true : false;
+                _leftHandShoot = !_leftHandShoot;
             }
-            else
-            {
-                yield return new WaitForSeconds(_currentConfig.OneHandDelay);
-            }
-         
+
+            _shootDelayRemaining = 0f;
             _canShoot = true;
         }
 
         public void ChangeState()
         {
+            if (_disposed || !IsPlayerActive()) return;
+
             if (_currentConfig.PlayerStateName == PlayerStateName.Normal)
             {
+                if (!_unlockedStates[CollectibleName.FireState]) return;
+                if (!_playerHudManager.TrySubtractEnergy(2f)) return;
+
                 _currentConfig = _playerStatesContainer.FindStateConfig(PlayerStateName.Fire);
                 _currentBehaviour = _fireState;
-                _coroutinesManager.StartCoroutine(EnergySubtractCoroutine(), _playerReferences.Player);
             }
             else
             {
@@ -137,6 +151,7 @@ namespace Raven.Player
                 _currentBehaviour = _normalState;
             }
 
+            _energySubtractTimer = 0f;
             SetStateVfx(_currentConfig.PlayerStateName);
 
             OnChangeState?.Invoke(_currentConfig.PlayerStateName);
@@ -146,6 +161,8 @@ namespace Raven.Player
 
         public void UnlockState(CollectibleName p_collectibleName)
         {
+            if (_disposed) return;
+
             _unlockedStates[p_collectibleName] = true;
 
             if (p_collectibleName == CollectibleName.SecondWeapon)
@@ -155,16 +172,26 @@ namespace Raven.Player
             }
         }
 
-        private IEnumerator EnergySubtractCoroutine()
+        private void UpdateEnergyDrain()
         {
-            while (_currentBehaviour == _fireState)
+            if (_currentBehaviour != _fireState) return;
+
+            _energySubtractTimer += Time.deltaTime;
+            while (_energySubtractTimer >= 1f)
             {
+                _energySubtractTimer -= 1f;
+
                 if (!_playerHudManager.TrySubtractEnergy(2f))
                 {
                     ChangeState();
+                    return;
                 }
-                yield return new WaitForSeconds(1f);
             }
+        }
+
+        private bool IsPlayerActive()
+        {
+            return _playerReferences != null && _playerReferences.Player != null && _playerReferences.Player.activeInHierarchy;
         }
 
         private void SetStateVfx(PlayerStateName p_playerStateName)

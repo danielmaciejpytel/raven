@@ -132,6 +132,35 @@ float2 RefractionOffset(float2 screenPos, float3 viewDir, float3 normalWS, float
 }
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
+// Reuse the pre-transparent background captured after MF.SSGI (also used by distortion VFX).
+TEXTURE2D_X(_RavenAfterSSGITexture);
+float4 _RavenAfterSSGITexture_TexelSize;
+float _RavenAfterSSGIReady;
+
+float3 RavenWaterSceneColor(float2 uv)
+{
+    if (_RavenAfterSSGIReady > 0.5)
+    {
+        uv = ClampAndScaleUVForBilinear(UnityStereoTransformScreenSpaceTex(uv), _RavenAfterSSGITexture_TexelSize.xy);
+        return SAMPLE_TEXTURE2D_X(_RavenAfterSSGITexture, sampler_CameraOpaqueTexture, uv).rgb;
+    }
+    return SampleSceneColor(uv);
+}
+// Match MF.SSGI's final composition on the water surface, before refraction and fog.
+float _RavenSSGICompositionReady;
+float4 _RavenSSGIComposition; // pre-multiply, contrast, intensity, range min
+float _RavenSSGICompositionRangeMax;
+float3 RavenComposeWaterSurface(float3 color, float depth)
+{
+    if (_RavenSSGICompositionReady < 0.5) return color;
+    float pre = _RavenSSGIComposition.x;
+    float minLum = saturate(min(color.r, min(color.g, color.b)));
+    minLum *= minLum; minLum *= minLum; minLum *= minLum;
+    float3 composed = lerp(color, color * minLum, pre) * (1.0 + pre);
+    composed = pow(max(composed, 0.0), _RavenSSGIComposition.y) * _RavenSSGIComposition.z;
+    float fade = saturate((depth - _RavenSSGIComposition.w) / max(0.001, _RavenSSGICompositionRangeMax - _RavenSSGIComposition.w));
+    return lerp(composed, color, fade);
+}
 #define CHROMASHIFT_SIZE 0.05
 
 float3 SampleOpaqueTexture(float4 screenPos, float2 offset, float dispersion)
@@ -140,7 +169,7 @@ float3 SampleOpaqueTexture(float4 screenPos, float2 offset, float dispersion)
 	screenPos.xy += offset;
 	screenPos.xy /= screenPos.w;
 	
-	float3 sceneColor = SampleSceneColor(screenPos.xy).rgb;
+	float3 sceneColor = RavenWaterSceneColor(screenPos.xy).rgb;
 	
 	#if PHYSICAL_REFRACTION //Chromatic part
 	if(dispersion > 0)
@@ -149,8 +178,8 @@ float3 SampleOpaqueTexture(float4 screenPos, float2 offset, float dispersion)
 		//Note: screen buffer texelsize purposely not used, this way the effect is actually consistent across all resolutions
 		float texelOffset = chromaShift * CHROMASHIFT_SIZE;
 	
-		sceneColor.r = SampleSceneColor(screenPos.xy + float2(texelOffset, 0)).r;
-		sceneColor.b = SampleSceneColor(screenPos.xy - float2(texelOffset, 0)).b;
+		sceneColor.r = RavenWaterSceneColor(screenPos.xy + float2(texelOffset, 0)).r;
+		sceneColor.b = RavenWaterSceneColor(screenPos.xy - float2(texelOffset, 0)).b;
 	}
 	#endif
 

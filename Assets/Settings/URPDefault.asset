@@ -480,6 +480,71 @@ MonoBehaviour:
   - {fileID: 1051487890226320470}
   - {fileID: -6433617796945270018}
   - {fileID: -6036289218740069112}
+  - {fileID: 7158436309172405694}
+  - {fileID: 115821957811027930}
+--- !u!114 &115821957811027930
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fd03cbbfa7b7fe4dbc3d7709b42d662, type: 3}
+  m_Name: ScreenSpaceGlobalIlluminationVolume
+  m_EditorClassIdentifier: SSGIURP::ScreenSpaceGlobalIlluminationVolume
+  active: 1
+  enable:
+    m_OverrideState: 1
+    m_Value: 0
+  thicknessMode:
+    m_OverrideState: 1
+    m_Value: 0
+  depthBufferThickness:
+    m_OverrideState: 1
+    m_Value: 0.1
+  quality:
+    m_OverrideState: 1
+    m_Value: 0
+  fullResolutionSS:
+    m_OverrideState: 1
+    m_Value: 0
+  resolutionScaleSS:
+    m_OverrideState: 1
+    m_Value: 0.5
+  sampleCount:
+    m_OverrideState: 1
+    m_Value: 2
+  maxRaySteps:
+    m_OverrideState: 1
+    m_Value: 32
+  denoiseSS:
+    m_OverrideState: 1
+    m_Value: 1
+  denoiserAlgorithmSS:
+    m_OverrideState: 1
+    m_Value: 1
+  denoiseIntensitySS:
+    m_OverrideState: 1
+    m_Value: 0.95
+  denoiserRadiusSS:
+    m_OverrideState: 1
+    m_Value: 0.6
+  secondDenoiserPassSS:
+    m_OverrideState: 1
+    m_Value: 1
+  rayMiss:
+    m_OverrideState: 1
+    m_Value: 3
+  indirectDiffuseLightingMultiplier:
+    m_OverrideState: 1
+    m_Value: 1
+  indirectDiffuseRenderingLayers:
+    m_OverrideState: 1
+    m_Value:
+      serializedVersion: 0
+      m_Bits: 4294967295
 --- !u!114 &136964265014228437
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -796,3 +861,91 @@ MonoBehaviour:
   gain:
     m_OverrideState: 1
     m_Value: {x: 1, y: 1, z: 1, w: 0}
+--- !u!114 &7158436309172405694
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630a38b420b39c040b1469b07a79e7d6, type: 3}
+  m_Name: SSGIVolumeComponent
+  m_EditorClassIdentifier: Assembly-CSharp::MF.SSGI.SSGIVolumeComponent
+  active: 1
+  PreMultiply:
+    m_OverrideState: 1
+    m_Value: 0.25
+  FinalContrast:
+    m_OverrideState: 1
+    m_Value: 1
+  FinalIntensity:
+    m_OverrideState: 1
+    m_Value: 1.25
+  LightFalloffDistance:
+    m_OverrideState: 1
+    m_Value: 5
+  LightIntensity:
+    m_OverrideState: 1
+    m_Value: 2
+  LightDirInfluence:
+    m_OverrideState: 1
+    m_Value: 0.95
+  NormalmapBoost:
+    m_OverrideState: 1
+    m_Value: 0.75
+  GITint:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  GIContrast:
+    m_OverrideState: 1
+    m_Value: 0.65
+  GISaturation:
+    m_OverrideState: 1
+    m_Value: 1
+  GIVibrance:
+    m_OverrideState: 1
+    m_Value: 0.5
+  FallbackDirectIntensity:
+    m_OverrideState: 1
+    m_Value: 0.25
+  FallbackDirectSaturation:
+    m_OverrideState: 1
+    m_Value: 1
+  FallbackDirectPower:
+    m_OverrideState: 1
+    m_Value: 2
+  SkyboxInfluence:
+    m_OverrideState: 1
+    m_Value: 1
+  ShadowIntensity:
+    m_OverrideState: 1
+    m_Value: 2.5
+  ShadowTint:
+    m_OverrideState: 1
+    m_Value: {r: 0.06, g: 0.08, b: 0.12, a: 1}
+  ShadowExponential:
+    m_OverrideState: 1
+    m_Value: 0.5
+  ShadowContrast:
+    m_OverrideState: 1
+    m_Value: 0.05
+  ContactShadowsRange:
+    m_OverrideState: 1
+    m_Value: 0.25
+  ContactShadowsSoftKnee:
+    m_OverrideState: 1
+    m_Value: 0.25
+  CastedShadowsIntensity:
+    m_OverrideState: 1
+    m_Value: 5
+  CastedShadowsOmniDirectional:
+    m_OverrideState: 1
+    m_Value: 0.5
+  CastedShadowsRange:
+    m_OverrideState: 1
+    m_Value: 15
+  CastedShadowsSoftKnee:
+    m_OverrideState: 1
+    m_Value: 0.85

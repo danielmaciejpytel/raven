@@ -9,7 +9,7 @@ namespace VolumetricFogAndMist2 {
 
         public string managerName {
             get {
-                return "Point Light Manager";
+                return "PointLightManager";
             }
         }
 
@@ -27,6 +27,8 @@ namespace VolumetricFogAndMist2 {
         public float inscattering = 1f;
         [Tooltip("Global intensity multiplier for point lights")]
         public float intensity = 1f;
+        [Tooltip("Only lights overlapping these rendering layer bits illuminate fog. Default and Enviro are 1 and 2; Player is 4.")]
+        public uint pointLightRenderingLayerMask = 3;
         [Tooltip("Reduces light intensity near point lights")]
         public float insideAtten;
 
@@ -66,6 +68,7 @@ namespace VolumetricFogAndMist2 {
             for (int i = 0; k < MAX_POINT_LIGHTS && i < pointLights.Length; i++) {
                 Light light = pointLights[i];
                 if (light == null || !light.isActiveAndEnabled || light.type != LightType.Point) continue;
+                if ((light.renderingLayerMask & pointLightRenderingLayerMask) == 0) continue;
                 Vector3 pos = light.transform.position;
                 float range = light.range;
 

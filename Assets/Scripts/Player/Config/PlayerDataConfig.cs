@@ -14,6 +14,9 @@ namespace Raven.Config
         [SerializeField, Range(1f, 100f)] private int _regenerationValue = 2;
         [Header("-----HEALTH CONFIG-----")]
         [SerializeField, Range(1f, 100f)] private float _maxHealthValue = 100f;
+        [SerializeField, Min(1)] private int _startingLives = 3;
+
+        public int StartingLives => Mathf.Max(1, _startingLives);
 
         public int RegenerationValue => _regenerationValue;
         public float TimeToStartRegeneration => _timeToStartRegeneration;

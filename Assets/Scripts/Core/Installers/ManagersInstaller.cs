@@ -9,6 +9,6 @@ public class ManagersInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        Container.Bind<AudioManager>().AsSingle().WithArguments(_audioReferences).NonLazy();
+        Container.BindInterfacesAndSelfTo<AudioManager>().AsSingle().WithArguments(_audioReferences).NonLazy();
     }
 }

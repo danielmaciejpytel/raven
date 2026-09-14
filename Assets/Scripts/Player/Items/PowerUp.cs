@@ -1,5 +1,6 @@
 using ModestTree;
 using NaughtyAttributes;
+using Raven.Core;
 using Raven.Player;
 using Raven.UI;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace Raven.Collectible.PowerUp
 
         private PlayerHudManager _playerHudManager;
         private Transform _playerTransform;
+        private Collider[] _overlapResults = new Collider[8];
+        private bool _collected;
 
         [Inject]
         public void Construct(PlayerHudManager p_playerHudManager)
@@ -26,19 +29,24 @@ namespace Raven.Collectible.PowerUp
 
         private void Update()
         {
-            Collider[] hits =
-            Physics.OverlapSphere(transform.position, _activeRadius);
-
-            for (int i = 0; i < hits.Length; i++)
+            if (_collected || Time.deltaTime <= 0f) return;
+            if (_playerTransform == null)
             {
-                if (hits[i] == null)
-                {
-                    continue;
-                }
+                int hitCount = PhysicsQueries.OverlapSphere(transform.position, _activeRadius, ref _overlapResults);
 
-                if (hits[i].tag == "Player")
+                for (int i = 0; i < hitCount; i++)
                 {
-                    _playerTransform = hits[i].transform;
+                    Collider hit = _overlapResults[i];
+                    if (hit == null)
+                    {
+                        continue;
+                    }
+
+                    if (hit.CompareTag("Player"))
+                    {
+                        _playerTransform = hit.transform;
+                        break;
+                    }
                 }
             }
 
@@ -54,6 +62,7 @@ namespace Raven.Collectible.PowerUp
                     return;
                 }
 
+                _collected = true;
                 switch (_powerUpType)
                 {
                     case PowerUpType.Energy:

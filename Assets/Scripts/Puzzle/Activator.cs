@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEngine;
 
@@ -35,12 +36,11 @@ namespace Raven.Puzzle
         private bool _closingDoor;
         private bool _openingDoor;
         private bool _doorAreOpened;
-        private bool _doorAreClosed = true;
         private bool _play;
 
-        private AudioSource _audioSource;
+        private Coroutine _closeDelayCoroutine;
+        private readonly HashSet<Collider> _playerColliders = new HashSet<Collider>();
 
-        private float _timer;
         private float _stayOpenTimer;
 
         private Vector3 _doorDestiny;
@@ -53,11 +53,17 @@ namespace Raven.Puzzle
         private void Awake()
         {
             GetComponent<Collider>().isTrigger = true;
-            _audioSource = GetComponent<AudioSource>();
+
+            if (_doorTransform == null)
+            {
+                Debug.LogError($"Activator '{name}' has no door transform assigned.", this);
+                enabled = false;
+                return;
+            }
 
             if (_activatorType == ActivatorType.Torch)
             {
-                _fire.SetActive(false);
+                if (_fire != null) _fire.SetActive(false);
             }
             else
             {
@@ -76,7 +82,7 @@ namespace Raven.Puzzle
                 OpenDoor();
             }
 
-            if (_closingDoor)
+            else if (_closingDoor)
             {
                 CloseDoor();
             }
@@ -84,14 +90,11 @@ namespace Raven.Puzzle
 
         public void OpenDoor()
         {
-            if (_closingDoor) return;
+            if (_closingDoor || _doorTransform == null) return;
 
-            _doorAreClosed = false;
-
-            if (_timer <= _openTime && !_doorAreOpened)
+            if (_openTime > 0f && _percent < 1f && !_doorAreOpened)
             {
-                _percent = _timer / _openTime;
-                _timer += Time.deltaTime;
+                _percent = Mathf.MoveTowards(_percent, 1f, Time.deltaTime / _openTime);
                 
                 _doorTransform.position = _doorStartPos + _doorShift * _percent;
 
@@ -102,24 +105,28 @@ namespace Raven.Puzzle
             }
             else
             {
+                _percent = 1f;
+                _doorTransform.position = _doorDestiny;
+                if (_activatorType == ActivatorType.Lever) transform.position = _partDestiny;
                 _doorAreOpened = true;
-                _timer = _closeTime - _percent * _closeTime;
 
-                if (_stayOpenForAWhile)
+                if (_stayOpenForAWhile && _activatorType == ActivatorType.Torch)
                 {
+                    if (_doorAudioSource != null) _doorAudioSource.Stop();
                     StayOpenWhile();
-                    _doorAudioSource.Stop();
                 }
                 else if (!_stayOpen && _activatorType == ActivatorType.Torch)
                 {
                     _openingDoor = false;
                     _doorAreOpened = false;
                     _closingDoor = true;
+                    _play = true;
+                    PlaySound(_closeSound);
                 }
                 else
                 {
                     _openingDoor = false;
-                    _doorAudioSource.Stop();
+                    if (_doorAudioSource != null) _doorAudioSource.Stop();
                 }
             }
         }
@@ -145,60 +152,56 @@ namespace Raven.Puzzle
         {
             _doorAreOpened = false;
 
-            if (_timer <= _closeTime)
+            if (_closeTime > 0f && _percent > 0f)
             {
-                _percent = _timer / _closeTime;
-                _timer += Time.deltaTime;
+                _percent = Mathf.MoveTowards(_percent, 0f, Time.deltaTime / _closeTime);
 
-                _doorTransform.position = _doorDestiny - _doorShift * _percent;
+                _doorTransform.position = _doorStartPos + _doorShift * _percent;
 
                 if (_activatorType == ActivatorType.Lever)
                 {
-                    transform.position = _partDestiny - _partShift * _percent;
+                    transform.position = _partStartPos + _partShift * _percent;
                 }
             }
             else
             {
+                _percent = 0f;
+                _doorTransform.position = _doorStartPos;
+                if (_activatorType == ActivatorType.Lever) transform.position = _partStartPos;
                 _closingDoor = false;
-                _doorAreClosed = true;
-
-                _timer = _openTime - _percent * _openTime;
 
                 if (_activatorType == ActivatorType.Torch)
                 {
-                    _fire.SetActive(false);
-                    _torchAudioSource.Stop();
+                    if (_fire != null) _fire.SetActive(false);
+                    if (_torchAudioSource != null) _torchAudioSource.Stop();
                 }
 
-                _doorAudioSource.Stop();
+                if (_doorAudioSource != null) _doorAudioSource.Stop();
             }
         }
 
         private void OnTriggerEnter(Collider p_other)
         {
-            if (_openingDoor) return;
+            if (!isActiveAndEnabled) return;
 
-            if (_activatorType == ActivatorType.Torch && p_other.tag == "FireBullet")
+            if (_activatorType == ActivatorType.Torch && p_other.CompareTag("FireBullet"))
             {
+                if (_openingDoor || _doorAreOpened) return;
+                _closingDoor = false;
                 _openingDoor = true;
-                _fire.SetActive(true);
-                _torchAudioSource.Play();
+                _stayOpenTimer = 0f;
+                if (_fire != null) _fire.SetActive(true);
+                if (_torchAudioSource != null) _torchAudioSource.Play();
                 _play = true;
                 PlaySound(_openSound);
             }
-            else if (_activatorType == ActivatorType.Lever && p_other.tag == "Player")
+            else if (_activatorType == ActivatorType.Lever && IsPlayer(p_other))
             {
-                _closingDoor = false;
+                _playerColliders.Add(p_other);
+                CancelCloseDelay();
+                if (_openingDoor || _doorAreOpened) return;
 
-                if (!_doorAreClosed)
-                {
-                    _timer = _openTime - _percent * _openTime;
-                }
-                else
-                {
-                    _timer = 0;
-                }
-                
+                _closingDoor = false;
                 _openingDoor = true;
                 _play = true;
                 PlaySound(_openSound);
@@ -207,16 +210,19 @@ namespace Raven.Puzzle
 
         private void OnTriggerExit(Collider p_collider)
         {
-            if (!_stayOpen && !_closingDoor && _activatorType == ActivatorType.Lever && p_collider.tag == "Player")
+            if (!_playerColliders.Remove(p_collider) || _playerColliders.Count > 0) return;
+
+            if ((!_stayOpen || _stayOpenForAWhile) && !_closingDoor && _activatorType == ActivatorType.Lever)
             {
                 if (_stayOpenForAWhile)
                 {
-                    StartCoroutine(CloseDelayCoroutine());
+                    CancelCloseDelay();
+                    _closeDelayCoroutine = StartCoroutine(CloseDelayCoroutine());
                     return;
                 }
 
                 _openingDoor = false;
-                _timer = _closeTime - _percent * _closeTime;
+                _doorAreOpened = false;
                 _closingDoor = true;
                 _play = true;
                 PlaySound(_closeSound);
@@ -225,9 +231,12 @@ namespace Raven.Puzzle
 
         private IEnumerator CloseDelayCoroutine()
         {
+            yield return new WaitForSeconds(Mathf.Max(0f, _stayOpenTime));
+            _closeDelayCoroutine = null;
+            if (_playerColliders.Count > 0) yield break;
+
             _openingDoor = false;
-            yield return new WaitForSeconds(_stayOpenTime);
-            _timer = _closeTime - _percent * _closeTime;
+            _doorAreOpened = false;
             _closingDoor = true;
             _play = true;
             PlaySound(_closeSound);
@@ -237,11 +246,33 @@ namespace Raven.Puzzle
         {
             if (_play)
             {
-                _doorAudioSource.Stop();
-                _doorAudioSource.clip = p_audioClip;
-                _doorAudioSource.Play();
+                if (_doorAudioSource != null)
+                {
+                    _doorAudioSource.Stop();
+                    _doorAudioSource.clip = p_audioClip;
+                    if (p_audioClip != null) _doorAudioSource.Play();
+                }
                 _play = false;
             }
+        }
+
+        private static bool IsPlayer(Collider collider)
+        {
+            CharacterController player = collider.GetComponentInParent<CharacterController>();
+            return collider.CompareTag("Player") || (player != null && player.CompareTag("Player"));
+        }
+
+        private void CancelCloseDelay()
+        {
+            if (_closeDelayCoroutine == null) return;
+            StopCoroutine(_closeDelayCoroutine);
+            _closeDelayCoroutine = null;
+        }
+
+        private void OnDisable()
+        {
+            CancelCloseDelay();
+            _playerColliders.Clear();
         }
 
 #if UNITY_EDITOR

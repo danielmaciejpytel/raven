@@ -1,4 +1,4 @@
-﻿//Stylized Water 2
+//Stylized Water 2
 //Staggart Creations (http://staggart.xyz)
 //Copyright protected under Unity Asset Store EULA
 
@@ -374,41 +374,8 @@ namespace StylizedWater2
 
         public static void DrawRenderGraphError()
         {
-            #if UNITY_6000_0_OR_NEWER && URP
-            if (GraphicsSettings.GetRenderPipelineSettings<RenderGraphSettings>().enableRenderCompatibilityMode == false)
-            {
-                EditorGUILayout.HelpBox("Using Render Graph in Unity 6+ is not supported." +
-                                        "\n\nBackwards compatibility mode must be enabled.", MessageType.Error);
-                
-                GUILayout.Space(-32);
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(new GUIContent("Enable", EditorGUIUtility.IconContent("d_tab_next").image), GUILayout.Width(60)))
-                    {
-                        #if URP_COMPATIBILITY_MODE
-                                                GraphicsSettings.GetRenderPipelineSettings<RenderGraphSettings>().enableRenderCompatibilityMode = true;
-                        
-                                                EditorUtility.DisplayDialog($"{AssetInfo.ASSET_NAME} v{AssetInfo.INSTALLED_VERSION}", 
-                                                    "Please note that this fallback option will be removed in a future Unity version, this version of Stylized Water will no longer be completely functional then." +
-                                                    "\n\n" +
-                                                    "A license upgrade for Unity 6+ supported version may be available, please check the documentation for current information.", "OK");
-                        #else
-                                                // The setter for enableRenderCompatibilityMode is obsolete / not accessible without URP_COMPATIBILITY_MODE.
-                                                // Inform the user that enabling compatibility mode can't be done automatically in this build.
-                                                EditorUtility.DisplayDialog($"{AssetInfo.ASSET_NAME} v{AssetInfo.INSTALLED_VERSION}",
-                                                    "Automatic enabling of Render Graph compatibility mode is not available in this Unity build.\n\n" +
-                                                    "If you require this fallback, define URP_COMPATIBILITY_MODE in your project scripting defines or enable the compatibility option in the render pipeline settings if available. " +
-                                                    "See the asset documentation for more information.", "OK");
-                        #endif
-                    }
-                    GUILayout.Space(8);
-                }
-                GUILayout.Space(11);
-            }
-            #endif
+            // Caustics and SSR have native Render Graph support in this project.
         }
-    
         public static void DrawFooter()
         {
             GUILayout.Space(5f);

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Rendering;
 #if URP
 using UnityEngine.Rendering.Universal;
@@ -30,6 +30,7 @@ namespace StylizedWater2
         {
             this.settings = renderFeature;
             m_directionalCaustics = settings.directionalCaustics;
+            ConfigureInput(settings.screenSpaceReflectionSettings.enable ? ScriptableRenderPassInput.Color | ScriptableRenderPassInput.Depth : (m_directionalCaustics ? ScriptableRenderPassInput.Depth : ScriptableRenderPassInput.None));
         }
 
         #if UNITY_2020_2_OR_NEWER
@@ -37,7 +38,47 @@ namespace StylizedWater2
         #endif
 
         #if UNITY_6000_0_OR_NEWER //Silence warning spam
-        public override void RecordRenderGraph(UnityEngine.Rendering.RenderGraphModule.RenderGraph renderGraph, ContextContainer frameData) { }
+        private class GraphData {
+            public bool caustics, ssr;
+            public Matrix4x4 projection;
+            public UniversalCameraData camera;
+        }
+        public override void RecordRenderGraph(UnityEngine.Rendering.RenderGraphModule.RenderGraph renderGraph, ContextContainer frameData) {
+            var lights = frameData.Get<UniversalLightData>();
+            var camera = frameData.Get<UniversalCameraData>();
+            bool directional = m_directionalCaustics && lights.mainLightIndex >= 0 && lights.visibleLights[lights.mainLightIndex].lightType == LightType.Directional;
+            using(var builder = renderGraph.AddUnsafePass<GraphData>("Water caustics and SSR constants", out var data)) {
+                data.caustics = directional;
+                data.ssr = settings.screenSpaceReflectionSettings.enable;
+                data.camera = camera;
+                data.projection = directional ? Matrix4x4.Rotate(lights.visibleLights[lights.mainLightIndex].light.transform.rotation).inverse : Matrix4x4.identity;
+                builder.AllowGlobalStateModification(true);
+                builder.AllowPassCulling(false);
+                builder.SetRenderFunc(static (GraphData d, UnityEngine.Rendering.RenderGraphModule.UnsafeGraphContext context) => {
+                    var cmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
+                    cmd.SetGlobalInt(_EnableDirectionalCaustics, d.caustics ? 1 : 0);
+                    cmd.SetGlobalInt(_WaterSSREnabled, d.ssr ? 1 : 0);
+                    cmd.SetGlobalMatrix(CausticsProjection, d.projection);
+                    if(d.caustics) NormalReconstruction.SetupProperties(cmd, d.camera);
+                    // The optional height prepass is separate from caustics/SSR and has no graph implementation.
+                    cmd.SetGlobalInt(_WaterDisplacementPrePassAvailable, 0);
+                    cmd.DisableShaderKeyword(DisplacementPrePass.KEYWORD);
+                });
+            }
+        }
+        internal sealed class ResetGraphConstants : ScriptableRenderPass {
+            private class Data { }
+            public ResetGraphConstants() { renderPassEvent = RenderPassEvent.AfterRendering; }
+            public override void RecordRenderGraph(UnityEngine.Rendering.RenderGraphModule.RenderGraph graph, ContextContainer frameData) {
+                using(var builder = graph.AddUnsafePass<Data>("Water constants reset", out var data)) {
+                    builder.AllowGlobalStateModification(true); builder.AllowPassCulling(false);
+                    builder.SetRenderFunc(static (Data d, UnityEngine.Rendering.RenderGraphModule.UnsafeGraphContext context) => {
+                        context.cmd.SetGlobalInt(_EnableDirectionalCaustics, 0);
+                        context.cmd.SetGlobalInt(_WaterSSREnabled, 0);
+                    });
+                }
+            }
+        }
         #endif
 
         #if UNITY_6000_0_OR_NEWER
@@ -111,7 +152,10 @@ namespace StylizedWater2
 
         public void Dispose()
         {
+            Shader.SetGlobalInt(_EnableDirectionalCaustics, 0);
+            Shader.SetGlobalInt(_WaterSSREnabled, 0);
             Shader.SetGlobalInt(_WaterDisplacementPrePassAvailable, 0);
+            Shader.DisableKeyword(DisplacementPrePass.KEYWORD);
         }
     }
 }

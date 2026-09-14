@@ -2,7 +2,6 @@ using Raven.Config;
 using Raven.Manager;
 using Raven.Player;
 using System;
-using System.Linq;
 using UnityEngine;
 
 namespace Raven.Core
@@ -58,21 +57,37 @@ namespace Raven.Core
         public AudioClipConditions GetCurrenAudioClipConditions(AudioClipConditions[] p_audioClips, AudioNames p_clipName)
         {
             if (p_audioClips == null) return null;
-            return p_audioClips.FirstOrDefault(x => x != null && x.AudioName == p_clipName);
+
+            for (int i = 0; i < p_audioClips.Length; i++)
+            {
+                AudioClipConditions clip = p_audioClips[i];
+                if (clip != null && clip.AudioName == p_clipName)
+                {
+                    return clip;
+                }
+            }
+
+            return null;
         }
 
         private void PlayWalk(float p_speed)
         {
+            AudioClipConditions walkClip = GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.Walk);
+            if (walkClip == null)
+            {
+                return;
+            }
+
             if (p_speed > 0 && !_playerMovementManager.Dash)
             {
-                if (_references.PlayerMoveSource.clip != GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.Walk).AudioClip)
+                if (_references.PlayerMoveSource.clip != walkClip.AudioClip || !_references.PlayerMoveSource.isPlaying)
                 {
-                    PlaySound(GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.Walk), _references.PlayerMoveSource);
+                    PlaySound(walkClip, _references.PlayerMoveSource);
                 }
             }
             else
             {
-                if (_references.PlayerMoveSource.clip == GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.Walk).AudioClip)
+                if (_references.PlayerMoveSource.clip == walkClip.AudioClip)
                 {
                     _references.PlayerMoveSource.Stop();
                     _references.PlayerMoveSource.clip = null;
@@ -87,20 +102,14 @@ namespace Raven.Core
                 return;
             }
 
-            if (p_playerStateName == PlayerStateName.Fire)
+            AudioNames dashName = p_playerStateName == PlayerStateName.Fire ? AudioNames.FireDash : AudioNames.Dash;
+            AudioClipConditions dashClip = GetCurrenAudioClipConditions(_references.AudioClipConditions, dashName);
+            if (dashClip == null)
             {
-                if (_references.PlayerMoveSource.clip != GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.FireDash).AudioClip)
-                {
-                    PlaySound(GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.FireDash), _references.PlayerMoveSource);
-                }
+                return;
             }
-            else
-            {
-                if (_references.PlayerMoveSource.clip != GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.Dash).AudioClip)
-                {
-                    PlaySound(GetCurrenAudioClipConditions(_references.AudioClipConditions, AudioNames.Dash), _references.PlayerMoveSource);
-                }
-            }
+
+            PlaySound(dashClip, _references.PlayerMoveSource);
         }
 
         private void PlayShoot()

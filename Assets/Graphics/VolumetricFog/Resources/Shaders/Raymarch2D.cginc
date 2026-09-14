@@ -42,6 +42,7 @@ float loop_t;
 #include "FogOfWar.cginc"
 #include "FogDistance.cginc"
 #include "Surface.cginc"
+#include "FogHeight.cginc"
 
 
 void SetJitter(float4 scrPos) {
@@ -78,6 +79,11 @@ half4 SampleDensity(float3 wpos) {
 
     SurfaceApply(boundsCenter, boundsExtents);
 
+#if VF2_HEIGHT_MAP
+    float heightWeight = ApplyLocalFogHeight(wpos, boundsExtents);
+    float heightEnvelope = 1.0 - abs((wpos.y - boundsCenter.y) / max(boundsExtents.y, 0.05));
+#endif
+
 #if V2F_DETAIL_NOISE
     half detail = tex3Dlod(_DetailTex, float4(wpos * DETAIL_SCALE + _WindDirection, 0)).a;
     half4 density = _DetailColor;
@@ -95,6 +101,10 @@ half4 SampleDensity(float3 wpos) {
     density.a -= abs(wpos.y);
 #endif
 
+#if VF2_HEIGHT_MAP
+    // Keep detail-only fog inside painted heights as well. Unpainted texels retain the original response.
+    density.a = lerp(density.a, min(density.a, heightEnvelope), heightWeight);
+#endif
     return density;
 }
 
@@ -148,34 +158,32 @@ half4 GetFogColor(float3 rayStart, float3 viewDir, float t0, float t1) {
 
     float len = t1 - t0;
     float rs = MIN_STEPPING + max(log(len), 0) / FOG_STEPPING;     // stepping ratio with atten detail with distance
+    // Cap the sample count by increasing the physical step as well as ray progress.
+    rs = max(rs, len / MAX_ITERATIONS);
     half4 sum = half4(0,0,0,0);
     float diffusion = 1.0 + pow(max(dot(viewDir, _SunDir.xyz), 0), _LightDiffusionPower) * _LightDiffusionIntensity;
     half3 diffusionColor = _LightColor.rgb * diffusion;
     half4 lightColor = half4(diffusionColor, 1.0);
 
-    float3 wpos = rayStart + viewDir * (t0 + jitter * JITTERING);
+    float3 rayOrigin = rayStart + viewDir * t0;
 
-    SurfaceComputeEndPoints(wpos, rayStart + viewDir * t1);
+    SurfaceComputeEndPoints(rayOrigin, rayStart + viewDir * t1);
 
-    wpos.y -= _BoundsVerticalOffset;
-    viewDir *= rs;
-
-    float energyStep = rs;
-    rs /= len + 0.001;
-    rs = max(rs, 1.0 / MAX_ITERATIONS);
-    
-    float t = 0;
+    rayOrigin.y -= _BoundsVerticalOffset;
 
     // Uncomment this Unroll macro to support WebGL. Increase 50 value if needed.
     // UNITY_UNROLLX(50)
-    while (t < 1.0) {
-        loop_t = t;
+    for (int sampleIndex = 0; sampleIndex < MAX_ITERATIONS; sampleIndex++) {
+        float t = sampleIndex * rs;
+        if (t >= len) break;
+        // Integrate each interval once, including a shorter final interval.
+        float energyStep = min(rs, len - t);
+        float sampleDistance = t + min(jitter * JITTERING, energyStep);
+        loop_t = sampleDistance / len;
+        float3 wpos = rayOrigin + viewDir * sampleDistance;
         AddFog(rayStart, wpos, energyStep, lightColor, sum);
         if (sum.a > 0.99) break;
-        t += rs;
-        wpos += viewDir;
     }
-    AddFog(rayStart, wpos, len * (rs - (t-1.0)), lightColor, sum);
 
 	sum += (jitter - 0.5) * DITHERING;
     sum *= _LightColor.a;

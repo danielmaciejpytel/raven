@@ -9,14 +9,20 @@ public class Bullet : MonoBehaviour
     private PlayerDataManager _playerDataManager;
     private EnemyConfig _enemyConfig;
     private float _speed;
+    private float _power;
+    private float _lifeTime = 4f;
     private GameObject _thisEnemy;
 
     private float _lifeTimer;
+    private bool _spent;
 
     public void Initialization(PlayerStatesManager p_playerStatesManager)
     {
         _playerStatesManager = p_playerStatesManager;
-        _speed = _playerStatesManager.CurrentConfig.BulletSpeed;
+        PlayerStateConfig config = _playerStatesManager.CurrentConfig;
+        _speed = config.BulletSpeed;
+        _power = config.bulletPower;
+        _lifeTime = config.BulletLifeTime;
     }
 
     public void Initialization(float p_bulletSpeed, PlayerDataManager p_playerDataManager, EnemyConfig p_enemyConfig, GameObject p_thisEnemy)
@@ -25,36 +31,45 @@ public class Bullet : MonoBehaviour
         _enemyConfig = p_enemyConfig;
         _playerDataManager = p_playerDataManager;
         _speed = p_bulletSpeed;
+        _power = p_enemyConfig.Power;
     }
 
     void Update()
     {
-        transform.position += transform.forward * _speed * Time.deltaTime;
+        if (_spent) return;
 
-        if (_lifeTimer >= 4)
+        transform.position += transform.forward * _speed * Time.deltaTime;
+        _lifeTimer += Time.deltaTime;
+
+        if (_lifeTimer >= _lifeTime)
         {
+            _spent = true;
             Destroy(gameObject);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Collectible" || other.tag == "Laver") return;
+        if (_spent) return;
+        if (other.CompareTag("Collectible") || other.CompareTag("Laver")) return;
+        if (other.isTrigger && (other.GetComponent<Checpoint>() != null || other.GetComponent<ResetPoint>() != null)) return;
+        if (_playerStatesManager == null && _thisEnemy != null &&
+            (other.gameObject == _thisEnemy || other.transform.IsChildOf(_thisEnemy.transform))) return;
 
-        if (_playerStatesManager != null && other.tag == "Enemy")
-        {
-            other.GetComponentInParent<EnemyController>().TakeDamage(_playerStatesManager.CurrentConfig.bulletPower);
-        }
-        else if (other.tag == "Player")
-        {
-            _playerDataManager.TakeDamage(_enemyConfig.Power);
-        }
-        else if (other.tag == "Enemy" && other.gameObject != _thisEnemy)
-        {
-            other.GetComponentInParent<EnemyController>().TakeDamage(_enemyConfig.Power);
-        }
+        CharacterController player = other.GetComponentInParent<CharacterController>();
+        bool hitPlayer = other.CompareTag("Player") || (player != null && player.CompareTag("Player"));
+        if (_playerStatesManager != null && hitPlayer) return;
 
-        if (_playerStatesManager == null && other.gameObject == _thisEnemy) return;
+        _spent = true;
+        EnemyController enemy = other.GetComponentInParent<EnemyController>();
+        if (enemy != null && (_playerStatesManager != null || _enemyConfig != null))
+        {
+            enemy.TakeDamage(_power);
+        }
+        else if (_playerDataManager != null && hitPlayer)
+        {
+            _playerDataManager.TakeDamage(_power);
+        }
 
         Destroy(this.gameObject);
     }

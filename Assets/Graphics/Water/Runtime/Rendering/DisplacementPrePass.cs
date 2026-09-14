@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -193,6 +193,7 @@ namespace StylizedWater2
         {
             Shader.SetGlobalVector(_WaterDisplacementCoords, Vector4.zero);
             RTHandles.Release(renderTarget);
+            renderTarget = null;
         }
     }
 }

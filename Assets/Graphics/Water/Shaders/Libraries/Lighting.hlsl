@@ -198,7 +198,8 @@ void AccumulateAdditionalWaterLight(Light light, InputData inputData, WaterSurfa
 				translucencyData.lightDir = light.direction;
 				translucencyData.lightColor = light.color * light.distanceAttenuation;
 				translucencyData.strength = translucencyStrength * light.shadowAttenuation;
-				translucencyData.exponent = translucencyExp * light.distanceAttenuation;
+				// Attenuate energy through lightColor, not the angular exponent: near-zero exponents create a camera-dependent edge.
+				translucencyData.exponent = max(translucencyExp, 1.0);
 				
 				ApplyTranslucency(translucencyData, surfaceData.emission.rgb);
 			}

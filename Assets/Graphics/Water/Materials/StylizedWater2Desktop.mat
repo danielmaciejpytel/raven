@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: StylizedWater2_Desktop
+  m_Name: StylizedWater2Desktop
   m_Shader: {fileID: -6465566751694194690, guid: d7b0192b9bf19c949900035fa781fdc4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -145,10 +145,10 @@ Material:
     - _CROSSPAN_INTERSECTIONOn: 1
     - _CausticsBrightness: 1
     - _CausticsChromance: 1
-    - _CausticsDistortion: 0.047
+    - _CausticsDistortion: 0.045
     - _CausticsOn: 1
     - _CausticsSpeed: 0.1
-    - _CausticsTiling: 0
+    - _CausticsTiling: 1
     - _ColorAbsorption: 0.025
     - _CrossPan_IntersectionOn: 0
     - _Cull: 0
@@ -255,7 +255,7 @@ Material:
     - _SparkleSize: 0.302
     - _SpecularHighlights: 1
     - _SpecularReflectionsOn: 1
-    - _Speed: 0.75
+    - _Speed: 0.325
     - _SrcBlend: 1
     - _SunReflectionDistortion: 0.725
     - _SunReflectionPerturbance: 0.386
@@ -277,9 +277,9 @@ Material:
     - _VertexColorDepth: 0
     - _VertexColorFoam: 0
     - _VertexColorWaveFlattening: 1
-    - _WaveCount: 2
+    - _WaveCount: 4
     - _WaveDistance: 0.775
-    - _WaveHeight: 0.1
+    - _WaveHeight: 0.325
     - _WaveNormalStr: 0.1
     - _WaveSpeed: 2.25
     - _WaveSteepness: 0

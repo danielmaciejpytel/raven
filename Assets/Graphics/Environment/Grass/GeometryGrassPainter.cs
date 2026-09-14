@@ -21,6 +21,7 @@ public class GeometryGrassPainter : MonoBehaviour
         public GameObject gameObject;
         public Mesh mesh;
         public MeshRenderer renderer;
+        public CellData pendingData;
     }
 
     private sealed class CellData
@@ -33,8 +34,104 @@ public class GeometryGrassPainter : MonoBehaviour
     }
 
     private readonly List<GrassCell> cells = new List<GrassCell>();
+    private int nextPendingCell;
+    private RendererState lastRendererState;
+    private bool hasRendererState;
+    private struct RendererState
+    {
+        public int layer;
+        public bool enabled;
+        public Material material;
+        public UnityEngine.Rendering.ShadowCastingMode shadows;
+        public bool receiveShadows;
+        public uint renderingLayers;
+        public UnityEngine.Rendering.LightProbeUsage lightProbes;
+        public UnityEngine.Rendering.ReflectionProbeUsage reflectionProbes;
+        public Transform probeAnchor;
+        public bool occlusion;
+        public int sortingLayer;
+        public int sortingOrder;
+        public bool Matches(RendererState other) =>
+            layer == other.layer
+            && enabled == other.enabled
+            && material == other.material
+            && shadows == other.shadows
+            && receiveShadows == other.receiveShadows
+            && renderingLayers == other.renderingLayers
+            && lightProbes == other.lightProbes
+            && reflectionProbes == other.reflectionProbes
+            && probeAnchor == other.probeAnchor
+            && occlusion == other.occlusion
+            && sortingLayer == other.sortingLayer
+            && sortingOrder == other.sortingOrder;
+    }
+    private RendererState ReadRendererState() => new RendererState {
+        layer = gameObject.layer,
+        enabled = sourceRenderer.enabled && isActiveAndEnabled,
+        material = sourceRenderer.sharedMaterial,
+        shadows = sourceRenderer.shadowCastingMode,
+        receiveShadows = sourceRenderer.receiveShadows,
+        renderingLayers = sourceRenderer.renderingLayerMask,
+        lightProbes = sourceRenderer.lightProbeUsage,
+        reflectionProbes = sourceRenderer.reflectionProbeUsage,
+        probeAnchor = sourceRenderer.probeAnchor,
+        occlusion = sourceRenderer.allowOcclusionWhenDynamic,
+        sortingLayer = sourceRenderer.sortingLayerID,
+        sortingOrder = sourceRenderer.sortingOrder
+    };
+
     private MeshRenderer sourceRenderer;
     private bool rebuildRequested;
+
+    // Share the upload budget across every painter, including Scene View. Uploading all
+    // painted meshes in one frame can exhaust Unity's default graphics staging ring.
+    private const int UploadVertexBudget = 8192;
+    private static readonly List<GeometryGrassPainter> activePainters = new List<GeometryGrassPainter>();
+    private static int lastUploadFrame = -1;
+
+    private static void UploadPendingMeshes()
+    {
+        // Preserve the existing ambient look in scenes without baked probe data.
+        Shader.SetGlobalFloat("_RavenGrassBakedProbes", LightmapSettings.lightProbes != null
+            && LightmapSettings.lightProbes.count > 0 ? 1f : 0f);
+        int remaining = UploadVertexBudget;
+        foreach (var painter in activePainters)
+        {
+            if (painter == null || !painter.isActiveAndEnabled)
+                continue;
+            while (painter.nextPendingCell < painter.cells.Count)
+            {
+                var cell = painter.cells[painter.nextPendingCell];
+                var data = cell.pendingData;
+                if (data == null)
+                {
+                    painter.nextPendingCell++;
+                    continue;
+                }
+                if (data.positions.Count > remaining)
+                    return;
+                painter.UploadCell(cell, data);
+                cell.pendingData = null;
+                painter.nextPendingCell++;
+                remaining -= data.positions.Count;
+                if (remaining <= 0)
+                    return;
+            }
+        }
+    }
+
+#if UNITY_EDITOR
+    private static double nextEditorUploadTime;
+    private static void UploadEditorMeshes()
+    {
+        // Editor updates can run several times between rendered frames, especially
+        // after a domain reload. Do not spend a fresh upload budget on every tick.
+        if (Application.isPlaying || EditorApplication.timeSinceStartup < nextEditorUploadTime)
+            return;
+        nextEditorUploadTime = EditorApplication.timeSinceStartup + 1.0 / 60.0;
+        UploadPendingMeshes();
+    }
+#endif
 
     private void OnValidate()
     {
@@ -95,8 +192,12 @@ public class GeometryGrassPainter : MonoBehaviour
     {
         filter = GetComponent<MeshFilter>();
         sourceRenderer = GetComponent<MeshRenderer>();
+        if (!activePainters.Contains(this))
+            activePainters.Add(this);
         RebuildMesh();
 #if UNITY_EDITOR
+        EditorApplication.update -= UploadEditorMeshes;
+        EditorApplication.update += UploadEditorMeshes;
         SceneView.duringSceneGui -= OnScene;
         SceneView.duringSceneGui += OnScene;
 #endif
@@ -104,7 +205,10 @@ public class GeometryGrassPainter : MonoBehaviour
 
     private void OnDisable()
     {
+        activePainters.Remove(this);
 #if UNITY_EDITOR
+        if (activePainters.Count == 0)
+            EditorApplication.update -= UploadEditorMeshes;
         SceneView.duringSceneGui -= OnScene;
 #endif
         ReleaseCells();
@@ -122,6 +226,7 @@ public class GeometryGrassPainter : MonoBehaviour
 
     private void OnDestroy()
     {
+        activePainters.Remove(this);
 #if UNITY_EDITOR
         SceneView.duringSceneGui -= OnScene;
 #endif
@@ -134,40 +239,64 @@ public class GeometryGrassPainter : MonoBehaviour
         {
             if (cell.gameObject != null)
                 cell.gameObject.SetActive(false);
-            DestroyGenerated(cell.mesh);
             DestroyGenerated(cell.gameObject);
+            DestroyGenerated(cell.mesh);
         }
         cells.Clear();
+        hasRendererState = false;
+        nextPendingCell = 0;
     }
 
     private void LateUpdate()
     {
         if (rebuildRequested)
             RebuildMesh();
+        if (Application.isPlaying && lastUploadFrame != Time.frameCount)
+        {
+            lastUploadFrame = Time.frameCount;
+            UploadPendingMeshes();
+        }
         // Keep the original renderer as the source of material/layer settings.
         if (sourceRenderer == null)
             return;
-        foreach (var cell in cells)
-            ApplyRendererSettings(cell);
+        var state = ReadRendererState();
+        if (!hasRendererState || !lastRendererState.Matches(state))
+        {
+            lastRendererState = state;
+            hasRendererState = true;
+            foreach (var cell in cells)
+                ApplyRendererSettings(cell);
+        }
     }
 
     private void ApplyRendererSettings(GrassCell cell)
     {
         if (cell.renderer == null)
             return;
-        cell.gameObject.layer = gameObject.layer;
-        cell.renderer.enabled = sourceRenderer.enabled && isActiveAndEnabled;
+        if (cell.gameObject.layer != (gameObject.layer))
+            cell.gameObject.layer = gameObject.layer;
+        if (cell.renderer.enabled != (sourceRenderer.enabled && isActiveAndEnabled))
+            cell.renderer.enabled = sourceRenderer.enabled && isActiveAndEnabled;
         if (cell.renderer.sharedMaterial != sourceRenderer.sharedMaterial)
             cell.renderer.sharedMaterial = sourceRenderer.sharedMaterial;
-        cell.renderer.shadowCastingMode = sourceRenderer.shadowCastingMode;
-        cell.renderer.receiveShadows = sourceRenderer.receiveShadows;
-        cell.renderer.renderingLayerMask = sourceRenderer.renderingLayerMask;
-        cell.renderer.lightProbeUsage = sourceRenderer.lightProbeUsage;
-        cell.renderer.reflectionProbeUsage = sourceRenderer.reflectionProbeUsage;
-        cell.renderer.probeAnchor = sourceRenderer.probeAnchor;
-        cell.renderer.allowOcclusionWhenDynamic = sourceRenderer.allowOcclusionWhenDynamic;
-        cell.renderer.sortingLayerID = sourceRenderer.sortingLayerID;
-        cell.renderer.sortingOrder = sourceRenderer.sortingOrder;
+        if (cell.renderer.shadowCastingMode != (sourceRenderer.shadowCastingMode))
+            cell.renderer.shadowCastingMode = sourceRenderer.shadowCastingMode;
+        if (cell.renderer.receiveShadows != (sourceRenderer.receiveShadows))
+            cell.renderer.receiveShadows = sourceRenderer.receiveShadows;
+        if (cell.renderer.renderingLayerMask != (sourceRenderer.renderingLayerMask))
+            cell.renderer.renderingLayerMask = sourceRenderer.renderingLayerMask;
+        if (cell.renderer.lightProbeUsage != (sourceRenderer.lightProbeUsage))
+            cell.renderer.lightProbeUsage = sourceRenderer.lightProbeUsage;
+        if (cell.renderer.reflectionProbeUsage != (sourceRenderer.reflectionProbeUsage))
+            cell.renderer.reflectionProbeUsage = sourceRenderer.reflectionProbeUsage;
+        if (cell.renderer.probeAnchor != (sourceRenderer.probeAnchor))
+            cell.renderer.probeAnchor = sourceRenderer.probeAnchor;
+        if (cell.renderer.allowOcclusionWhenDynamic != (sourceRenderer.allowOcclusionWhenDynamic))
+            cell.renderer.allowOcclusionWhenDynamic = sourceRenderer.allowOcclusionWhenDynamic;
+        if (cell.renderer.sortingLayerID != (sourceRenderer.sortingLayerID))
+            cell.renderer.sortingLayerID = sourceRenderer.sortingLayerID;
+        if (cell.renderer.sortingOrder != (sourceRenderer.sortingOrder))
+            cell.renderer.sortingOrder = sourceRenderer.sortingOrder;
     }
 
     // Preserve the painted object-space coordinates: the shader uses them as random seeds.
@@ -180,7 +309,9 @@ public class GeometryGrassPainter : MonoBehaviour
             sourceRenderer = GetComponent<MeshRenderer>();
 
         rebuildRequested = false;
+        nextPendingCell = 0;
         var groups = new Dictionary<Vector3Int, CellData>();
+        var batches = new List<CellData>();
         float cellSize = Mathf.Max(1f, lightingCellSize);
         i = positions.Count;
         indicies.Clear();
@@ -190,10 +321,11 @@ public class GeometryGrassPainter : MonoBehaviour
             Vector3 position = positions[index];
             var key = new Vector3Int(Mathf.FloorToInt(position.x / cellSize),
                 Mathf.FloorToInt(position.y / cellSize), Mathf.FloorToInt(position.z / cellSize));
-            if (!groups.TryGetValue(key, out var data))
+            if (!groups.TryGetValue(key, out var data) || data.positions.Count >= UploadVertexBudget)
             {
                 data = new CellData();
-                groups.Add(key, data);
+                groups[key] = data;
+                batches.Add(data);
             }
             data.indices.Add(data.positions.Count);
             data.positions.Add(position);
@@ -203,7 +335,7 @@ public class GeometryGrassPainter : MonoBehaviour
         }
 
         int cellIndex = 0;
-        foreach (var data in groups.Values)
+        foreach (var data in batches)
         {
             GrassCell cell;
             if (cellIndex < cells.Count)
@@ -221,32 +353,42 @@ public class GeometryGrassPainter : MonoBehaviour
                 cells.Add(cell);
             }
 
-            cell.mesh.Clear();
-            cell.mesh.indexFormat = data.positions.Count > 65535
-                ? UnityEngine.Rendering.IndexFormat.UInt32
-                : UnityEngine.Rendering.IndexFormat.UInt16;
-            cell.mesh.SetVertices(data.positions);
-            cell.mesh.SetIndices(data.indices, MeshTopology.Points, 0);
-            cell.mesh.SetUVs(0, data.sizes);
-            cell.mesh.SetColors(data.colors);
-            cell.mesh.SetNormals(data.normals);
-            cell.mesh.RecalculateBounds();
-            ExpandBladeBounds(cell.mesh, data.sizes);
-            ApplyRendererSettings(cell);
-            cell.gameObject.SetActive(true);
+            cell.pendingData = data;
             cellIndex++;
         }
 
         for (int index = cells.Count - 1; index >= cellIndex; index--)
         {
             cells[index].gameObject.SetActive(false);
-            DestroyGenerated(cells[index].mesh);
             DestroyGenerated(cells[index].gameObject);
+            DestroyGenerated(cells[index].mesh);
             cells.RemoveAt(index);
         }
 
         // Generated cells own the geometry; avoid drawing the old monolithic mesh as well.
         filter.sharedMesh = null;
+    }
+
+    private void UploadCell(GrassCell cell, CellData data)
+    {
+        cell.mesh.Clear();
+        cell.mesh.indexFormat = data.positions.Count > 65535
+            ? UnityEngine.Rendering.IndexFormat.UInt32
+            : UnityEngine.Rendering.IndexFormat.UInt16;
+        cell.mesh.SetVertices(data.positions);
+        cell.mesh.SetIndices(data.indices, MeshTopology.Points, 0);
+        cell.mesh.SetUVs(0, data.sizes);
+        cell.mesh.SetColors(data.colors);
+        cell.mesh.SetNormals(data.normals);
+        cell.mesh.RecalculateBounds();
+        ExpandBladeBounds(cell.mesh, data.sizes);
+        cell.mesh.UploadMeshData(false);
+        ApplyRendererSettings(cell);
+        cell.gameObject.SetActive(true);
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+            SceneView.RepaintAll();
+#endif
     }
 
     private void ExpandBladeBounds(Mesh target, List<Vector2> sizes)

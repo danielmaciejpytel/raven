@@ -1,27 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System;
 using UnityEngine;
 
 namespace Raven.Manager
 {
     public class CoroutinesManager : MonoBehaviour
     {
-        Dictionary<object, HashSet<Coroutine>> coroutinesLookup = new Dictionary<object, HashSet<Coroutine>>();
+        private sealed class TrackedCoroutine
+        {
+            public Coroutine Coroutine;
+            public object Publisher;
+            public bool Completed;
+        }
+
+        private readonly Dictionary<object, HashSet<Coroutine>> coroutinesLookup = new Dictionary<object, HashSet<Coroutine>>();
 
         public Coroutine StartCoroutine(IEnumerator enumerator, object publisher)
         {
-            Coroutine coroutine = StartCoroutine(enumerator);
+            if (enumerator == null) throw new ArgumentNullException(nameof(enumerator));
+            if (publisher == null) throw new ArgumentNullException(nameof(publisher));
+            var tracked = new TrackedCoroutine { Publisher = publisher };
+            Coroutine coroutine = base.StartCoroutine(RunTracked(enumerator, tracked));
+            tracked.Coroutine = coroutine;
 
-            if (coroutinesLookup.ContainsKey(publisher))
+            if (tracked.Completed)
             {
-                foreach (var item in coroutinesLookup)
-                {
-                    if (item.Key == publisher)
-                    {
-                        item.Value.Add(coroutine);
-                    }
-                }
+                return coroutine;
+            }
+
+            if (coroutinesLookup.TryGetValue(publisher, out HashSet<Coroutine> coroutines))
+            {
+                coroutines.Add(coroutine);
             }
             else
             {
@@ -31,45 +41,76 @@ namespace Raven.Manager
             return coroutine;
         }
 
+        private IEnumerator RunTracked(IEnumerator enumerator, TrackedCoroutine tracked)
+        {
+            try
+            {
+                while (enumerator.MoveNext())
+                {
+                    yield return enumerator.Current;
+                }
+            }
+            finally
+            {
+                tracked.Completed = true;
+                if (tracked.Coroutine != null)
+                {
+                    RemoveTracking(tracked.Publisher, tracked.Coroutine);
+                }
+
+                (enumerator as IDisposable)?.Dispose();
+            }
+        }
+
         public void StopCoroutine(Coroutine coroutine, object publisher)
         {
             if (coroutine == null) return;
 
-            if (coroutinesLookup.ContainsKey(publisher))
+            if (coroutinesLookup.TryGetValue(publisher, out HashSet<Coroutine> coroutines) && coroutines.Remove(coroutine))
             {
-                foreach (var item in coroutinesLookup)
-                {
-                    if (item.Key == publisher)
-                    {
-                        Coroutine coroutineToStop = item.Value.FirstOrDefault(x => x == coroutine);
+                base.StopCoroutine(coroutine);
 
-                        if (coroutineToStop != null)
-                            StopCoroutine(coroutineToStop);
-                    }
+                if (coroutines.Count == 0)
+                {
+                    coroutinesLookup.Remove(publisher);
                 }
             }
         }
 
         public void StopAllCoroutines(object publisher)
         {
-            if (coroutinesLookup.ContainsKey(publisher))
+            if (coroutinesLookup.TryGetValue(publisher, out HashSet<Coroutine> coroutines))
             {
-                foreach (var item in coroutinesLookup)
+                // Detach before stopping: cleanup must not mutate the set being enumerated.
+                coroutinesLookup.Remove(publisher);
+
+                foreach (Coroutine coroutine in coroutines)
                 {
-                    if (item.Key == publisher)
-                    {
-                        foreach (Coroutine coroutine in item.Value)
-                        {
-                            StopCoroutine(coroutine);
-                        }
-                    }
+                    base.StopCoroutine(coroutine);
                 }
             }
         }
 
         public void DestroyPublisher(object publisher)
         {
-            if (coroutinesLookup.ContainsKey(publisher))
+            StopAllCoroutines(publisher);
+        }
+
+        private void OnDisable()
+        {
+            base.StopAllCoroutines();
+            coroutinesLookup.Clear();
+        }
+
+        private void RemoveTracking(object publisher, Coroutine coroutine)
+        {
+            if (!coroutinesLookup.TryGetValue(publisher, out HashSet<Coroutine> coroutines))
+            {
+                return;
+            }
+
+            coroutines.Remove(coroutine);
+            if (coroutines.Count == 0)
             {
                 coroutinesLookup.Remove(publisher);
             }
