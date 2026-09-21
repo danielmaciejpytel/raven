@@ -8,8 +8,6 @@ namespace Raven.Player
 {
     public class PlayerRigManager : ITickable, IDisposable
     {
-        private CameraManager _cameraManager;
-
         private Rig[] _rigs;
         private GameObject _rigTarget;
         private LayerMask _rayLayerMask;
@@ -17,6 +15,16 @@ namespace Raven.Player
 
         private bool _activeWeight;
         private bool _secondWeapon;
+        private bool _aimDeactivatePending;
+        private float _aimDeactivateTimer;
+        private Transform _visualHandTarget;
+        private Vector3 _visualHandTargetBasePosition;
+        private Quaternion _visualHandTargetBaseRotation;
+        private float _recoilAmount;
+        private float _recoilRecoverSpeed;
+        private float _recoilKickDistance;
+        private float _recoilKickAngle;
+        private const float AimWeightSmoothTime = 0.12f;
 
         public GameObject RigTarget => _rigTarget;
 
@@ -27,7 +35,6 @@ namespace Raven.Player
             {
                 if (_secondWeapon == value) return;
                 _secondWeapon = value;
-                UpdateRigWeights();
             }
         }
 
@@ -36,21 +43,37 @@ namespace Raven.Player
             _rayLayerMask = p_rayMask;
             _rigs = p_rigs;
             _rigTarget = p_rigTarget;
-            _cameraManager = p_cameraManager;
             _mainCamera = p_mainCamera;
 
-            UpdateRigWeights();
+            if (_rigs.Length > 0 && _rigs[0] != null)
+            {
+                _visualHandTarget = _rigs[0].transform.Find("Target");
+                if (_visualHandTarget != null)
+                {
+                    _visualHandTargetBasePosition = _visualHandTarget.localPosition;
+                    _visualHandTargetBaseRotation = _visualHandTarget.localRotation;
+                }
+            }
 
-            _cameraManager.OnAimChange += ActiveWeight;
+            ApplyRigWeights(0f);
+
         }
 
         public void Dispose()
         {
-            _cameraManager.OnAimChange -= ActiveWeight;
+            if (_visualHandTarget != null)
+            {
+                _visualHandTarget.localPosition = _visualHandTargetBasePosition;
+                _visualHandTarget.localRotation = _visualHandTargetBaseRotation;
+            }
         }
 
         public void Tick()
         {
+            UpdateAimDeactivateDelay();
+            UpdateVisualRecoil();
+            UpdateRigWeights();
+
             Vector3 rayOrigin = _mainCamera.position;
             Vector3 rayDirection = _mainCamera.forward;
 
@@ -69,34 +92,74 @@ namespace Raven.Player
             return hit;
         }
 
-        private void ActiveWeight(bool p_aim)
+        public void KickRecoil(float kickDistance, float kickAngle, float recoverTime)
         {
-            _activeWeight = p_aim;
-            UpdateRigWeights();
+            if (!_activeWeight || _visualHandTarget == null) return;
+
+            _recoilKickDistance = Mathf.Max(0f, kickDistance);
+            _recoilKickAngle = Mathf.Max(0f, kickAngle);
+            _recoilAmount = 1f;
+            _recoilRecoverSpeed = 1f / Mathf.Max(0.01f, recoverTime);
+        }
+
+        public void SetAimState(bool aim, float exitDelay)
+        {
+            if (aim)
+            {
+                _activeWeight = true;
+                _aimDeactivatePending = false;
+                _aimDeactivateTimer = 0f;
+                return;
+            }
+
+            _aimDeactivateTimer = Mathf.Max(0f, exitDelay);
+            _aimDeactivatePending = _aimDeactivateTimer > 0f;
+            if (!_aimDeactivatePending)
+            {
+                _activeWeight = false;
+            }
+        }
+
+        private void UpdateAimDeactivateDelay()
+        {
+            if (!_aimDeactivatePending) return;
+
+            _aimDeactivateTimer -= Time.deltaTime;
+            if (_aimDeactivateTimer > 0f) return;
+
+            _aimDeactivatePending = false;
+            _aimDeactivateTimer = 0f;
+            _activeWeight = false;
         }
 
         private void UpdateRigWeights()
         {
+            if (_rigs.Length == 0) return;
+
+            float blendStep = AimWeightSmoothTime <= 0f ? 1f : Time.deltaTime / AimWeightSmoothTime;
             for (int i = 0; i < _rigs.Length; i++)
             {
-                _rigs[i].weight = 0f;
+                float targetWeight = _activeWeight && (_secondWeapon || i == 0) ? 1f : 0f;
+                _rigs[i].weight = Mathf.MoveTowards(_rigs[i].weight, targetWeight, blendStep);
             }
+        }
 
-            if (!_activeWeight || _rigs.Length == 0)
-            {
-                return;
-            }
+        private void UpdateVisualRecoil()
+        {
+            if (_visualHandTarget == null) return;
 
-            if (_secondWeapon)
+            _recoilAmount = Mathf.MoveTowards(_recoilAmount, 0f, _recoilRecoverSpeed * Time.deltaTime);
+            float easedAmount = _recoilAmount * _recoilAmount;
+            _visualHandTarget.localPosition = _visualHandTargetBasePosition + Vector3.back * (_recoilKickDistance * easedAmount);
+            _visualHandTarget.localRotation = _visualHandTargetBaseRotation *
+                                              Quaternion.Euler(-_recoilKickAngle * easedAmount, 0f, 0f);
+        }
+
+        private void ApplyRigWeights(float weight)
+        {
+            for (int i = 0; i < _rigs.Length; i++)
             {
-                for (int i = 0; i < _rigs.Length; i++)
-                {
-                    _rigs[i].weight = 1f;
-                }
-            }
-            else
-            {
-                _rigs[0].weight = 1f;
+                _rigs[i].weight = weight;
             }
         }
     }

@@ -17,6 +17,15 @@ MonoBehaviour:
   _gravityValue: -22.5
   _fppToTppDelayTime: 0.125
   _fppMouseSensitivity: 5
+  _groundSnapDistance: 0.3
+  _fallingDelay: 0.12
+  _animationSpeedDampTime: 0.08
+  _animationDirectionDampTime: 0.1
+  _animationTurnDampTime: 0.08
+  _locomotionMinPlaybackRate: 0.75
+  _recoilLocalKickDistance: 0.035
+  _recoilLocalKickAngle: 2.5
+  _recoilRecoverTime: 0.12
   _aimMaxUpAngle: 20
   _aimMaxDownAngle: 20
   _startCameraYawOffset: 0

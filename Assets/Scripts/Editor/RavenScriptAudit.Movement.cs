@@ -123,6 +123,39 @@ public static partial class RavenScriptAudit
                 "Disabling the controller cancels dash without a completion effect");
             fixture.Controller.enabled = true;
             fixture.Place(fixture.Spawn);
+            fixture.SetMove(new Vector2(0f, 0.5f));
+            fixture.Movement.Tick();
+            // CharacterController.velocity uses the current Unity time step.
+            yield return new WaitForFixedUpdate();
+            Vector3 analogStart = fixture.Player.transform.position;
+            fixture.Movement.FixedTick();
+            float analogDistance = Vector3.ProjectOnPlane(fixture.Player.transform.position - analogStart, Vector3.up).magnitude;
+            float processedMagnitude = new UnityEngine.InputSystem.Processors.StickDeadzoneProcessor()
+                .Process(new Vector2(0f, 0.5f)).magnitude;
+            float expectedAnalogDistance = fixture.Movement.MoveSpeed * processedMagnitude * Time.fixedDeltaTime;
+            Check(Mathf.Abs(fixture.Movement.MoveVector.magnitude - processedMagnitude) < 0.001f &&
+                  Mathf.Abs(analogDistance - expectedAnalogDistance) < 0.002f &&
+                  Mathf.Abs(fixture.Movement.PlanarSpeed - fixture.Movement.MoveSpeed * processedMagnitude) < 0.05f,
+                $"Analog movement preserves processed half-stick magnitude and exposes actual planar speed (distance {analogDistance:F4}, speed {fixture.Movement.PlanarSpeed:F3})");
+            fixture.SetMove(Vector2.zero);
+            fixture.Movement.Tick();
+            fixture.Movement.FixedTick();
+            Check(fixture.Movement.PlanarSpeed < 0.01f, "Planar speed returns to zero after movement input stops");
+
+            fixture.Place(fixture.Spawn);
+            fixture.SetMove(Vector2.right);
+            fixture.Movement.Tick();
+            Vector3 turnStart = fixture.Player.transform.position;
+            fixture.Movement.FixedTick();
+            Vector3 turnDisplacement = Vector3.ProjectOnPlane(fixture.Player.transform.position - turnStart, Vector3.up);
+            Check(fixture.Movement.TurnAngle > 45f && turnDisplacement.sqrMagnitude > 0f &&
+                  Vector3.Dot(turnDisplacement.normalized, fixture.Player.transform.forward) > 0.999f,
+                $"TPP translation follows the smoothed body heading while TurnAngle preserves desired turn delta ({fixture.Movement.TurnAngle:F1} deg)");
+            fixture.SetMove(Vector2.zero);
+            fixture.Movement.Tick();
+            fixture.Movement.FixedTick();
+
+            fixture.Place(fixture.Spawn);
             fixture.Energy.value = 200f;
             fixture.PulseDash();
             Check(FinishMovementAuditDash(fixture) == Mathf.CeilToInt(fixture.Fire.DashTime / Time.fixedDeltaTime),
@@ -206,6 +239,8 @@ public static partial class RavenScriptAudit
             FinishMovementAuditDash(fixture);
             Check(!fixture.Movement.Dash && fixture.Movement.GravityBool, "The paused dash completes normally after resume");
 
+            CheckMovementAuditSlopes(fixture);
+
             fixture.Movement.Dispose();
             fixture.States.Dispose();
             Vector3 disposedPosition = fixture.Player.transform.position;
@@ -224,6 +259,74 @@ public static partial class RavenScriptAudit
             if (oldGamepad != null && oldGamepad.added) oldGamepad.MakeCurrent();
             Time.fixedDeltaTime = oldFixedDelta;
             Time.timeScale = oldTimeScale;
+        }
+    }
+
+    private static void CheckMovementAuditSlopes(MovementAuditFixture fixture)
+    {
+        BoxCollider floor = fixture.Root.GetComponentsInChildren<BoxCollider>().First(c => c.CompareTag("Ground"));
+        Quaternion oldRotation = floor.transform.rotation;
+        float oldStep = Time.fixedDeltaTime;
+        try
+        {
+            foreach (float step in new[] { 0.01f, 0.02f, 0.03f })
+            foreach (float angle in new[] { 10f, 25f, 40f, -25f })
+            {
+                Time.fixedDeltaTime = step;
+                floor.transform.rotation = Quaternion.Euler(angle, 0f, 0f);
+                Physics.SyncTransforms();
+                fixture.Place(fixture.Spawn + Vector3.up, false);
+                fixture.SetMove(Vector2.zero);
+                fixture.Movement.Tick();
+                for (int i = 0; i < 100; i++) fixture.Movement.FixedTick();
+                bool settled = fixture.Movement.Grounded;
+                fixture.SetMove(Vector2.up);
+                fixture.Movement.Tick();
+                int airborneSteps = 0;
+                for (int i = 0; i < 100; i++)
+                {
+                    fixture.Movement.FixedTick();
+                    if (!fixture.Movement.Grounded || !fixture.Movement.AnimationGrounded) airborneSteps++;
+                }
+                Check(settled && airborneSteps == 0,
+                    $"Slope {angle:F0} deg at step {step:F2}: all 100 movement steps stay grounded (lost {airborneSteps})");
+            }
+
+            Time.fixedDeltaTime = 0.02f;
+            fixture.SetMove(Vector2.zero);
+            fixture.Movement.Tick();
+            floor.enabled = false;
+            Physics.SyncTransforms();
+            fixture.Movement.FixedTick();
+            Check(!fixture.Movement.Grounded && fixture.Movement.AnimationGrounded,
+                "One lost support step does not trigger Falling");
+            float startHeight = fixture.Player.transform.position.y;
+            for (int i = 0; i < 10; i++) fixture.Movement.FixedTick();
+            Check(!fixture.Movement.AnimationGrounded && fixture.Player.transform.position.y < startHeight - 0.2f,
+                "Sustained loss of support still falls and releases animation grounding");
+            fixture.Place(fixture.Spawn + Vector3.up * 3f, false);
+            Check(!fixture.Movement.AnimationGrounded, "Teleport into air clears previous ground grace");
+
+            floor.enabled = true;
+            floor.transform.rotation = oldRotation;
+            Physics.SyncTransforms();
+            fixture.Place(fixture.Spawn);
+            fixture.NormalMode();
+            fixture.Energy.value = 200f;
+            fixture.PulseDash();
+            floor.enabled = false;
+            Physics.SyncTransforms();
+            fixture.Movement.FixedTick();
+            Check(fixture.Movement.Dash && !fixture.Movement.Grounded && !fixture.Movement.AnimationGrounded,
+                "Airborne dash keeps its immediate airborne animation signal without ground grace");
+            fixture.Place(fixture.Spawn, false);
+        }
+        finally
+        {
+            floor.enabled = true;
+            floor.transform.rotation = oldRotation;
+            Time.fixedDeltaTime = oldStep;
+            Physics.SyncTransforms();
         }
     }
 
@@ -326,7 +429,10 @@ public static partial class RavenScriptAudit
                 var input = Child("Input").AddComponent<InputManager>();
                 input.CanInput = true;
                 _gamepad = InputSystem.AddDevice<Gamepad>(Root.name);
-                Field<Controls>(input, "_controls").devices = new InputDevice[] { _gamepad };
+                Controls fixtureControls = Field<Controls>(input, "_controls");
+                fixtureControls.devices = new InputDevice[] { _gamepad };
+                fixtureControls.Disable();
+                fixtureControls.Enable();
                 Coroutines = Child("Coroutines").AddComponent<CoroutinesManager>();
                 _camera = new CameraManager(input, Child("AimCamera"), null, Player, cameraTransform, Child("AimLock"), movementConfig);
                 GameObject target = Child("Target");
@@ -385,6 +491,13 @@ public static partial class RavenScriptAudit
             Buttons(GamepadButton.South);
             Movement.Tick();
             Buttons();
+        }
+
+        public void SetMove(Vector2 stick)
+        {
+            var state = new GamepadState { leftStick = stick };
+            InputSystem.QueueStateEvent(_gamepad, state);
+            InputSystem.Update();
         }
 
         public Bullet PulseShot()

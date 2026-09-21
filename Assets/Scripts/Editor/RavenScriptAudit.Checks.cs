@@ -33,6 +33,8 @@ public static partial class RavenScriptAudit
     private static CheckReport _checks;
     private static GameObject _checkHost;
     private static double _checkDeadline;
+    private static InputSettings _originalInputSettings;
+    private static InputSettings _auditInputSettings;
 
     [MenuItem("Tools/Raven/Script Audit/Run Play Mode Checks %#F9")]
     public static void RunPlayModeChecks()
@@ -45,6 +47,13 @@ public static partial class RavenScriptAudit
 
         SceneContext context = Object.FindFirstObjectByType<SceneContext>();
         if (context == null || context.Container == null) throw new InvalidOperationException("No initialized SceneContext.");
+        // Synthetic devices must also work when automation leaves Game View unfocused.
+        _originalInputSettings = InputSystem.settings;
+        _auditInputSettings = Object.Instantiate(_originalInputSettings);
+        _auditInputSettings.hideFlags = HideFlags.DontSave;
+        _auditInputSettings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+        _auditInputSettings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+        InputSystem.settings = _auditInputSettings;
         _checks = new CheckReport
         {
             unityVersion = Application.unityVersion,
@@ -154,6 +163,10 @@ public static partial class RavenScriptAudit
         WriteChecks();
         if (_checkHost != null) Object.Destroy(_checkHost);
         _checkHost = null;
+        if (_originalInputSettings != null) InputSystem.settings = _originalInputSettings;
+        if (_auditInputSettings != null) Object.Destroy(_auditInputSettings);
+        _originalInputSettings = null;
+        _auditInputSettings = null;
         Debug.Log($"Raven script audit: {_checks.status}, {_checks.passed} passed, {_checks.failed} failed, {_checks.runtimeErrors.Count} runtime errors. Logs/RavenScriptAudit-tests.json");
     }
 
@@ -216,6 +229,8 @@ public static partial class RavenScriptAudit
         try
         {
             pauseControls.devices = new InputDevice[] { pauseKeyboard };
+            pauseControls.Disable();
+            pauseControls.Enable();
             var updatePanel = typeof(PauseEndPanel).GetMethod("Update", BindingFlags.Instance | BindingFlags.NonPublic);
             InputSystem.QueueStateEvent(pauseKeyboard, new KeyboardState(Key.Escape));
             InputSystem.Update();
@@ -246,7 +261,10 @@ public static partial class RavenScriptAudit
         try
         {
             var isolatedInput = fixture.AddComponent<InputManager>();
-            Field<Controls>(isolatedInput, "_controls").asset.devices = new InputDevice[] { pointer };
+            Controls isolatedControls = Field<Controls>(isolatedInput, "_controls");
+            isolatedControls.devices = new InputDevice[] { pointer };
+            isolatedControls.Disable();
+            isolatedControls.Enable();
             isolatedInput.CanInput = true;
             typeof(MovementConfig).GetField("_fppMouseSensitivity", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(config, 5f);
             var aim = new GameObject("Aim");

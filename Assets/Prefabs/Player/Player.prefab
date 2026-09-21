@@ -7189,6 +7189,7 @@ GameObject:
   - component: {fileID: 7779076327410325604}
   - component: {fileID: 4401415830580789790}
   - component: {fileID: 7817806714109714587}
+  - component: {fileID: 7817806714109714588}
   m_Layer: 3
   m_Name: Raven
   m_TagString: Untagged
@@ -7237,14 +7238,35 @@ Animator:
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
+  m_LinearVelocityBlending: 1
+  m_StabilizeFeet: 1
   m_AnimatePhysics: 0
   m_WarningMessage:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7817806714109714588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6971295252762133214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a63484efaf542c1a560dd66f31ea0ab, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: -1
+  _rayStartHeight: 0.3
+  _rayDistance: 0.75
+  _soleOffset: 0.025
+  _weightSpeed: 12
+  _pelvisWeight: 0.55
+  _maxPelvisOffset: 0.12
 --- !u!114 &7817806714109714587
 MonoBehaviour:
   m_ObjectHideFlags: 0

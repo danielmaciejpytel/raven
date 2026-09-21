@@ -23,8 +23,11 @@ namespace Raven.Manager
         private readonly Transform _groundCheck;
 
         private Vector3 _moveVector;
+        private Vector3 _planarVelocity;
         private float _currentGravity;
+        private float _airborneTime = float.PositiveInfinity;
         private float _turnSmoothVelocity;
+        private float _turnAngle;
         private bool _dash;
         private float _dashTimer;
         private IPlayerState _dashBehaviour;
@@ -40,7 +43,22 @@ namespace Raven.Manager
         public bool Dash => _dash;
         public bool GravityBool => _gravity;
         public Vector3 MoveVector => _moveVector;
+        public Vector3 PlanarVelocity => _planarVelocity;
+        public float PlanarSpeed => _planarVelocity.magnitude;
+        public float VerticalSpeed => _playerController != null ? _playerController.velocity.y : 0f;
+        public bool Grounded => _playerController != null && _playerController.isGrounded;
+        public bool AnimationGrounded => Grounded || _airborneTime < _movementConfig.FallingDelay;
+        public float TurnAngle => _turnAngle;
         public bool Fpp => _fpp;
+        public float MoveSpeed => _movementConfig.MoveSpeed;
+        public float FppExitDelayTime => _movementConfig.FppToTppDelayTime;
+        public float AnimationSpeedDampTime => _movementConfig.AnimationSpeedDampTime;
+        public float AnimationDirectionDampTime => _movementConfig.AnimationDirectionDampTime;
+        public float AnimationTurnDampTime => _movementConfig.AnimationTurnDampTime;
+        public float LocomotionMinPlaybackRate => _movementConfig.LocomotionMinPlaybackRate;
+        public float RecoilLocalKickDistance => _movementConfig.RecoilLocalKickDistance;
+        public float RecoilLocalKickAngle => _movementConfig.RecoilLocalKickAngle;
+        public float RecoilRecoverTime => _movementConfig.RecoilRecoverTime;
         internal PlayerStateConfig DashConfig => _dashConfig;
 
         public event Action<float> OnMove;
@@ -118,14 +136,7 @@ namespace Raven.Manager
                 _playerStatesManager.CurrentBehaviour.ActiveDash(this);
             }
 
-            if (_moveVector.sqrMagnitude > 0f)
-            {
-                OnMove?.Invoke(_movementConfig.MoveSpeed);
-            }
-            else
-            {
-                OnMove?.Invoke(0);
-            }
+            OnMove?.Invoke(PlanarSpeed);
         }
 
         public void FixedTick()
@@ -148,7 +159,11 @@ namespace Raven.Manager
             float deltaTime = Time.fixedDeltaTime;
             Vector3 displacement = GetMoveDirection(_moveVector, deltaTime) * _movementConfig.MoveSpeed * deltaTime;
             displacement += Gravity(deltaTime);
+            FollowGround(ref displacement);
+            // Keep one Move call: velocity must describe both horizontal and vertical motion.
             _playerController.Move(displacement);
+            UpdatePlanarVelocity();
+            UpdateGroundContact(deltaTime);
         }
 
         #region Movement Scripts
@@ -167,30 +182,76 @@ namespace Raven.Manager
             return Vector3.up * _currentGravity * p_deltaTime;
         }
 
+        private void FollowGround(ref Vector3 displacement)
+        {
+            if (!Grounded || _currentGravity > 0f || _movementConfig.GroundSnapDistance <= 0f) return;
+
+            Bounds bounds = _playerController.bounds;
+            float lift = Mathf.Max(0.05f, _playerController.skinWidth);
+            float radius = Mathf.Max(bounds.extents.x, bounds.extents.z);
+            float minimumNormalY = Mathf.Max(0.01f, Mathf.Cos(_playerController.slopeLimit * Mathf.Deg2Rad));
+            // On a slope the capsule touches off-centre. Its bottom stays above the
+            // centre ray hit by r * (1 / normal.y - 1); this is not an airborne gap.
+            float maxSupportHeight = radius * (1f / minimumNormalY - 1f);
+            Vector3 origin = new Vector3(bounds.center.x + displacement.x, bounds.min.y + lift,
+                bounds.center.z + displacement.z);
+            int count = PhysicsQueries.Raycast(origin, Vector3.down, ref _groundHits,
+                lift + _movementConfig.GroundSnapDistance + maxSupportHeight, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            float nearest = float.PositiveInfinity;
+            RaycastHit support = default;
+            for (int i = 0; i < count; i++)
+            {
+                RaycastHit hit = _groundHits[i];
+                if (hit.collider == null || hit.transform == _playerTransform || hit.transform.IsChildOf(_playerTransform) ||
+                    Physics.GetIgnoreLayerCollision(_playerController.gameObject.layer, hit.collider.gameObject.layer) ||
+                    Physics.GetIgnoreCollision(_playerController, hit.collider) || hit.distance >= nearest) continue;
+                nearest = hit.distance;
+                support = hit;
+            }
+            if (float.IsPositiveInfinity(nearest) ||
+                support.normal.y < minimumNormalY) return;
+
+            float supportHeight = radius * (1f / support.normal.y - 1f);
+            float drop = bounds.min.y - (support.point.y + supportHeight);
+            if (drop < 0f || drop > _movementConfig.GroundSnapDistance) return;
+            displacement.y = Mathf.Min(displacement.y, -Mathf.Min(_movementConfig.GroundSnapDistance,
+                drop + 0.01f));
+        }
+
+        private void UpdateGroundContact(float deltaTime)
+        {
+            // Ground grace only filters ordinary locomotion. An airborne dash keeps
+            // its original immediate airborne signal, including the dash exit.
+            _airborneTime = Grounded ? 0f : _dash ? float.PositiveInfinity : _airborneTime + deltaTime;
+        }
+
         private void SetMoveVector()
         {
             Vector2 movementAxis = _inputManager.GetMovementAxis();
-            _moveVector = new Vector3(movementAxis.x, 0f, movementAxis.y).normalized;
+            _moveVector = Vector3.ClampMagnitude(new Vector3(movementAxis.x, 0f, movementAxis.y), 1f);
         }
 
         private Vector3 GetMoveDirection(Vector3 p_moveVector, float p_deltaTime)
         {
             if (_fpp)
             {
+                _turnAngle = 0f;
                 return _playerTransform.right * p_moveVector.x + _playerTransform.forward * p_moveVector.z;
             }
 
             if (p_moveVector.sqrMagnitude <= 0f)
             {
+                _turnAngle = 0f;
                 return Vector3.zero;
             }
 
             float targetAngle = Mathf.Atan2(p_moveVector.x, p_moveVector.z) * Mathf.Rad2Deg + _camTransform.eulerAngles.y;
+            _turnAngle = Mathf.DeltaAngle(_playerTransform.eulerAngles.y, targetAngle);
             float angle = Mathf.SmoothDampAngle(_playerTransform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity,
                 _movementConfig.TurnSmoothTime, Mathf.Infinity, p_deltaTime);
             _playerTransform.rotation = Quaternion.Euler(0f, angle, 0f);
 
-            return Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+            return Quaternion.Euler(0f, angle, 0f) * Vector3.forward * p_moveVector.magnitude;
         }
 
         internal void BeginDash(IPlayerState p_behaviour, PlayerStateConfig p_config)
@@ -217,9 +278,11 @@ namespace Raven.Manager
             if (deltaTime > 0f)
             {
                 Vector3 direction = _moveVector.sqrMagnitude > 0f
-                    ? GetMoveDirection(_moveVector, deltaTime)
+                    ? GetMoveDirection(_moveVector, deltaTime).normalized
                     : _playerTransform.forward;
                 _playerController.Move(direction * _dashConfig.DashSpeed * deltaTime);
+                UpdatePlanarVelocity();
+                UpdateGroundContact(deltaTime);
                 _dashTimer += deltaTime;
             }
 
@@ -249,13 +312,23 @@ namespace Raven.Manager
         private void ResetMovement()
         {
             _moveVector = Vector3.zero;
+            _planarVelocity = Vector3.zero;
+            _airborneTime = float.PositiveInfinity;
             _currentGravity = 0f;
             _turnSmoothVelocity = 0f;
+            _turnAngle = 0f;
             _dash = false;
             _gravity = true;
             _dashTimer = 0f;
             _dashBehaviour = null;
             _dashConfig = null;
+        }
+
+        private void UpdatePlanarVelocity()
+        {
+            Vector3 velocity = _playerController.velocity;
+            velocity.y = 0f;
+            _planarVelocity = velocity;
         }
 
         #endregion
