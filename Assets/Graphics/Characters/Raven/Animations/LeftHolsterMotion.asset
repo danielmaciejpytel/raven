@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01f77c8b63bc6bc428d1312b5e9b014b, type: 3}
+  m_Name: LeftHolsterMotion(Clone)(Clone)
+  m_EditorClassIdentifier: Assembly-CSharp::Raven.Player.RavenHolsterMotion
+  duration: 0.5
+  previewClip: {fileID: -203655887218126122, guid: 5b9d78eda83368145bb2b8073a397b03, type: 3}
+  previewTime: 0
+  keys:
+  - position: {x: -0.39205113, y: -0.10039051, z: -0.046101272}
+    rotation: {x: 30.674686, y: 84.33854, z: 254.54224}
+    elbow: {x: -0.18843807, y: 0.19790679, z: -0.053693265}
+  - position: {x: -0.301929, y: 0.17136389, z: 0.23718937}
+    rotation: {x: 44.937626, y: 200.14569, z: 278.25494}
+    elbow: {x: -0.004218757, y: 0.34, z: -0.74997103}
+  - position: {x: -0.24907473, y: 0.35776576, z: 0.3010798}
+    rotation: {x: 45.957184, y: 285.09766, z: 354.84894}
+    elbow: {x: -0.83999276, y: -0.36, z: -0.23}
+  - position: {x: 0.021625504, y: 0.26983598, z: 0.26245528}
+    rotation: {x: 48.733414, y: 324.17902, z: 282.84805}
+    elbow: {x: -4.9607267, y: -3.7836237, z: 5.7883625}
+  - position: {x: 0.21979994, y: 0.18079999, z: 0.0986999}
+    rotation: {x: 54.05075, y: 359.99066, z: 279.97717}
+    elbow: {x: -8.999998, y: -7.9699984, z: 11.569998}

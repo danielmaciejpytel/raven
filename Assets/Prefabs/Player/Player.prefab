@@ -582,6 +582,37 @@ Transform:
   - {fileID: 609831017688283716}
   m_Father: {fileID: 5547887478704013126}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &966995609745169646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7483630308450852788}
+  m_Layer: 0
+  m_Name: RightHolsterSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7483630308450852788
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966995609745169646}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.34806752, y: 0.29208687, z: -0.57270634, w: 0.68230623}
+  m_LocalPosition: {x: 0.2198, y: 0.1808, z: 0.0987}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6716906008891052120}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &998615716752900784
 GameObject:
   m_ObjectHideFlags: 0
@@ -1185,7 +1216,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.Rig
   m_Weight: 1
   m_Effectors: []
@@ -6004,8 +6035,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcf96328d7865b44ea2756073339a74a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   DisableOnMobiles: 1
   RenderMobileDistortion: 0
   ParticleBudgetForMobiles: 0.5
@@ -6633,6 +6664,37 @@ Transform:
   - {fileID: 3605399178778048441}
   m_Father: {fileID: 6657151042667818486}
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
+--- !u!1 &4835150771072090851
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1135141312280742321}
+  m_Layer: 0
+  m_Name: LeftHolsterSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1135141312280742321
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4835150771072090851}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.36110488, y: 0.36110488, z: -0.60795003, w: 0.60795003}
+  m_LocalPosition: {x: 0.0331, y: 0.1351, z: 0.0941}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6716906008891052120}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4867532071842534619
 GameObject:
   m_ObjectHideFlags: 0
@@ -7307,6 +7369,7 @@ GameObject:
   - component: {fileID: 3577674410413505695}
   - component: {fileID: 615894174114875494}
   - component: {fileID: 8716431975896289304}
+  - component: {fileID: 2994478283402932117}
   m_Layer: 3
   m_Name: Raven
   m_TagString: Untagged
@@ -7359,7 +7422,7 @@ Animator:
   m_LinearVelocityBlending: 1
   m_StabilizeFeet: 1
   m_AnimatePhysics: 0
-  m_WarningMessage:
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -7374,8 +7437,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_RigLayers:
   - m_Rig: {fileID: 6510884645314238656}
     m_Active: 1
@@ -7394,8 +7457,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1a63484efaf542c1a560dd66f31ea0ab, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -7417,7 +7480,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1dc1eb813b01a3c44a1ffbbfcfdfcb32, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Raven.Player.RavenHeadLook
   _weight: 1
   _maxYaw: 70
@@ -7437,7 +7500,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9d784ea47384fb4c96d944b038d96c4, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Raven.Player.RavenAimTorso
   _maxUp: 8
   _maxDown: 10
@@ -7455,7 +7518,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a18f5707f9dd6c49bb17f2860af97d4, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Raven.Player.RavenFacialAnimation
   _face: {fileID: 6434234921604687803}
   _blinkInterval: {x: 2.5, y: 5.5}
@@ -7480,7 +7543,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e7016de83164b3c4f91e10205eb61209, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Raven.Player.RavenPistolGrip
   _right:
     weapon: {fileID: 7779076326661777297}
@@ -7563,6 +7626,33 @@ MonoBehaviour:
     - {x: 0.00000012984438, y: 0.00010292473, z: -0.002205973, w: 0.99999756}
     - {x: 0.00000046656987, y: -0.00016228486, z: -0.0026482146, w: 0.9999965}
   _blendTime: 0.12
+--- !u!114 &2994478283402932117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6971295252762133214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e927dc29d2df70b4c80a8a3dedaad85c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Raven.Player.RavenWeaponHolster
+  _right:
+    weapon: {fileID: 7779076326661777297}
+    holster: {fileID: 1135141312280742321}
+    motion: {fileID: 11400000, guid: 8436dd3643dbdab499938769445cf381, type: 2}
+  _left:
+    weapon: {fileID: 7779076326097758416}
+    holster: {fileID: 7483630308450852788}
+    motion: {fileID: 11400000, guid: e6f823247f9ee174abbbe5a88a07f082, type: 2}
+  _holsterDelay: 3
+  _holsterDuration: 0.7
+  _handReleaseTime: 0.3
+  _reachArc: 0.06
+  _rightCrossBodyTimeScale: 1.25
+  _rightApproachClearance: 0.16
+  _rightInsertHeight: 0.05
 --- !u!1 &7048067680634949035
 GameObject:
   m_ObjectHideFlags: 0
@@ -7724,6 +7814,8 @@ Transform:
   - {fileID: 3494567987845586162}
   - {fileID: 6638377092543256355}
   - {fileID: 8969873365644728768}
+  - {fileID: 7483630308450852788}
+  - {fileID: 1135141312280742321}
   m_Father: {fileID: 1676467051349838074}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7734870636862688547
@@ -7800,7 +7892,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf219326d2292de48a0c671da18d402b, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.OverrideTransform
   m_Weight: 1
   m_Data:
@@ -7884,8 +7976,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f2bfe20de4dccb4dad0c9f8d85c123e, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7817806713500875902
 GameObject:
   m_ObjectHideFlags: 0
@@ -7929,8 +8021,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 0
   m_Effectors:
   - m_Transform: {fileID: 0}
@@ -8087,8 +8179,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf04dbbc8121e424b91230ca5041555a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   Player: {fileID: 7817806714087019046}
   PlayerAnimator: {fileID: 4401415830580789790}
   PlayerRigs:
@@ -8120,8 +8212,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3597a44ba2b27b146931fe7995cba191, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7817806714679916705
 GameObject:
   m_ObjectHideFlags: 0
@@ -8195,8 +8287,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aeda7bfbf984f2a4da5ab4b8967b115d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
     m_Root: {fileID: 9001100378695424636}
@@ -8282,8 +8374,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aeda7bfbf984f2a4da5ab4b8967b115d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
     m_Root: {fileID: 6046620395036207512}
@@ -8371,8 +8463,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 0
   m_Effectors:
   - m_Transform: {fileID: 7817806714679916704}
@@ -8774,7 +8866,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf219326d2292de48a0c671da18d402b, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.OverrideTransform
   m_Weight: 1
   m_Data:

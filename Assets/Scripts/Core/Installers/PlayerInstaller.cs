@@ -40,6 +40,8 @@ namespace Raven.Core.Installer
                 headLook.Initialize(_mainCameraTransform, _playerReferences.Player.transform,
                     Container.Resolve<Raven.Input.InputManager>(), _rigTarget.transform);
             var face = _playerReferences.PlayerAnimator.GetComponent<RavenFacialAnimation>();
+            var holster = _playerReferences.PlayerAnimator.GetComponent<RavenWeaponHolster>();
+            if (holster != null) holster.Initialize(Container.Resolve<Raven.Input.InputManager>(), _playerReferences.Player.transform);
             if (face != null) face.Initialize(Container.Resolve<Raven.Input.InputManager>());
             var torso = _playerReferences.PlayerAnimator.GetComponent<RavenAimTorso>();
             if (torso != null)

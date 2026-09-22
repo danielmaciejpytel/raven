@@ -27,9 +27,16 @@ namespace Raven.Player
         [SerializeField] private HandGrip _right = new HandGrip();
         [SerializeField] private HandGrip _left = new HandGrip();
         [SerializeField, Range(0.03f, 0.5f)] private float _blendTime = 0.12f;
+        private RavenWeaponHolster _holster;
+
+        private void Awake() => _holster = GetComponent<RavenWeaponHolster>();
 
         private void Update() { Restore(_right); Restore(_left); }
-        private void LateUpdate() { Apply(_right); Apply(_left); }
+        private void LateUpdate()
+        {
+            Apply(_right); Apply(_left);
+            _holster?.EvaluateAfterGrip();
+        }
         private void OnDisable()
         {
             Restore(_right); Restore(_left);
@@ -44,12 +51,19 @@ namespace Raven.Player
             grip.applied = false;
         }
 
+        public void ApplyPreviewPose()
+        {
+            _right.blend = _left.blend = 1f;
+            Apply(_right); Apply(_left);
+        }
+
         private void Apply(HandGrip grip)
         {
             if (grip.bones == null || grip.neutralRotations == null || grip.bones.Length != grip.neutralRotations.Length) return;
             if (grip.animatedRotations == null || grip.animatedRotations.Length != grip.bones.Length)
                 grip.animatedRotations = new Quaternion[grip.bones.Length];
-            float target = grip.weapon != null && grip.weapon.gameObject.activeInHierarchy ? grip.weight : 0f;
+            float target = grip.weapon != null && grip.weapon.gameObject.activeInHierarchy &&
+                grip.bones.Length > 0 && grip.weapon.IsChildOf(grip.bones[0]) ? grip.weight : 0f;
             grip.blend = Mathf.MoveTowards(grip.blend, target, Time.deltaTime / Mathf.Max(0.01f, _blendTime));
             if (grip.blend <= 0f) return;
             for (int i = 0; i < grip.bones.Length; i++)
