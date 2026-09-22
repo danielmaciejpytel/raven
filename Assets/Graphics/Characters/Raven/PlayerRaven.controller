@@ -81,9 +81,9 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: -3270131113801077593, guid: 65c6b3f243b6d1d4c8b3bf47871bf62d, type: 3}
     m_Threshold: 0
-    m_Position: {x: -1, y: -1}
+    m_Position: {x: -0.70710677, y: -0.70710677}
     m_TimeScale: 1
-    m_CycleOffset: 0
+    m_CycleOffset: 0.125
     m_DirectBlendParameter: Speed
     m_Mirror: 0
   - serializedVersion: 2
@@ -97,7 +97,7 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: -387853344613858836, guid: 65c6b3f243b6d1d4c8b3bf47871bf62d, type: 3}
     m_Threshold: 0.25
-    m_Position: {x: -1, y: 1}
+    m_Position: {x: -0.70710677, y: 0.70710677}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: Speed
@@ -113,7 +113,7 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: 7400016, guid: 65c6b3f243b6d1d4c8b3bf47871bf62d, type: 3}
     m_Threshold: 0.5
-    m_Position: {x: 1, y: 1}
+    m_Position: {x: 0.70710677, y: 0.70710677}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: Speed
@@ -121,9 +121,9 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: 7400018, guid: 65c6b3f243b6d1d4c8b3bf47871bf62d, type: 3}
     m_Threshold: 0.625
-    m_Position: {x: 1, y: -1}
+    m_Position: {x: 0.70710677, y: -0.70710677}
     m_TimeScale: 1
-    m_CycleOffset: 0
+    m_CycleOffset: 0.125
     m_DirectBlendParameter: Speed
     m_Mirror: 0
   - serializedVersion: 2
@@ -139,7 +139,7 @@ BlendTree:
     m_Threshold: 0.875
     m_Position: {x: 0, y: -1}
     m_TimeScale: 1
-    m_CycleOffset: 0
+    m_CycleOffset: 0.125
     m_DirectBlendParameter: Speed
     m_Mirror: 0
   - serializedVersion: 2
@@ -163,7 +163,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -194,7 +194,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -485231769361934186}
@@ -210,13 +210,44 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &-8140562457897900357
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 5774928366101802348}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.16
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-7981742407901737371
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5231073033297616603}
@@ -238,7 +269,7 @@ AnimatorTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 5774928366101802348}
@@ -252,7 +283,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
@@ -280,13 +311,94 @@ AnimatorStateTransition:
   m_InterruptionSource: 3
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
+--- !u!1101 &-7846695597397196175
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: RunningPivot
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 407520298600510509}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.055
+  m_TransitionOffset: 0
+  m_ExitTime: 0.75
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 0
+--- !u!206 &-7752105813555846097
+BlendTree:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Stationary Turn Steps
+  m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400028, guid: 0da771f9271d80442a29d10bf39b69f3, type: 3}
+    m_Threshold: -180
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter:
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400024, guid: 0da771f9271d80442a29d10bf39b69f3, type: 3}
+    m_Threshold: -90
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter:
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400026, guid: 0da771f9271d80442a29d10bf39b69f3, type: 3}
+    m_Threshold: 90
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter:
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400028, guid: 0da771f9271d80442a29d10bf39b69f3, type: 3}
+    m_Threshold: 180
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter:
+    m_Mirror: 1
+  m_BlendParameter: StationaryTurnAngle
+  m_BlendParameterY: Blend
+  m_MinThreshold: 0
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 0
+  m_NormalizedBlendValues: 0
+  m_BlendType: 0
 --- !u!1101 &-7676291746501179065
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Dash
@@ -311,7 +423,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
@@ -345,7 +457,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -485231769361934186}
@@ -386,18 +498,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: 5b9d78eda83368145bb2b8073a397b03, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &-6783683246696042464
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5327681005114743019}
@@ -419,7 +531,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3691254463853169763}
@@ -460,11 +572,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: 811be90d2fe7c404b8c55aa42765ec68, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &-6421489278218862489
 AnimatorState:
   serializedVersion: 6
@@ -487,11 +599,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400008, guid: 0f10fe3eac699fb43ae5a5329baf0664, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &-6356323661148327152
 AnimatorState:
   serializedVersion: 6
@@ -514,11 +626,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 3bfc22ca4e55d4945b26a68767a7ed04, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &-6262005825782706602
 AnimatorState:
   serializedVersion: 6
@@ -541,18 +653,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 70c1090edfd793444a0533e45c74dfad, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &-6232592666069933012
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
@@ -616,11 +728,405 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400008, guid: 65c6b3f243b6d1d4c8b3bf47871bf62d, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
+--- !u!319 &-5639477978656551630
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Raven Turn Legs
+  m_Mask: 00000000000000000000000001000000010000000000000000000000000000000000000001000000010000000000000000000000
+  m_Elements:
+  - m_Path:
+    m_Weight: 0
+  - m_Path: VFX
+    m_Weight: 0
+  - m_Path: VFX/normal_state_body
+    m_Weight: 0
+  - m_Path: VFX/normal_state_body/Point Light
+    m_Weight: 0
+  - m_Path: VFX/normal_state_body/Point Light Player
+    m_Weight: 0
+  - m_Path: VFX/normal_state_body/Point Light Player (1)
+    m_Weight: 0
+  - m_Path: VFX/normal_state_body/normal_state_body_aura
+    m_Weight: 0
+  - m_Path: VFX/normal_state_body/normal_state_body_aura/dash
+    m_Weight: 0
+  - m_Path: VFX/normal_state_body/FireHeatDistortion (Best)
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso/Fire Flames Torso
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso/FireFlamesTorsoVariant
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso/FireFlamesTorsoVariant/FireDash
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso/RealisticSparksParticlesLoop
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso/FireHeatDistortion
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso/Lights (New)
+    m_Weight: 0
+  - m_Path: VFX/fire_state_torso/Lights (New)/Point Light
+    m_Weight: 0
+  - m_Path: VFX/fire_state_hips
+    m_Weight: 0
+  - m_Path: VFX/fire_state_hips/FireFlamesTorsoVariant
+    m_Weight: 0
+  - m_Path: VFX/fire_state_hips/RealisticSparksParticlesLoop
+    m_Weight: 0
+  - m_Path: VFX/fire_state_hips/FireHeatDistortion
+    m_Weight: 0
+  - m_Path: VFX/fire_state_hips/Lights (New)
+    m_Weight: 0
+  - m_Path: VFX/fire_state_hips/Lights (New)/Point Light
+    m_Weight: 0
+  - m_Path: VFX/fire_state_light
+    m_Weight: 0
+  - m_Path: VFX/fire_state_light/Point Light
+    m_Weight: 0
+  - m_Path: VFX/fire_state_light/Point Light Player
+    m_Weight: 0
+  - m_Path: VFX/fire_state_light/Point Light Player (1)
+    m_Weight: 0
+  - m_Path: VFX/fire_state_light/FireHeatDistortion (Best)
+    m_Weight: 0
+  - m_Path: Raven_Rig
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase/VFX
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase/VFX/fire_state_left_foot
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase/VFX/fire_state_left_foot/FireFlamesFoot
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase/VFX/fire_state_left_foot/RealisticSparksParticlesLoop
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase/VFX/fire_state_left_foot/FireHeatDistortion
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase/VFX/fire_state_left_foot/Lights
+      (New)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase/VFX/fire_state_left_foot/Lights
+      (New)/Point Light
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase/VFX
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase/VFX/fire_state_right_foot
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase/VFX/fire_state_right_foot/FireFlamesFoot
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase/VFX/fire_state_right_foot/RealisticSparksParticlesLoop
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase/VFX/fire_state_right_foot/FireHeatDistortion
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase/VFX/fire_state_right_foot/Lights
+      (New)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/RightUpLeg/RightLeg/RightFoot/RightToeBase/VFX/fire_state_right_foot/Lights
+      (New)/Point Light
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/Bone.002
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/Bone.002/Bone.002_end
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/flint_bone
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/flint_bone/Bone.001
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/flint_bone/Bone.001/Bone.001_end
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/flint_bone/flint
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/flintlock_gun
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/flintlock_gun/frizzen
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/trigger_bone
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/trigger_bone/Bone
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/trigger_bone/Bone/Bone_end
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/trigger_bone/trigger
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/pistol
+      (1)/Shoot Point
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandIndex1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandIndex1/LeftHandIndex2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandIndex1/LeftHandIndex2/LeftHandIndex3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandMiddle1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandMiddle1/LeftHandMiddle2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandMiddle1/LeftHandMiddle2/LeftHandMiddle3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandPinky1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandPinky1/LeftHandPinky2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandPinky1/LeftHandPinky2/LeftHandPinky3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandRing1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandRing1/LeftHandRing2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandRing1/LeftHandRing2/LeftHandRing3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandThumb1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandThumb1/LeftHandThumb2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LeftHandThumb1/LeftHandThumb2/LeftHandThumb3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX/normal_state_left_hand
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX/normal_state_left_hand/Flames
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX/normal_state_left_hand/Point
+      Lights
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX/normal_state_left_hand/Point
+      Lights/Point Light (Up)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX/normal_state_left_hand/Point
+      Lights/Point Light (Low)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX/normal_state_left_hand/Point
+      Lights/Point Light (Front)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/VFX/normal_state_left_hand/Point
+      Lights/Point Light (Back)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye/eye_cursed_aura
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye/Point
+      Lights
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye/Point
+      Lights/Point Light (Up)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye/Point
+      Lights/Point Light (Low)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye/Point
+      Lights/Point Light (Front)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye/Point
+      Lights/Point Light (Back)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+      (1)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+      (1)/eye_cursed_aura
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+      (1)/Point Lights
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+      (1)/Point Lights/Point Light (Up)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+      (1)/Point Lights/Point Light (Low)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+      (1)/Point Lights/Point Light (Front)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/normal_state_head/normal_state_eye
+      (1)/Point Lights/Point Light (Back)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/fire_state_head
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/fire_state_head/FireFlamesEyeLeft
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/Neck/Head/VFX/fire_state_head/FireFlamesEyeRight
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/Bone.002
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/Bone.002/Bone.002_end
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/flint_bone
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/flint_bone/Bone.001
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/flint_bone/Bone.001/Bone.001_end
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/flint_bone/flint
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/flintlock_gun
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/flintlock_gun/frizzen
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/trigger_bone
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/trigger_bone/Bone
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/trigger_bone/Bone/Bone_end
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/trigger_bone/trigger
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/pistol/Shoot
+      Point
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandIndex1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandIndex1/RightHandIndex2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandIndex1/RightHandIndex2/RightHandIndex3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandMiddle1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandMiddle1/RightHandMiddle2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandMiddle1/RightHandMiddle2/RightHandMiddle3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandPinky1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandPinky1/RightHandPinky2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandPinky1/RightHandPinky2/RightHandPinky3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandRing1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandRing1/RightHandRing2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandRing1/RightHandRing2/RightHandRing3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandThumb1
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandThumb1/RightHandThumb2
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RightHandThumb1/RightHandThumb2/RightHandThumb3
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX/normal_state_right_hand
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX/normal_state_right_hand/Flames
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX/normal_state_right_hand/Point
+      Lights
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX/normal_state_right_hand/Point
+      Lights/Point Light (Up)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX/normal_state_right_hand/Point
+      Lights/Point Light (Low)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX/normal_state_right_hand/Point
+      Lights/Point Light (Front)
+    m_Weight: 0
+  - m_Path: Raven_Rig/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/VFX/normal_state_right_hand/Point
+      Lights/Point Light (Back)
+    m_Weight: 0
+  - m_Path: RightHandRig
+    m_Weight: 0
+  - m_Path: RightHandRig/Target
+    m_Weight: 0
+  - m_Path: RightHandRig/HandMover
+    m_Weight: 0
+  - m_Path: LeftHandRig
+    m_Weight: 0
+  - m_Path: LeftHandRig/HandMover
+    m_Weight: 0
+  - m_Path: Raven_Body
+    m_Weight: 0
+  - m_Path: Raven_Boots
+    m_Weight: 0
+  - m_Path: Raven_Cloth
+    m_Weight: 0
+  - m_Path: Raven_Gear
+    m_Weight: 0
+  - m_Path: Raven_Hair
+    m_Weight: 0
+  - m_Path: Raven_Hands
+    m_Weight: 0
+  - m_Path: Raven_Hat
+    m_Weight: 0
+  - m_Path: Raven_Outfit
+    m_Weight: 0
 --- !u!1102 &-5327681005114743019
 AnimatorState:
   serializedVersion: 6
@@ -645,11 +1151,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -9000000000000000001}
-  m_Tag: 
+  m_Tag:
   m_SpeedParameter: LocomotionPlaybackRate
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1107 &-5316696965534645525
 AnimatorStateMachine:
   serializedVersion: 6
@@ -738,18 +1244,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: 61ee243fc2a71654cbd8c7bb1862431c, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &-5016830009099763190
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -799,11 +1305,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400014, guid: 4ee731d726c3dd34eb36806ea0d8fe98, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &-4523679233664292472
 AnimatorState:
   serializedVersion: 6
@@ -825,18 +1331,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400002, guid: cfcbdbb570f3dbb4f83ea58a11a6b3dc, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &-4467390243549026245
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 2708341378987801094}
@@ -852,13 +1358,69 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &-4072936966401830006
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 728467249531208638}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.03
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
+--- !u!1101 &-4000080221457690487
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 5774928366101802348}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.16
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-3908856599247797069
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4595295530353102786}
@@ -896,18 +1458,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: cecc002d00c21a04a9714e67fe318953, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &-3548265934991955365
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Dash
@@ -932,7 +1494,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -966,7 +1528,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
@@ -1000,7 +1562,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -945078108895923308}
@@ -1016,13 +1578,50 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &-2931511782766633659
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: RunningPivot
+    m_EventTreshold: 0
+  - m_ConditionMode: 4
+    m_ConditionEvent: Speed
+    m_EventTreshold: 0.05
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -6929085457382883012}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.12
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-2916028934945628280
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -1053,7 +1652,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -6262005825782706602}
@@ -1075,7 +1674,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -6262005825782706602}
@@ -1097,7 +1696,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Aim
@@ -1128,7 +1727,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Dash
@@ -1147,13 +1746,43 @@ AnimatorStateTransition:
   m_InterruptionSource: 3
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
+--- !u!1102 &-1677831386183968880
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: StationaryTurn
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions:
+  - {fileID: -4072936966401830006}
+  - {fileID: -8140562457897900357}
+  - {fileID: 1951902629424162596}
+  - {fileID: -345750763549114969}
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 1
+  m_Motion: {fileID: -7752105813555846097}
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter: StationaryTurnProgress
 --- !u!1101 &-1210789495376140180
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -485231769361934186}
@@ -1190,18 +1819,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: e2cb8cdf5b4aede4a931eb08e3fba966, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &-799363170231377838
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5327681005114743019}
@@ -1238,6 +1867,12 @@ AnimatorStateMachine:
   - serializedVersion: 1
     m_State: {fileID: 901920260921100102}
     m_Position: {x: 1050, y: 190, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 407520298600510509}
+    m_Position: {x: 600, y: 350, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: -1677831386183968880}
+    m_Position: {x: 600, y: 500, z: 0}
   m_ChildStateMachines:
   - serializedVersion: 1
     m_StateMachine: {fileID: -111231265304723605}
@@ -1247,6 +1882,8 @@ AnimatorStateMachine:
     m_Position: {x: 130, y: 120, z: 0}
   m_AnyStateTransitions:
   - {fileID: 901920260921100111}
+  - {fileID: -7846695597397196175}
+  - {fileID: 3999030253195098415}
   m_EntryTransitions: []
   m_StateMachineTransitions:
   - first: {fileID: -111231265304723605}
@@ -1265,7 +1902,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Aim
@@ -1311,18 +1948,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400010, guid: 0da771f9271d80442a29d10bf39b69f3, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &-510352437706011054
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5327681005114743019}
@@ -1360,18 +1997,55 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 8aacb1c86695d564092dea0fb1d92abd, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
+--- !u!1101 &-345750763549114969
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: StartTurning
+    m_EventTreshold: 0
+  - m_ConditionMode: 4
+    m_ConditionEvent: Speed
+    m_EventTreshold: 0.05
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -6929085457382883012}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.12
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-286301129892344248
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 2708341378987801094}
@@ -1387,6 +2061,32 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1102 &-261777914323717275
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turn
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 1
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: -7752105813555846097}
+  m_Tag:
+  m_SpeedParameter: TurnPlaybackRate
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &-113434006136949841
 AnimatorState:
   serializedVersion: 6
@@ -1408,11 +2108,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400008, guid: 0da771f9271d80442a29d10bf39b69f3, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1107 &-111231265304723605
 AnimatorStateMachine:
   serializedVersion: 6
@@ -1507,11 +2207,77 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
+  - m_Name: Turning
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: TurnDirection
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: TurnPlaybackRate
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: StationaryTurnAngle
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: RunningPivot
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: RunningPivotAngle
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: RunningPivotProgress
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: StartTurning
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: StationaryTurnProgress
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
     m_StateMachine: {fileID: -758677579102401485}
     m_Mask: {fileID: 0}
+    m_Motions: []
+    m_Behaviours: []
+    m_BlendingMode: 0
+    m_SyncedLayerIndex: -1
+    m_DefaultWeight: 0
+    m_IKPass: 1
+    m_SyncedLayerAffectsTiming: 0
+    m_Controller: {fileID: 9100000}
+  - serializedVersion: 5
+    m_Name: Turn In Place
+    m_StateMachine: {fileID: 5641754702233657870}
+    m_Mask: {fileID: -5639477978656551630}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0
@@ -1526,7 +2292,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -1560,7 +2326,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -485231769361934186}
@@ -1582,7 +2348,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Dash
@@ -1601,13 +2367,43 @@ AnimatorStateTransition:
   m_InterruptionSource: 3
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
+--- !u!1102 &407520298600510509
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: RunningPivot
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions:
+  - {fileID: 5371925769427118395}
+  - {fileID: -4000080221457690487}
+  - {fileID: 4483883342787792575}
+  - {fileID: -2931511782766633659}
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 1
+  m_Motion: {fileID: 777693316187406406}
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter: RunningPivotProgress
 --- !u!1101 &489339186438942311
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Aim
@@ -1654,11 +2450,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400002, guid: 3bfc22ca4e55d4945b26a68767a7ed04, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &592607995027819688
 AnimatorState:
   serializedVersion: 6
@@ -1684,11 +2480,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: 5b9d78eda83368145bb2b8073a397b03, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &728467249531208638
 AnimatorState:
   serializedVersion: 6
@@ -1713,18 +2509,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: ceb617527321b4f4d97a8d347c16e49f, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &765298446542915630
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Dash
@@ -1749,7 +2545,7 @@ AnimatorTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5327681005114743019}
@@ -1757,6 +2553,37 @@ AnimatorTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 1
+--- !u!206 &777693316187406406
+BlendTree:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Running 180 Pivot
+  m_Childs:
+  - serializedVersion: 2
+    m_Motion: {fileID: -203655887218126122, guid: cecc002d00c21a04a9714e67fe318953, type: 3}
+    m_Threshold: -110
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter:
+    m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: -203655887218126122, guid: cecc002d00c21a04a9714e67fe318953, type: 3}
+    m_Threshold: 110
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter:
+    m_Mirror: 1
+  m_BlendParameter: RunningPivotAngle
+  m_BlendParameterY: Blend
+  m_MinThreshold: 0
+  m_MaxThreshold: 1
+  m_UseAutomaticThresholds: 0
+  m_NormalizedBlendValues: 0
+  m_BlendType: 0
 --- !u!1102 &901920260921100101
 AnimatorState:
   serializedVersion: 6
@@ -1781,10 +2608,10 @@ AnimatorState:
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: b2d53e5b2f88d18428b29e11b538b35b, type: 2}
   m_Tag: Airborne
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &901920260921100102
 AnimatorState:
   serializedVersion: 6
@@ -1811,10 +2638,10 @@ AnimatorState:
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 5fd0d68b761c7304b9c3667c3e664286, type: 2}
   m_Tag: Landing
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &901920260921100111
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -2044,18 +2871,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400008, guid: 65c6b3f243b6d1d4c8b3bf47871bf62d, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &1189815222673483197
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -2086,7 +2913,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -2114,13 +2941,50 @@ AnimatorStateTransition:
   m_InterruptionSource: 3
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
+--- !u!1101 &1951902629424162596
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: StartTurning
+    m_EventTreshold: 0
+  - m_ConditionMode: 3
+    m_ConditionEvent: Speed
+    m_EventTreshold: 0.05
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -5327681005114743019}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.12
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &2325161275711719881
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: Speed
@@ -2154,7 +3018,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -2185,7 +3049,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4595295530353102786}
@@ -2222,18 +3086,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400006, guid: ee01e582a2e7f0543ad57a765d4eb748, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &2892585669370408270
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4595295530353102786}
@@ -2255,7 +3119,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -6262005825782706602}
@@ -2271,6 +3135,40 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &3999030253195098415
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: StartTurning
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -1677831386183968880}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.045
+  m_TransitionOffset: 0
+  m_ExitTime: 0.75
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 0
 --- !u!1102 &4215488106538736432
 AnimatorState:
   serializedVersion: 6
@@ -2292,11 +3190,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: 130bd4725f1ea2d439ae45c0fa786fb4, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &4218109308364705067
 AnimatorState:
   serializedVersion: 6
@@ -2322,11 +3220,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: 8352ffaa80a78234e87d5cddf0c8877c, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1102 &4388736157808279916
 AnimatorState:
   serializedVersion: 6
@@ -2348,18 +3246,55 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400006, guid: ee01e582a2e7f0543ad57a765d4eb748, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
+--- !u!1101 &4483883342787792575
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 2
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: Aim
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: RunningPivot
+    m_EventTreshold: 0
+  - m_ConditionMode: 3
+    m_ConditionEvent: Speed
+    m_EventTreshold: 0.05
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -5327681005114743019}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.12
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &4689496304111700912
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5327681005114743019}
@@ -2381,7 +3316,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: DirectionY
@@ -2406,6 +3341,31 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &5371925769427118395
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name:
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: Dash
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 728467249531208638}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.03
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 3
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1102 &5553931699483674623
 AnimatorState:
   serializedVersion: 6
@@ -2427,18 +3387,40 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400006, guid: ee01e582a2e7f0543ad57a765d4eb748, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
+--- !u!1107 &5641754702233657870
+AnimatorStateMachine:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turn In Place
+  m_ChildStates:
+  - serializedVersion: 1
+    m_State: {fileID: -261777914323717275}
+    m_Position: {x: 450, y: 50, z: 0}
+  m_ChildStateMachines: []
+  m_AnyStateTransitions: []
+  m_EntryTransitions: []
+  m_StateMachineTransitions: {}
+  m_StateMachineBehaviours: []
+  m_AnyStatePosition: {x: 50, y: 20, z: 0}
+  m_EntryPosition: {x: 50, y: 120, z: 0}
+  m_ExitPosition: {x: 800, y: 120, z: 0}
+  m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
+  m_DefaultState: {fileID: -261777914323717275}
 --- !u!1101 &5739112448567805185
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -2493,18 +3475,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -8712508904214815290}
-  m_Tag: 
+  m_Tag:
   m_SpeedParameter: LocomotionPlaybackRate
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &5794101936339931460
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4595295530353102786}
@@ -2541,18 +3523,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: cfcbdbb570f3dbb4f83ea58a11a6b3dc, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &6382063285008367525
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Dash
@@ -2577,7 +3559,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
@@ -2611,7 +3593,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -5327681005114743019}
@@ -2633,7 +3615,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 2708341378987801094}
@@ -2655,7 +3637,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
@@ -2689,7 +3671,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -6262005825782706602}
@@ -2726,18 +3708,18 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400008, guid: 65c6b3f243b6d1d4c8b3bf47871bf62d, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_Tag:
+  m_SpeedParameter:
+  m_MirrorParameter:
+  m_CycleOffsetParameter:
+  m_TimeParameter:
 --- !u!1101 &7707519934532072050
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
@@ -2877,7 +3859,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: Dash
@@ -2908,7 +3890,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
+  m_Name:
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 2708341378987801094}

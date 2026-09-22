@@ -19,8 +19,21 @@ MonoBehaviour:
   _fppMouseSensitivity: 5
   _groundSnapDistance: 0.3
   _fallingDelay: 0.12
-  _animationSpeedDampTime: 0.08
-  _animationDirectionDampTime: 0.1
+  _startTurnAngle: 30
+  _startTurnSpeed: 540
+  _runPivotAngle: 110
+  _runPivotDuration: 0.42
+  _runPivotMinSpeed: 0.25
+  _runPivotInputGrace: 0.2
+  _aimCameraBlendIn: 0.42
+  _aimCameraBlendOut: 0.32
+  _aimEntryMinTime: 0.15
+  _aimEntryMaxTime: 0.35
+  _aimEntryStepAngle: 35
+  _aimEntryBlendStart: 0.72
+  _aimReturnTime: 0.25
+  _animationSpeedDampTime: 0.1
+  _animationDirectionDampTime: 0.14
   _animationTurnDampTime: 0.08
   _locomotionMinPlaybackRate: 0.75
   _recoilLocalKickDistance: 0.035

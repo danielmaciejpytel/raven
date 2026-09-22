@@ -142,18 +142,107 @@ public static partial class RavenScriptAudit
             fixture.Movement.FixedTick();
             Check(fixture.Movement.PlanarSpeed < 0.01f, "Planar speed returns to zero after movement input stops");
 
+            foreach (float step in new[] { 0.01f, 0.02f, 0.03f })
+            foreach (Vector2 direction in new[] { Vector2.left, Vector2.right, Vector2.down })
+            {
+                Time.fixedDeltaTime = step;
+                fixture.Place(fixture.Spawn);
+                fixture.SetMove(direction);
+                fixture.Movement.Tick();
+                Vector3 turnStart = fixture.Player.transform.position;
+                bool stayedInPlace = true;
+                int frames = 0;
+                do
+                {
+                    fixture.Movement.FixedTick();
+                    if (fixture.Movement.StartTurning)
+                        stayedInPlace &= Vector3.ProjectOnPlane(fixture.Player.transform.position - turnStart, Vector3.up).sqrMagnitude < 0.000001f;
+                    frames++;
+                } while (fixture.Movement.StartTurning && frames < 100);
+                Vector3 desired = new Vector3(direction.x, 0f, direction.y);
+                Vector3 displacement = Vector3.ProjectOnPlane(fixture.Player.transform.position - turnStart, Vector3.up);
+                Check(stayedInPlace && frames * step <= 0.37f && displacement.sqrMagnitude > 0f &&
+                      Vector3.Dot(desired, displacement.normalized) > 0.999f &&
+                      Vector3.Dot(desired, fixture.Player.transform.forward) > 0.999f,
+                    $"Stationary turn {direction} at {step:F2}s starts directly along requested heading without an arc ({frames * step:F2}s)");
+            }
             fixture.Place(fixture.Spawn);
             fixture.SetMove(Vector2.right);
             fixture.Movement.Tick();
-            Vector3 turnStart = fixture.Player.transform.position;
             fixture.Movement.FixedTick();
-            Vector3 turnDisplacement = Vector3.ProjectOnPlane(fixture.Player.transform.position - turnStart, Vector3.up);
-            Check(fixture.Movement.TurnAngle > 45f && turnDisplacement.sqrMagnitude > 0f &&
-                  Vector3.Dot(turnDisplacement.normalized, fixture.Player.transform.forward) > 0.999f,
-                $"TPP translation follows the smoothed body heading while TurnAngle preserves desired turn delta ({fixture.Movement.TurnAngle:F1} deg)");
             fixture.SetMove(Vector2.zero);
             fixture.Movement.Tick();
             fixture.Movement.FixedTick();
+            Check(!fixture.Movement.StartTurning && fixture.Movement.PlanarSpeed < 0.01f,
+                "Releasing movement cancels a stationary turn without translation");
+            fixture.SetMove(Vector2.zero);
+            fixture.Movement.Tick();
+            fixture.Movement.FixedTick();
+
+            foreach (float step in new[] { 0.01f, 0.02f, 0.03f })
+            foreach (float targetYaw in new[] { -180f, -135f, 135f })
+            {
+                Time.fixedDeltaTime = step;
+                fixture.Place(fixture.Spawn);
+                fixture.SetMove(Vector2.up);
+                fixture.Movement.Tick();
+                for (int i = 0; i < 6; i++) fixture.Movement.FixedTick();
+                Vector3 desired = Quaternion.Euler(0f, targetYaw, 0f) * Vector3.forward;
+                fixture.SetMove(new Vector2(desired.x, desired.z));
+                fixture.Movement.Tick();
+                fixture.Movement.FixedTick();
+                bool entered = fixture.Movement.RunningPivot;
+                bool continuous = !fixture.Movement.StartTurning;
+                int frames = 1;
+                while (fixture.Movement.RunningPivot && frames < 100)
+                {
+                    Vector3 before = fixture.Player.transform.position;
+                    fixture.Movement.FixedTick();
+                    continuous &= !fixture.Movement.StartTurning &&
+                        Vector3.ProjectOnPlane(fixture.Player.transform.position - before, Vector3.up).magnitude > 0.0001f;
+                    frames++;
+                }
+                Check(entered && continuous && frames * step <= 0.45f &&
+                      Vector3.Dot(fixture.Player.transform.forward, desired) > 0.999f,
+                    $"Running pivot {targetYaw} at {step:F2}s keeps moving and finishes along the new heading ({frames * step:F2}s)");
+            }
+            fixture.Place(fixture.Spawn);
+            fixture.SetMove(Vector2.up);
+            fixture.Movement.Tick();
+            for (int i = 0; i < 6; i++) fixture.Movement.FixedTick();
+            fixture.SetMove(Vector2.down);
+            fixture.Movement.Tick();
+            fixture.Movement.FixedTick();
+            fixture.SetMove(Vector2.zero);
+            fixture.Movement.Tick();
+            fixture.Movement.FixedTick();
+            Check(!fixture.Movement.RunningPivot && fixture.Movement.PlanarSpeed < 0.01f,
+                "Releasing input cancels a running pivot immediately");
+
+            // Keyboard direction changes include a neutral interval (released keys,
+            // or W+S cancelling each other). It must not select a standing turn.
+            foreach (float step in new[] { 0.01f, 0.02f, 0.03f })
+            foreach (float gap in new[] { 0.02f, 0.08f, 0.15f, 0.35f })
+            {
+                Time.fixedDeltaTime = step;
+                fixture.Place(fixture.Spawn);
+                fixture.SetMove(Vector2.up);
+                fixture.Movement.Tick();
+                for (int i = 0; i < 6; i++) fixture.Movement.FixedTick();
+                fixture.SetMove(Vector2.zero);
+                fixture.Movement.Tick();
+                Vector3 stoppedAt = fixture.Player.transform.position;
+                for (int i = 0; i < Mathf.CeilToInt(gap / step); i++) fixture.Movement.FixedTick();
+                bool stopped = fixture.Movement.PlanarSpeed < 0.01f &&
+                    Vector3.ProjectOnPlane(fixture.Player.transform.position - stoppedAt, Vector3.up).sqrMagnitude < 0.000001f;
+                fixture.SetMove(Vector2.down);
+                fixture.Movement.Tick();
+                fixture.Movement.FixedTick();
+                bool recentRun = gap < 0.2f;
+                Check(stopped && fixture.Movement.RunningPivot == recentRun && fixture.Movement.StartTurning != recentRun,
+                    $"Reversal after neutral gap {gap:F2}s at step {step:F2}s selects {(recentRun ? "running pivot" : "standing turn")} without release drift");
+            }
+
 
             fixture.Place(fixture.Spawn);
             fixture.Energy.value = 200f;

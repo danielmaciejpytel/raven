@@ -35,13 +35,23 @@ namespace Raven.Core.Installer
 
         public override void InstallBindings()
         {
+            var headLook = _playerReferences.PlayerAnimator.GetComponent<RavenHeadLook>();
+            if (headLook != null)
+                headLook.Initialize(_mainCameraTransform, _playerReferences.Player.transform,
+                    Container.Resolve<Raven.Input.InputManager>(), _rigTarget.transform);
+            var face = _playerReferences.PlayerAnimator.GetComponent<RavenFacialAnimation>();
+            if (face != null) face.Initialize(Container.Resolve<Raven.Input.InputManager>());
+            var torso = _playerReferences.PlayerAnimator.GetComponent<RavenAimTorso>();
+            if (torso != null)
+                torso.Initialize(_mainCameraTransform, _playerReferences.Player.transform,
+                    Container.Resolve<Raven.Input.InputManager>(), _movementConfig);
             Container.BindInterfacesAndSelfTo<PlayerDataManager>().AsSingle().WithArguments(_playerDataConfig, _deadPanelAnimator);
             Container.BindInterfacesAndSelfTo<PlayerStatesManager>().AsSingle().WithArguments(_playerStatesContainer, _playerReferences).NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerHudManager>().AsSingle().WithArguments(_hudReferences, _playerDataConfig, _collectibles).NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerMovementManager>().AsSingle().WithArguments(_playerReferences.Player, _movementConfig, _mainCameraTransform, _playerReferences.PlayerGroundCheck).NonLazy();
-            Container.BindInterfacesAndSelfTo<PlayerAnimatorManager>().AsSingle().WithArguments(_playerReferences.PlayerAnimator).NonLazy();
             Container.BindInterfacesAndSelfTo<CameraManager>().AsSingle().WithArguments(_shootCamera, _tppCamera, _playerReferences.Player, _mainCameraTransform, _shootCameraLock, _movementConfig).NonLazy();
-            Container.BindInterfacesAndSelfTo<PlayerRigManager>().AsSingle().WithArguments(_playerReferences.PlayerRigs, _rigTarget, _shootRaycastHits, _mainCameraTransform).NonLazy();
+            Container.BindInterfacesAndSelfTo<PlayerAnimatorManager>().AsSingle().WithArguments(_playerReferences.PlayerAnimator).NonLazy();
+            Container.BindInterfacesAndSelfTo<PlayerRigManager>().AsSingle().WithArguments(_playerReferences.PlayerRigs, _rigTarget, _shootRaycastHits, _mainCameraTransform, _movementConfig).NonLazy();
         }
     }
 }

@@ -23,6 +23,51 @@ namespace Raven.Config
         [Tooltip("Continuous time without ground contact before the Animator can enter Falling.")]
         [SerializeField, Range(0f, 0.3f)] private float _fallingDelay = 0.12f;
 
+        [Header("Turn Before Moving")]
+        [Tooltip("Minimum heading change that uses a stationary turn when starting.")]
+        [SerializeField, Range(10f, 90f)] private float _startTurnAngle = 30f;
+        [Tooltip("Body rotation in degrees per second during a stationary start turn.")]
+        [SerializeField, Range(180f, 900f)] private float _startTurnSpeed = 540f;
+        public float StartTurnAngle => _startTurnAngle;
+        public float StartTurnSpeed => _startTurnSpeed;
+
+        [Header("Running Pivot")]
+        [Tooltip("Minimum heading change for a running plant-and-turn.")]
+        [SerializeField, Range(90f, 170f)] private float _runPivotAngle = 110f;
+        [Tooltip("Duration of a 180-degree running pivot. Smaller turns finish sooner.")]
+        [SerializeField, Range(0.25f, 0.65f)] private float _runPivotDuration = 0.42f;
+        [Tooltip("Fraction of running speed at the planted part of the turn. Keeps momentum instead of entering idle.")]
+        [SerializeField, Range(0.1f, 0.6f)] private float _runPivotMinSpeed = 0.25f;
+        [Tooltip("Maximum neutral input gap that still counts as reversing a recent run. Does not add movement after release.")]
+        [SerializeField, Range(0f, 0.3f)] private float _runPivotInputGrace = 0.2f;
+        public float RunPivotInputGrace => _runPivotInputGrace;
+        public float RunPivotAngle => _runPivotAngle;
+        public float RunPivotDuration => _runPivotDuration;
+        public float RunPivotMinSpeed => _runPivotMinSpeed;
+
+        [Header("Aim Camera Transition")]
+        [Tooltip("Camera travel time into shoulder aim. Does not delay aiming input.")]
+        [SerializeField, Range(0.15f, 0.8f)] private float _aimCameraBlendIn = 0.42f;
+        [SerializeField, Range(0.15f, 0.8f)] private float _aimCameraBlendOut = 0.32f;
+        public float AimCameraBlendIn => _aimCameraBlendIn;
+        public float AimCameraBlendOut => _aimCameraBlendOut;
+
+        [Header("Aim Entry")]
+        [SerializeField, Range(0.08f, 0.25f)] private float _aimEntryMinTime = 0.14f;
+        [SerializeField, Range(0.2f, 0.5f)] private float _aimEntryMaxTime = 0.32f;
+        [SerializeField, Range(20f, 60f)] private float _aimEntryStepAngle = 35f;
+        [Tooltip("Normalized turn time at which the recovery can blend into aiming, once the body is within 25 degrees of the target.")]
+        [SerializeField, Range(0.5f, 0.95f)] private float _aimEntryBlendStart = 0.72f;
+        public float AimEntryBlendStart => _aimEntryBlendStart;
+        public float AimEntryMinTime => _aimEntryMinTime;
+        public float AimEntryMaxTime => Mathf.Max(_aimEntryMinTime, _aimEntryMaxTime);
+        public float AimEntryStepAngle => _aimEntryStepAngle;
+
+        [Header("Aim Pose")]
+        [Tooltip("Duration of the immediate body-relative arm return after releasing aim.")]
+        [SerializeField, Range(0.12f, 1f)] private float _aimReturnTime = 0.2f;
+        public float AimReturnTime => _aimReturnTime;
+
         [Header("Animation")]
         [SerializeField, Range(0.01f, 0.5f)] private float _animationSpeedDampTime = 0.08f;
         [SerializeField, Range(0.01f, 0.5f)] private float _animationDirectionDampTime = 0.1f;

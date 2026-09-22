@@ -34,6 +34,7 @@ public static partial class RavenScriptAudit
     private static GameObject _checkHost;
     private static double _checkDeadline;
     private static InputSettings _originalInputSettings;
+    private static HideFlags _originalInputSettingsFlags;
     private static InputSettings _auditInputSettings;
 
     [MenuItem("Tools/Raven/Script Audit/Run Play Mode Checks %#F9")]
@@ -49,6 +50,10 @@ public static partial class RavenScriptAudit
         if (context == null || context.Container == null) throw new InvalidOperationException("No initialized SceneContext.");
         // Synthetic devices must also work when automation leaves Game View unfocused.
         _originalInputSettings = InputSystem.settings;
+        _originalInputSettingsFlags = _originalInputSettings.hideFlags;
+        // Input System destroys HideAndDontSave defaults when replacing settings.
+        // Keep this instance alive so the audit can restore the user's exact settings.
+        _originalInputSettings.hideFlags = HideFlags.DontSave;
         _auditInputSettings = Object.Instantiate(_originalInputSettings);
         _auditInputSettings.hideFlags = HideFlags.DontSave;
         _auditInputSettings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
@@ -80,6 +85,8 @@ public static partial class RavenScriptAudit
         Check(context.Container.Resolve<InputManager>().GameplayInputEnabled, "Menu has handed control to the player");
         yield return CheckPauseAndInput(context);
         yield return CheckQueriesAndCoroutines();
+        yield return CheckAimEntryCamera();
+        yield return CheckAnimationAimMask();
         yield return CheckMovementAndCombat(context);
         yield return CheckInteractions(context);
         yield return CheckNavigation(context);
@@ -163,7 +170,11 @@ public static partial class RavenScriptAudit
         WriteChecks();
         if (_checkHost != null) Object.Destroy(_checkHost);
         _checkHost = null;
-        if (_originalInputSettings != null) InputSystem.settings = _originalInputSettings;
+        if (_originalInputSettings != null)
+        {
+            InputSystem.settings = _originalInputSettings;
+            _originalInputSettings.hideFlags = _originalInputSettingsFlags;
+        }
         if (_auditInputSettings != null) Object.Destroy(_auditInputSettings);
         _originalInputSettings = null;
         _auditInputSettings = null;

@@ -28,6 +28,17 @@ namespace Raven.Manager
         private float _airborneTime = float.PositiveInfinity;
         private float _turnSmoothVelocity;
         private float _turnAngle;
+        private bool _startTurning;
+        private float _stationaryTurnAngle;
+        private float _stationaryTurnProgress;
+        private bool _runningPivot;
+        private float _pivotTimer;
+        private float _pivotDuration;
+        private float _pivotStartYaw;
+        private float _pivotTargetYaw;
+        private float _pivotAngle;
+        private float _pivotProgress;
+        private float _recentRunTime;
         private bool _dash;
         private float _dashTimer;
         private IPlayerState _dashBehaviour;
@@ -50,6 +61,14 @@ namespace Raven.Manager
         public bool AnimationGrounded => Grounded || _airborneTime < _movementConfig.FallingDelay;
         public float TurnAngle => _turnAngle;
         public bool Fpp => _fpp;
+        public bool StartTurning => _startTurning;
+        public float StationaryTurnAngle => _stationaryTurnAngle;
+        public float StationaryTurnProgress => _stationaryTurnProgress;
+        public bool RunningPivot => _runningPivot;
+        public float RunningPivotAngle => _pivotAngle;
+        public float RunningPivotProgress => _pivotProgress;
+        public float StartTurnSpeed => _movementConfig.StartTurnSpeed;
+        public int TeleportVersion { get; private set; }
         public float MoveSpeed => _movementConfig.MoveSpeed;
         public float FppExitDelayTime => _movementConfig.FppToTppDelayTime;
         public float AnimationSpeedDampTime => _movementConfig.AnimationSpeedDampTime;
@@ -110,6 +129,7 @@ namespace Raven.Manager
                 _playerController.enabled = controllerWasEnabled;
             }
             CancelDash();
+            TeleportVersion++;
             ResetMovement();
             Physics.SyncTransforms();
             _cameraManager.OnPlayerTeleported();
@@ -164,6 +184,14 @@ namespace Raven.Manager
             _playerController.Move(displacement);
             UpdatePlanarVelocity();
             UpdateGroundContact(deltaTime);
+            // Remember locomotion briefly across released or opposing keys, but do
+            // not retain physical velocity: releasing input still stops immediately.
+            if (!Grounded || _fpp || _startTurning)
+                _recentRunTime = 0f;
+            else if (PlanarSpeed > MoveSpeed * 0.2f)
+                _recentRunTime = _movementConfig.RunPivotInputGrace;
+            else
+                _recentRunTime = Mathf.Max(0f, _recentRunTime - deltaTime);
         }
 
         #region Movement Scripts
@@ -233,20 +261,105 @@ namespace Raven.Manager
 
         private Vector3 GetMoveDirection(Vector3 p_moveVector, float p_deltaTime)
         {
+            // Both modes use the same visible view: switching aim never remaps W/A/S/D.
+            float referenceYaw = _camTransform.eulerAngles.y;
             if (_fpp)
             {
+                _startTurning = false;
+                _runningPivot = false;
                 _turnAngle = 0f;
-                return _playerTransform.right * p_moveVector.x + _playerTransform.forward * p_moveVector.z;
+                Vector3 direction = Quaternion.Euler(0f, referenceYaw, 0f) * p_moveVector;
+                if (_fppToTppDelay && !_dash && direction.sqrMagnitude > 0.0001f)
+                {
+                    // Align the body during the existing exit window, while strafe motion
+                    // still has an independent heading. TPP can then resume without an arc.
+                    float heading = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+                    float remaining = Mathf.Max(0.0001f, Mathf.Max(p_deltaTime, _movementConfig.FppToTppDelayTime - _fppToTppTimer));
+                    float yaw = Mathf.LerpAngle(_playerTransform.eulerAngles.y, heading, p_deltaTime / remaining);
+                    _playerTransform.rotation = Quaternion.Euler(0f, yaw, 0f);
+                    _turnSmoothVelocity = 0f;
+                }
+                return direction;
             }
 
             if (p_moveVector.sqrMagnitude <= 0f)
             {
+                _startTurning = false;
+                _runningPivot = false;
+                _turnSmoothVelocity = 0f;
                 _turnAngle = 0f;
                 return Vector3.zero;
             }
 
-            float targetAngle = Mathf.Atan2(p_moveVector.x, p_moveVector.z) * Mathf.Rad2Deg + _camTransform.eulerAngles.y;
+            float targetAngle = Mathf.Atan2(p_moveVector.x, p_moveVector.z) * Mathf.Rad2Deg + referenceYaw;
             _turnAngle = Mathf.DeltaAngle(_playerTransform.eulerAngles.y, targetAngle);
+            // Turn before translating from rest; otherwise forward motion draws an arc.
+            // A dash retains its existing direction, time and distance calculation.
+            if (!_dash && Grounded)
+            {
+                float error = Mathf.Abs(_turnAngle);
+                // A reversal during a run has its own continuous movement profile.
+                // It must never enter the stationary-turn path just because speed drops.
+                if (_runningPivot && Mathf.Abs(Mathf.DeltaAngle(_pivotTargetYaw, targetAngle)) > 75f)
+                    _runningPivot = false;
+                if (!_runningPivot && !_startTurning && (PlanarSpeed > MoveSpeed * 0.2f || _recentRunTime > 0f) &&
+                    error >= _movementConfig.RunPivotAngle)
+                {
+                    _runningPivot = true;
+                    _pivotTimer = 0f;
+                    _pivotProgress = 0f;
+                    _pivotStartYaw = _playerTransform.eulerAngles.y;
+                    _pivotTargetYaw = targetAngle;
+                    _pivotAngle = _turnAngle;
+                    _pivotDuration = _movementConfig.RunPivotDuration * Mathf.Lerp(0.75f, 1f,
+                        Mathf.InverseLerp(_movementConfig.RunPivotAngle, 180f, error));
+                }
+                if (_runningPivot)
+                {
+                    _pivotTimer += p_deltaTime;
+                    _pivotProgress = Mathf.Clamp01(_pivotTimer / _pivotDuration);
+                    // The plant is in the middle of the clip; accelerate out facing the new heading.
+                    float rotationPhase = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.1f, 0.8f, _pivotProgress));
+                    float pivotYaw = _pivotStartYaw + _pivotAngle * rotationPhase;
+                    _playerTransform.rotation = Quaternion.Euler(0f, pivotYaw, 0f);
+                    _turnSmoothVelocity = 0f;
+                    float speedScale = Mathf.Lerp(_movementConfig.RunPivotMinSpeed, 1f,
+                        Mathf.Abs(2f * _pivotProgress - 1f));
+                    if (_pivotProgress >= 1f) _runningPivot = false;
+                    return _playerTransform.forward * (p_moveVector.magnitude * speedScale);
+                }
+                if (!_startTurning && error > _movementConfig.StartTurnAngle && PlanarSpeed < 0.15f)
+                {
+                    _startTurning = true;
+                    _stationaryTurnAngle = _turnAngle;
+                    _stationaryTurnProgress = 0f;
+                }
+                if (_startTurning)
+                {
+                    float step = _movementConfig.StartTurnSpeed * p_deltaTime;
+                    _stationaryTurnProgress = Mathf.Clamp01(1f - Mathf.Max(0f, error - step) / Mathf.Max(1f, Mathf.Abs(_stationaryTurnAngle)));
+                    _playerTransform.rotation = Quaternion.Euler(0f,
+                        Mathf.MoveTowardsAngle(_playerTransform.eulerAngles.y, targetAngle, step), 0f);
+                    _turnSmoothVelocity = 0f;
+                    if (error > step) return Vector3.zero;
+                    _startTurning = false;
+                    _turnAngle = 0f;
+                    return _playerTransform.forward * p_moveVector.magnitude;
+                }
+                if (PlanarSpeed < 0.15f)
+                {
+                    _playerTransform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
+                    _turnSmoothVelocity = 0f;
+                    _turnAngle = 0f;
+                    return _playerTransform.forward * p_moveVector.magnitude;
+                }
+            }
+            else
+            {
+                _startTurning = false;
+                _runningPivot = false;
+            }
+
             float angle = Mathf.SmoothDampAngle(_playerTransform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity,
                 _movementConfig.TurnSmoothTime, Mathf.Infinity, p_deltaTime);
             _playerTransform.rotation = Quaternion.Euler(0f, angle, 0f);
@@ -263,6 +376,9 @@ namespace Raven.Manager
             _dashConfig = p_config;
             _dashTimer = 0f;
             _dash = true;
+            _recentRunTime = 0f;
+            _startTurning = false;
+            _runningPivot = false;
             _gravity = false;
             _currentGravity = 0f;
             OnDash?.Invoke(true);
@@ -317,6 +433,12 @@ namespace Raven.Manager
             _currentGravity = 0f;
             _turnSmoothVelocity = 0f;
             _turnAngle = 0f;
+            _startTurning = false;
+            _stationaryTurnAngle = 0f;
+            _stationaryTurnProgress = 0f;
+            _runningPivot = false;
+            _pivotProgress = 0f;
+            _recentRunTime = 0f;
             _dash = false;
             _gravity = true;
             _dashTimer = 0f;
@@ -361,6 +483,14 @@ namespace Raven.Manager
                 return;
             }
 
+            if (!_dash && _moveVector.sqrMagnitude > 0.0001f && PlanarSpeed > 0.01f)
+            {
+                // Finish facing the requested TPP direction, not a heading saved from another input.
+                float yaw = _camTransform.eulerAngles.y +
+                    Mathf.Atan2(_moveVector.x, _moveVector.z) * Mathf.Rad2Deg;
+                _playerTransform.rotation = Quaternion.Euler(0f, yaw, 0f);
+                _turnSmoothVelocity = 0f;
+            }
             _fpp = false;
             _fppToTppDelay = false;
             _fppToTppTimer = 0f;

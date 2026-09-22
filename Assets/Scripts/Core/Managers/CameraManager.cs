@@ -13,7 +13,13 @@ namespace Raven.Manager
         private GameObject _shootCamera;
         private CinemachineCamera _tppCamera;
         private CinemachineOrbitalFollow _tppOrbital;
+        private Vector3 _originalTppPositionDamping;
         private CinemachineCamera _aimCamera;
+        private CinemachineBrain _brain;
+        private CinemachineBlenderSettings _originalBlends;
+        private CinemachineBlenderSettings _aimBlends;
+        private CinemachineCore.BlendHints _originalTppBlendHint;
+        private CinemachineCore.BlendHints _originalAimBlendHint;
         private CinemachineInputAxisController[] _orbitInputs;
         private bool[] _orbitInputsEnabled;
         private Transform _playerTransform;
@@ -24,6 +30,25 @@ namespace Raven.Manager
         private bool _isAiming;
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
+        private CharacterController _playerController;
+        private bool _aimEntryActive;
+        private bool _aimEntryMoving;
+        private float _aimEntryTimer;
+        private float _aimEntryDuration;
+        private float _aimEntryStartYaw;
+        private float _aimEntryTargetYaw;
+        private float _aimEntryAngle;
+
+        public bool AimEntryActive => _aimEntryActive;
+        public bool AimEntryMoving => _aimEntryMoving;
+        public bool AimEntryRunningPivot => _aimEntryMoving && Mathf.Abs(_aimEntryAngle) >= _movementConfig.RunPivotAngle;
+        public float AimEntryAngle => _aimEntryAngle;
+        public float AimEntryProgress => _aimEntryActive ? Mathf.Clamp01(_aimEntryTimer / _aimEntryDuration) : 1f;
+        public float AimYawError => Mathf.DeltaAngle(_playerTransform.eulerAngles.y, _cinemachineTargetYaw);
+        public float AimPoseWeight => _aimEntryActive
+            ? 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(20f, 80f, Mathf.Abs(AimYawError))) : 1f;
+        public float AimEntryBlendStart => _movementConfig.AimEntryBlendStart;
+        public float AimEntryStepAngle => _movementConfig.AimEntryStepAngle;
 
         public GameObject ShootCameraLock;
 
@@ -58,6 +83,14 @@ namespace Raven.Manager
             if (_tppCamera != null)
             {
                 _tppOrbital = _tppCamera.GetComponent<CinemachineOrbitalFollow>();
+                if (_tppOrbital != null)
+                {
+                    _originalTppPositionDamping = _tppOrbital.TrackerSettings.PositionDamping;
+                    // Composer looks at the live player. A horizontally lagging follow position
+                    // makes strafing rotate the view, which then steers camera-relative movement.
+                    // Keep vertical terrain smoothing; camera-mode travel has its own blend.
+                    _tppOrbital.TrackerSettings.PositionDamping = new Vector3(0f, _originalTppPositionDamping.y, 0f);
+                }
                 _orbitInputs = _tppCamera.GetComponents<CinemachineInputAxisController>();
             }
             else _orbitInputs = Array.Empty<CinemachineInputAxisController>();
@@ -66,15 +99,53 @@ namespace Raven.Manager
                 _orbitInputsEnabled[i] = _orbitInputs[i].enabled;
             _aimCamera = _shootCamera.GetComponent<CinemachineCamera>();
             _playerTransform = p_player.GetComponent<Transform>();
+            _playerController = p_player.GetComponent<CharacterController>();
             _mainCamera = p_mainCamera;
             ShootCameraLock = p_ShootCameraLock;
+            ConfigureAimCameraBlend();
 
         }
 
         public void Dispose()
         {
+            if (_tppOrbital != null) _tppOrbital.TrackerSettings.PositionDamping = _originalTppPositionDamping;
+            if (_aimBlends != null)
+            {
+                if (_brain != null && _brain.CustomBlends == _aimBlends) _brain.CustomBlends = _originalBlends;
+                if (_tppCamera != null) _tppCamera.BlendHint = _originalTppBlendHint;
+                if (_aimCamera != null) _aimCamera.BlendHint = _originalAimBlendHint;
+                UnityEngine.Object.Destroy(_aimBlends);
+            }
             for (int i = 0; i < _orbitInputs.Length; i++)
                 if (_orbitInputs[i] != null) _orbitInputs[i].enabled = _orbitInputsEnabled[i];
+        }
+
+        private void ConfigureAimCameraBlend()
+        {
+            if (_mainCamera == null || _tppCamera == null || _aimCamera == null ||
+                !_mainCamera.TryGetComponent(out _brain)) return;
+
+            // Keep menu/other camera rules and never mutate a shared settings asset in Play Mode.
+            _originalBlends = _brain.CustomBlends;
+            _aimBlends = _originalBlends != null ? UnityEngine.Object.Instantiate(_originalBlends)
+                : ScriptableObject.CreateInstance<CinemachineBlenderSettings>();
+            _aimBlends.name = "Raven aim camera blends (runtime)";
+            _aimBlends.hideFlags = HideFlags.DontSave;
+            var rules = new System.Collections.Generic.List<CinemachineBlenderSettings.CustomBlend>(
+                _aimBlends.CustomBlends ?? Array.Empty<CinemachineBlenderSettings.CustomBlend>());
+            rules.RemoveAll(r => (r.From == _tppCamera.Name && r.To == _aimCamera.Name) ||
+                (r.From == _aimCamera.Name && r.To == _tppCamera.Name));
+            rules.Add(new CinemachineBlenderSettings.CustomBlend { From = _tppCamera.Name, To = _aimCamera.Name,
+                Blend = new CinemachineBlendDefinition(CinemachineBlendDefinition.Styles.EaseInOut, _movementConfig.AimCameraBlendIn) });
+            rules.Add(new CinemachineBlenderSettings.CustomBlend { From = _aimCamera.Name, To = _tppCamera.Name,
+                Blend = new CinemachineBlendDefinition(CinemachineBlendDefinition.Styles.EaseInOut, _movementConfig.AimCameraBlendOut) });
+            _aimBlends.CustomBlends = rules.ToArray();
+            _brain.CustomBlends = _aimBlends;
+            _originalTppBlendHint = _tppCamera.BlendHint;
+            _originalAimBlendHint = _aimCamera.BlendHint;
+            // Cinemachine snapshots the rendered blend when it is interrupted, including rapid re-aim.
+            _tppCamera.BlendHint |= CinemachineCore.BlendHints.FreezeWhenBlendingOut;
+            _aimCamera.BlendHint |= CinemachineCore.BlendHints.FreezeWhenBlendingOut;
         }
 
         public void Tick()
@@ -109,6 +180,7 @@ namespace Raven.Manager
             // Discard damping/collision history from the old checkpoint position.
             if (_tppCamera != null) _tppCamera.PreviousStateIsValid = false;
             if (_aimCamera != null) _aimCamera.PreviousStateIsValid = false;
+            _aimEntryActive = false;
             _cinemachineTargetYaw = _playerTransform.eulerAngles.y;
             _setPlayerRotation = true;
         }
@@ -117,6 +189,17 @@ namespace Raven.Manager
         {
             if (_shootCamera.activeSelf != p_aim)
             {
+                if (!p_aim && _tppOrbital != null)
+                {
+                    // Prepare the destination only when returning. Changing the outgoing TPP
+                    // orbit during aim entry used to move both ends of the camera blend.
+                    // A quick release can interrupt aim entry. Match the rendered view,
+                    // not the aim camera's destination yaw, and seed its new tracking history.
+                    float exitYaw = _mainCamera.eulerAngles.y;
+                    _tppOrbital.HorizontalAxis.Value = _tppOrbital.HorizontalAxis.ClampValue(exitYaw);
+                    _tppCamera.PreviousStateIsValid = false;
+                    _tppCamera.InternalUpdateCameraState(Vector3.up, -1f);
+                }
                 _shootCamera.SetActive(p_aim);
             }
 
@@ -124,19 +207,13 @@ namespace Raven.Manager
             {
                 if (_setPlayerRotation)
                 {
-                    SetPlayerRotation();
+                    BeginAimEntry();
                 }
-                else
-                {
-                    ShootCameraRotation();
-                    if (_tppOrbital != null)
-                    {
-                        _tppOrbital.HorizontalAxis.Value = _playerTransform.eulerAngles.y;
-                    }
-                }
+                ShootCameraRotation();
             }
             else
             {
+                _aimEntryActive = false;
                 _setPlayerRotation = true;
             }
 
@@ -152,8 +229,19 @@ namespace Raven.Manager
             _cinemachineTargetYaw = Mathf.Repeat(_cinemachineTargetYaw + look.x + 180f, 360f) - 180f;
             _cinemachineTargetPitch = ClampAimPitch(_cinemachineTargetPitch + look.y);
 
-            ShootCameraLock.transform.localRotation = Quaternion.Euler(-_cinemachineTargetPitch, 0f, 0.0f);
-            _playerTransform.rotation = Quaternion.Euler(0f, _cinemachineTargetYaw, 0.0f);
+            if (_aimEntryActive)
+            {
+                _aimEntryTargetYaw += look.x;
+                _aimEntryTimer += Time.deltaTime;
+                float progress = AimEntryProgress;
+                float yaw = Mathf.Lerp(_aimEntryStartYaw, _aimEntryTargetYaw, Mathf.SmoothStep(0f, 1f, progress));
+                _playerTransform.rotation = Quaternion.Euler(0f, yaw, 0f);
+                _aimEntryMoving |= PlanarSpeed() > _movementConfig.MoveSpeed * 0.2f;
+                if (progress >= 1f) _aimEntryActive = false;
+            }
+            else _playerTransform.rotation = Quaternion.Euler(0f, _cinemachineTargetYaw, 0f);
+            // The camera aims immediately; body yaw catches up independently.
+            ShootCameraLock.transform.rotation = Quaternion.Euler(-_cinemachineTargetPitch, _cinemachineTargetYaw, 0f);
         }
 
         private float ClampAimPitch(float pitch)
@@ -161,7 +249,7 @@ namespace Raven.Manager
             return Mathf.Clamp(pitch, -_movementConfig.AimMaxDownAngle, _movementConfig.AimMaxUpAngle);
         }
 
-        private void SetPlayerRotation()
+        private void BeginAimEntry()
         {
             // Capture the rendered view, including a partially completed camera blend.
             Vector3 direction = _mainCamera.forward;
@@ -184,7 +272,6 @@ namespace Raven.Manager
             {
                 _cinemachineTargetYaw = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
                 _cinemachineTargetPitch = ClampAimPitch(Mathf.Asin(Mathf.Clamp(direction.y, -1f, 1f)) * Mathf.Rad2Deg);
-                _playerTransform.rotation = Quaternion.Euler(0f, _cinemachineTargetYaw, 0f);
                 ShootCameraLock.transform.rotation = Quaternion.Euler(-_cinemachineTargetPitch, _cinemachineTargetYaw, 0f);
                 if (_aimCamera == null) break;
                 _aimCamera.PreviousStateIsValid = false;
@@ -194,7 +281,23 @@ namespace Raven.Manager
                 direction = toTarget.normalized;
             }
 
+            _aimEntryStartYaw = _playerTransform.eulerAngles.y;
+            _aimEntryAngle = Mathf.DeltaAngle(_aimEntryStartYaw, _cinemachineTargetYaw);
+            _aimEntryTargetYaw = _aimEntryStartYaw + _aimEntryAngle;
+            _aimEntryDuration = Mathf.Lerp(_movementConfig.AimEntryMinTime, _movementConfig.AimEntryMaxTime,
+                Mathf.Abs(_aimEntryAngle) / 180f);
+            _aimEntryTimer = 0f;
+            _aimEntryMoving = PlanarSpeed() > _movementConfig.MoveSpeed * 0.2f;
+            _aimEntryActive = Mathf.Abs(_aimEntryAngle) > 1f;
             _setPlayerRotation = false;
+        }
+
+        private float PlanarSpeed()
+        {
+            if (_playerController == null) return 0f;
+            Vector3 velocity = _playerController.velocity;
+            velocity.y = 0f;
+            return velocity.magnitude;
         }
     }
 }
