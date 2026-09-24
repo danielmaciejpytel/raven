@@ -28,6 +28,8 @@ public class PlayerHudReferences : MonoBehaviour
     public TextMeshProUGUI PopUpText;
 
     private TextMeshProUGUI _livesText;
+    private int _remainingLives;
+    private int _totalLives;
     private CanvasGroup _deathOverlay;
     private TextMeshProUGUI _gameOverText;
 
@@ -36,8 +38,13 @@ public class PlayerHudReferences : MonoBehaviour
         if (ViewFinder != null) ViewFinder.gameObject.SetActive(false);
     }
 
+    private void OnEnable() => RavenLocalization.LanguageChanged += RefreshLives;
+    private void OnDisable() => RavenLocalization.LanguageChanged -= RefreshLives;
+
     public void SetLives(int remaining, int total)
     {
+        _remainingLives = remaining;
+        _totalLives = total;
         if (_livesText == null)
         {
             _livesText = CreateText("LivesCounter", transform, 32f);
@@ -47,7 +54,14 @@ public class PlayerHudReferences : MonoBehaviour
             rect.sizeDelta = new Vector2(280f, 48f);
             _livesText.alignment = TextAlignmentOptions.Left;
         }
-        _livesText.SetText("Lives: {0} / {1}", remaining, total);
+        RavenLocalization.Unbind(_livesText);
+        RefreshLives();
+    }
+
+    private void RefreshLives()
+    {
+        if (_livesText == null) return;
+        _livesText.SetText(RavenLocalization.Get("Życia: {0} / {1}"), _remainingLives, _totalLives);
     }
 
     public IEnumerator ShowDeath(bool gameOver)
@@ -69,11 +83,15 @@ public class PlayerHudReferences : MonoBehaviour
             _deathOverlay = overlay.GetComponent<CanvasGroup>();
             _deathOverlay.ignoreParentGroups = true;
             _gameOverText = CreateText("GameOverText", overlay.transform, 90f);
-            _gameOverText.text = "Game Over";
+            RavenLocalization.Bind(_gameOverText, "Koniec gry");
             _gameOverText.alignment = TextAlignmentOptions.Center;
             _gameOverText.rectTransform.anchorMin = Vector2.zero;
             _gameOverText.rectTransform.anchorMax = Vector2.one;
             _gameOverText.rectTransform.offsetMin = _gameOverText.rectTransform.offsetMax = Vector2.zero;
+        }
+        else if (_gameOverText != null)
+        {
+            RavenLocalization.Bind(_gameOverText, "Koniec gry");
         }
         _gameOverText.gameObject.SetActive(gameOver);
         _deathOverlay.gameObject.SetActive(true);

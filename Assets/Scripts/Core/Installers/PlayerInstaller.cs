@@ -35,18 +35,8 @@ namespace Raven.Core.Installer
 
         public override void InstallBindings()
         {
-            var headLook = _playerReferences.PlayerAnimator.GetComponent<RavenHeadLook>();
-            if (headLook != null)
-                headLook.Initialize(_mainCameraTransform, _playerReferences.Player.transform,
-                    Container.Resolve<Raven.Input.InputManager>(), _rigTarget.transform);
-            var face = _playerReferences.PlayerAnimator.GetComponent<RavenFacialAnimation>();
-            var holster = _playerReferences.PlayerAnimator.GetComponent<RavenWeaponHolster>();
-            if (holster != null) holster.Initialize(Container.Resolve<Raven.Input.InputManager>(), _playerReferences.Player.transform);
-            if (face != null) face.Initialize(Container.Resolve<Raven.Input.InputManager>());
-            var torso = _playerReferences.PlayerAnimator.GetComponent<RavenAimTorso>();
-            if (torso != null)
-                torso.Initialize(_mainCameraTransform, _playerReferences.Player.transform,
-                    Container.Resolve<Raven.Input.InputManager>(), _movementConfig);
+            Container.BindInterfacesTo<PlayerCharacterVisualsInitializer>().AsSingle()
+                .WithArguments(_playerReferences, _mainCameraTransform, _rigTarget, _movementConfig);
             Container.BindInterfacesAndSelfTo<PlayerDataManager>().AsSingle().WithArguments(_playerDataConfig, _deadPanelAnimator);
             Container.BindInterfacesAndSelfTo<PlayerStatesManager>().AsSingle().WithArguments(_playerStatesContainer, _playerReferences).NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerHudManager>().AsSingle().WithArguments(_hudReferences, _playerDataConfig, _collectibles).NonLazy();

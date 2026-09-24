@@ -231,16 +231,16 @@ namespace Raven.UI
                 case CollectibleName.Dash:
                     _playerHudReferences.DashImage.sprite = _playerHudReferences.DashSprite;
                     _playerHudReferences.DashLocked.SetActive(false);
-                    ShowPopUp("Dash unlocked");
+                    ShowPopUp("Odblokowano unik");
                     break;
                 case CollectibleName.FireState:
                     _playerHudReferences.StateImage.sprite = _playerHudReferences.FireSprite;
                     _playerHudReferences.StateLocked.SetActive(false);
-                    ShowPopUp("Fire state unlocked");
+                    ShowPopUp("Odblokowano stan ognia");
                     break;
                 case CollectibleName.SecondWeapon:
                     _playerHudReferences.Weapon2Image.color = Color.white;
-                    ShowPopUp("Second pistol picked up");
+                    ShowPopUp("Podniesiono drugi pistolet");
                     break;
                 default:
                     break;
@@ -255,7 +255,8 @@ namespace Raven.UI
 
         private IEnumerator PopUpCoroutine(string p_text)
         {
-            _playerHudReferences.PopUpText.SetText(p_text);
+            RavenLocalization.Bind(_playerHudReferences.PopUpText, p_text);
+            _playerHudReferences.PopUpText.SetText(RavenLocalization.Get(p_text));
             _playerHudReferences.PopUp.SetActive(true);
 
             yield return new WaitForSeconds(2f);

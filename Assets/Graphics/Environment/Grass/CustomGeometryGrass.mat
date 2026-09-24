@@ -28,8 +28,10 @@ Material:
     - _AmbientStrength: 0.25
     - _BladeCurve: 4
     - _BladeForward: 0.325
-    - _GrassHeight: 0.75
-    - _GrassWidth: 0.0525
+    - _DensityMultiplier: 1
+    - _GrassHeight: 1
+    - _GrassWidth: 2
+    - _GrassWidthRandomness: 0.25
     - _MaxDist: 100
     - _MinDist: 0
     - _Rad: 0.25
@@ -37,7 +39,7 @@ Material:
     - _RandomHeight: 0.325
     - _Strength: 3
     - _WindSpeed: 12.5
-    - _WindStrength: 0.025
+    - _WindStrength: 1
     m_Colors:
     - _BottomColor: {r: 0.11575799, g: 0.3301887, b: 0.086181305, a: 1}
     - _TopColor: {r: 0.4262444, g: 0.5754717, b: 0.090482935, a: 1}

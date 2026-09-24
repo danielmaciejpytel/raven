@@ -1,0 +1,452 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: RavenUI_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: d9eba04f7e1dfa94e9029bc997a84a76, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 1538629632
+    m_Localized: Start Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1576378368
+    m_Localized: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572672
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572673
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572674
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572675
+    m_Localized: Resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572676
+    m_Localized: Graphics Quality
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572677
+    m_Localized: Sound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572678
+    m_Localized: Fullscreen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572679
+    m_Localized: Project Supervisor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572680
+    m_Localized: Patryk Niewiarowski
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572681
+    m_Localized: Daniel Pytel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572682
+    m_Localized: "Marcin \u015Awigut"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572683
+    m_Localized: Andrzej Kula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572684
+    m_Localized: Wojciech Nikorowicz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572685
+    m_Localized: "\u0141ukasz Lampka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572686
+    m_Localized: Andrzej Zawadzki
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572687
+    m_Localized: 1920x1080
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572688
+    m_Localized: Option A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572689
+    m_Localized: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572690
+    m_Localized: Programmer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572691
+    m_Localized: Lead Artist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766976
+    m_Localized: Additional Artist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766977
+    m_Localized: Design
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766978
+    m_Localized: 100/100
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766979
+    m_Localized: Locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766980
+    m_Localized: Abilities
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766981
+    m_Localized: '[ Q ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766982
+    m_Localized: '[ SPACE ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766983
+    m_Localized: '[ RMB ] + [ LMB ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766984
+    m_Localized: Aim           Shoot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766985
+    m_Localized: New Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766986
+    m_Localized: "You feel pain as salty seawater fills your fresh wounds. The smell
+      of blood and gunpowder will not leave your memory. You try to scream, but silence
+      is all that leaves your lips as your lungs fill with salt water. Then only
+      cold runs through you, and darkness covers your eyes. You find\u2026 peace."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766987
+    m_Localized: "You drift through endless darkness beyond time. The rebellion and
+      betrayal that led to your death seem like distant, almost unreal memories.
+      Suddenly you feel\u2026 pain. Startled, you open your eyes. You\u2026 can see.
+      You can still taste seawater and blood in your mouth. You try to take a deep
+      breath, but cannot draw in air. Instinctively, gasping for breath, you grab
+      your throat, mouth, nose\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766988
+    m_Localized: Panic takes hold, but soon gives way to calm. You are not suffocating.
+      You are not breathing. You almost forget what air is. You search for the place
+      where your heart should be, but feel no beat. A strong breeze lashes your wet
+      body, yet you do not shiver from the cold. You are not dead, but neither are
+      you alive. You look to the horizon, trying to work out where you are. A huge
+      stone skull towering over the land catches your eye. You take your first uncertain
+      step and head towards it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766989
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766990
+    m_Localized: "The cave is pitch-black. You hesitate for a moment, wondering whether
+      to enter. You grip your pistols tightly, take one last look at the misty island,
+      and step into the skull. The sound of the wind fades into darkness, replaced
+      by a steady, rhythmic murmur. It sounds a little like\u2026 breathing. You
+      open your eyes again. You feel pain as salty seawater fills your fresh wounds.
+      You cannot forget the smell of blood and gunpowder. You try to scream, but
+      silence is all that leaves your lips as your lungs fill with salt water. Then
+      only cold runs through you, and darkness covers your eyes. You find\u2026 peace."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766991
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766992
+    m_Localized: Resume Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766993
+    m_Localized: Quit Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766994
+    m_Localized: WORK IN PROGRESS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766995
+    m_Localized: Toggle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766996
+    m_Localized: 1280x720
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766997
+    m_Localized: 2560x1440
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766998
+    m_Localized: 3840x2160
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766999
+    m_Localized: Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767000
+    m_Localized: Medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767001
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767002
+    m_Localized: Press [e] to pickup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767003
+    m_Localized: Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767004
+    m_Localized: Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767005
+    m_Localized: 'Teleports a short distance
+
+
+      Press [E] to pick up'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767006
+    m_Localized: Ala has a cat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767007
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767008
+    m_Localized: Return
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767009
+    m_Localized: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767010
+    m_Localized: locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767011
+    m_Localized: '[ SPACE ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767012
+    m_Localized: aim           shot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767013
+    m_Localized: New Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767014
+    m_Localized: "You feel pain as salty seawater fills your fresh wounds. The smell
+      of blood and gunpowder will not leave your memory. You try to scream, but silence
+      is all that leaves your lips as your lungs fill with salt water. Then only
+      cold runs through you, and darkness covers your eyes. You find\u2026 peace."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767015
+    m_Localized: "You drift through endless darkness beyond time. The rebellion and
+      betrayal that led to your death seem like distant, almost unreal memories.
+      Suddenly you feel\u2026 pain. Startled, you open your eyes. You\u2026 can see.
+      You can still taste seawater and blood in your mouth. You try to take a deep
+      breath, but cannot draw in air. Instinctively, gasping for breath, you grab
+      your throat, mouth, nose\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767016
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767017
+    m_Localized: Polski
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767018
+    m_Localized: English
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767019
+    m_Localized: Game Over
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767020
+    m_Localized: Dash unlocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767021
+    m_Localized: Fire state unlocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767022
+    m_Localized: Second pistol picked up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767023
+    m_Localized: 'Lives: {0} / {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767024
+    m_Localized: 'Lives: {0} / {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794076209152
+    m_Localized: Aim         Shoot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374976
+    m_Localized: Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374977
+    m_Localized: "Aktywowany zmienia amunicj\u0119 na zapalaj\u0105c\u0105\nUWAGA:
+      ten tryb powoli spala energi\u0119\n\nNaci\u015Bnij [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374978
+    m_Localized: Tryb Ognisty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374979
+    m_Localized: "Aktywowany zmienia amunicj\u0119 na zapalaj\u0105c\u0105\nUWAGA:
+      Powoli zu\u017Cywa energi\u0119\n\nNaci\u015Bnij [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374980
+    m_Localized: "Zwi\u0119kszona szybkostrzelno\u015B\u0107 \nNaci\u015Bnij [E]
+      aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374981
+    m_Localized: Drugi Pistolet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374982
+    m_Localized: "Zwi\u0119kszona szybkostrzelno\u015B\u0107\n\nNaci\u015Bnij [E]
+      aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374983
+    m_Localized: "Zwi\u0119kszenie zdrowia oraz energii\nNaci\u015Bnij [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374984
+    m_Localized: "Rum Kotwicor\u0119kiego"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374985
+    m_Localized: "Na sta\u0142e wi\u0119ksza zdrowie i energi\u0119\n\nNaci\u015Bnij
+      [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374986
+    m_Localized: "You feel pain as salty seawater fills your fresh wounds. The smell
+      of blood and gunpowder will not leave your memory. You try to scream, but silence
+      is all that leaves your lips as your lungs fill with salt water. Then only
+      cold runs through you, and darkness covers your eyes. You find\u2026 peace."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374987
+    m_Localized: Panic takes hold, but soon gives way to calm. You are not suffocating.
+      You are not breathing. You almost forget what air is. You search for the place
+      where your heart should be, but feel no beat. A strong breeze lashes your wet
+      body, yet you do not shiver from the cold. You are not dead, but neither are
+      you alive. You look to the horizon, trying to work out where you are. A huge
+      stone skull towering over the land catches your eye. You take your first uncertain
+      step and head towards it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374988
+    m_Localized: "You drift through endless darkness beyond time. The rebellion and
+      betrayal that led to your death seem like distant, almost unreal memories.
+      Suddenly you feel\u2026 pain. Startled, you open your eyes. You\u2026 can see.
+      You can still taste seawater and blood in your mouth. You try to take a deep
+      breath, but cannot draw in air. Instinctively, gasping for breath, you grab
+      your throat, mouth, nose\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374989
+    m_Localized: "The cave is pitch-black. You hesitate for a moment, wondering whether
+      to enter. You grip your pistols tightly, take one last look at the misty island,
+      and step into the skull. The sound of the wind fades into darkness, replaced
+      by a steady, rhythmic murmur. It sounds a little like\u2026 breathing. You
+      open your eyes again. You feel pain as salty seawater fills your fresh wounds.
+      You cannot forget the smell of blood and gunpowder. You try to scream, but
+      silence is all that leaves your lips as your lungs fill with salt water. Then
+      only cold runs through you, and darkness covers your eyes. You find\u2026 peace."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374990
+    m_Localized: 'Teleports a short distance
+
+
+      Press [E] to pick up'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374991
+    m_Localized: '[ E ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374992
+    m_Localized: 'Lives: {0:0}/{1:0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374993
+    m_Localized: 'Zdrowie: {0}/{1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374994
+    m_Localized: 'Energia: {0}/{1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374995
+    m_Localized: Press [E] to pick up
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

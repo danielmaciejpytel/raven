@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Localization-String-Tables-Polish
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Localization-String-Tables-Polish
+  m_GUID: 38b32d4dee1f2964db2731e5c3788fac
+  m_SerializeEntries:
+  - m_GUID: 3b4b4d9ce728e6d4cba0f0eba020ba02
+    m_Address: RavenUI_pl
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-pl
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 1
+  m_Settings: {fileID: 11400000, guid: 405efaeed1a6c9740aa5b3d5decd44c0, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 7ec94f98b874aff4fa4ac4fa927a18cb, type: 2}
+    - {fileID: 11400000, guid: 70ebe167c050e124c943d532c9ea438d, type: 2}
+    - {fileID: 11400000, guid: 89ffb4eaa7a9514439064243d685c1c5, type: 2}

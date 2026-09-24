@@ -1,0 +1,447 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: RavenUI_pl
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: pl
+  m_SharedData: {fileID: 11400000, guid: d9eba04f7e1dfa94e9029bc997a84a76, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 1538629632
+    m_Localized: "Rozpocznij gr\u0119"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1576378368
+    m_Localized: "Wyjd\u017A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572672
+    m_Localized: Ustawienia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572673
+    m_Localized: "Tw\xF3rcy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572674
+    m_Localized: Wstecz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572675
+    m_Localized: "Rozdzielczo\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572676
+    m_Localized: "Jako\u015B\u0107 grafiki"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572677
+    m_Localized: "D\u017Awi\u0119k"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572678
+    m_Localized: "Pe\u0142ny ekran"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572679
+    m_Localized: Opiekun Projektu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572680
+    m_Localized: Patryk Niewiarowski
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572681
+    m_Localized: Daniel Pytel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572682
+    m_Localized: "Marcin \u015Awigut"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572683
+    m_Localized: Andrzej Kula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572684
+    m_Localized: Wojciech Nikorowicz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572685
+    m_Localized: "\u0141ukasz Lampka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572686
+    m_Localized: Andrzej Zawadzki
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572687
+    m_Localized: 1920x1080
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572688
+    m_Localized: Option A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572689
+    m_Localized: Wysoka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572690
+    m_Localized: Programista
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1580572691
+    m_Localized: "Grafik G\u0142\xF3wny"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766976
+    m_Localized: Grafik Pomocniczy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766977
+    m_Localized: Projekt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766978
+    m_Localized: 100/100
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766979
+    m_Localized: Zablokowane
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766980
+    m_Localized: "Zdolno\u015Bci"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766981
+    m_Localized: '[ Q ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766982
+    m_Localized: '[ SPACJA ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766983
+    m_Localized: '[ PPM ] + [ LPM ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766984
+    m_Localized: "Cel           Strza\u0142"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766985
+    m_Localized: Nowy tekst
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766986
+    m_Localized: "Czujesz b\xF3l, kiedy s\u0142ona, morska woda wype\u0142nia twoje
+      \u015Bwie\u017Ce rany. Ze swej pami\u0119ci nie mo\u017Cesz wyzby\u0107 si\u0119
+      zapachu krwi i prochu. Pr\xF3bujesz krzycze\u0107, ale jedyne co wydobywa si\u0119
+      z twoich ust to cisza, gdy twe p\u0142uca nape\u0142niaj\u0105 si\u0119 s\u0142on\u0105
+      wod\u0105. \rPotem przeszywa ci\u0119 ju\u017C tylko zimno, a ciemno\u015B\u0107
+      spowija oczy. Zaznajesz\u2026 spokoju."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766987
+    m_Localized: "Dryfujesz przez bezkresn\u0105 ciemno\u015B\u0107 poza czasem.
+      Bunt i zdrada kt\xF3ra doprowadzi\u0142a do twojej \u015Bmierci wydaj\u0105
+      si\u0119 tylko odleg\u0142ym, wr\u0119cz nierealnym wspomnieniem. Nagle czujesz\u2026
+      b\xF3l. Zaskoczona otwierasz oczy. Ty\u2026 widzisz. W ustach nadal czujesz
+      smak morskiej wody i krwi. Pr\xF3bujesz wzi\u0105\u0107 g\u0142\u0119boki oddech,
+      ale nie udaje ci si\u0119 wci\u0105gn\u0105\u0107 powietrza. Odruchowo, pr\xF3buj\u0105c
+      z\u0142apa\u0107 dech, \u0142apiesz si\u0119 za szyj\u0119, usta, nos..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766988
+    m_Localized: "Wpadasz w panik\u0119, kt\xF3ra jednak po chwili ust\u0119puje
+      poczuciu spokoju. Nie dusisz si\u0119. Nie oddychasz.                            
+      Zapominasz wr\u0119cz, czym jest powietrze. Szukasz miejsca w kt\xF3rym powinno
+      by\u0107 twoje serce, ale nie czujesz bicia.                                   
+      Silna bryza smaga twoje mokre cia\u0142o, ale nie wzdrygasz si\u0119 od zimna.
+      Nie jeste\u015B martwa, ale nie jeste\u015B te\u017C \u017Cywa. Spogl\u0105dasz
+      na horyzont, pr\xF3buj\u0105c zorientowa\u0107 si\u0119, gdzie jeste\u015B.
+      Twoj\u0105 uwag\u0119 przykuwa ogromna, kamienna czaszka g\xF3ruj\u0105ca nad
+      okolic\u0105. Stawiasz pierwszy, niepewny krok i udajesz si\u0119 w jej kierunku."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766989
+    m_Localized: Kontynuuj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766990
+    m_Localized: "W jaskini panuje nieprzenikniony mrok. Zastanawiasz si\u0119 przez
+      chwil\u0119 czy powinna\u015B wej\u015B\u0107 do jej \u015Brodka. Mocno zaciskasz
+      d\u0142onie na r\u0119koje\u015Bciach swoich pistolet\xF3w, odwracasz si\u0119
+      ostatni raz spogl\u0105daj\u0105c na mglist\u0105 wysp\u0119 i wkraczasz w
+      g\u0142\u0105b czaszki. D\u017Awi\u0119k wiatru ginie w ciemno\u015Bci, zast\u0119puje
+      go rytmiczny, regularny szum. Brzmi troch\u0119 jak\u2026 oddech. Ponownie
+      otwierasz oczy. Czujesz b\xF3l, kiedy s\u0142ona, morska woda wype\u0142nia
+      twoje \u015Bwie\u017Ce rany. Ze swej pami\u0119ci nie mo\u017Cesz wyzby\u0107
+      si\u0119 zapachu krwi i prochu. Pr\xF3bujesz krzycze\u0107, ale jedyne co wydobywa
+      si\u0119 z twoich ust to cisza, gdy twe p\u0142uca nape\u0142niaj\u0105 si\u0119
+      s\u0142on\u0105 wod\u0105. \r\nPotem przeszywa ci\u0119 ju\u017C tylko zimno,
+      a ciemno\u015B\u0107 spowija oczy. Zaznajesz\u2026 spokoju."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766991
+    m_Localized: Pauza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766992
+    m_Localized: "Wzn\xF3w gr\u0119"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766993
+    m_Localized: "Wyjd\u017A z gry"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766994
+    m_Localized: WORK IN PROGRESS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766995
+    m_Localized: Toggle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766996
+    m_Localized: 1280x720
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766997
+    m_Localized: 2560x1440
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766998
+    m_Localized: 3840x2160
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584766999
+    m_Localized: Niska
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767000
+    m_Localized: "\u015Arednia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767001
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767002
+    m_Localized: Press [e] to pickup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767003
+    m_Localized: Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767004
+    m_Localized: "Migni\u0119cie"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767005
+    m_Localized: "Teleportuje na kr\xF3tk\u0105 odleg\u0142o\u015B\u0107\n\nNaci\u015Bnij
+      [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767006
+    m_Localized: ala ma kota
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767007
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767008
+    m_Localized: Return
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767009
+    m_Localized: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767010
+    m_Localized: zablokowane
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767011
+    m_Localized: '[ SPACE ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767012
+    m_Localized: aim           shot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767013
+    m_Localized: Nowy tekst
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767014
+    m_Localized: "Czujesz b\xF3l, kiedy s\u0142ona, morska woda wype\u0142nia twoje
+      \u015Bwie\u017Ce rany.                                                                                         
+      Ze swej pami\u0119ci nie mo\u017Cesz wyzby\u0107 si\u0119 zapachu krwi i prochu.                                                                                       
+      Pr\xF3bujesz krzycze\u0107, ale jedyne co wydobywa si\u0119 z twoich ust to
+      cisza, gdy twe p\u0142uca nape\u0142niaj\u0105 si\u0119 s\u0142on\u0105 wod\u0105.
+      \r                                                                                                                                                                                                     
+      Potem przeszywa ci\u0119 ju\u017C tylko zimno, a ciemno\u015B\u0107 spowija
+      oczy.                                                                                 
+      Zaznajesz\u2026 spokoju."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767015
+    m_Localized: "Dryfujesz przez bezkresn\u0105 ciemno\u015B\u0107 poza czasem.
+      Bunt i zdrada kt\xF3ra doprowadzi\u0142a do twojej \u015Bmierci wydaj\u0105
+      si\u0119 tylko odleg\u0142ym, wr\u0119cz nierealnym wspomnieniem. Nagle czujesz\u2026
+      b\xF3l. Zaskoczona otwierasz oczy. Ty\u2026 widzisz.            W ustach nadal
+      czujesz smak morskiej wody i krwi. Pr\xF3bujesz wzi\u0105\u0107 g\u0142\u0119boki
+      oddech, ale nie udaje ci si\u0119 wci\u0105gn\u0105\u0107 powietrza. Odruchowo,
+      pr\xF3buj\u0105c z\u0142apa\u0107 dech, \u0142apiesz si\u0119 za szyj\u0119,
+      usta, nos..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767016
+    m_Localized: "J\u0119zyk"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767017
+    m_Localized: Polski
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767018
+    m_Localized: English
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767019
+    m_Localized: Koniec gry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767020
+    m_Localized: Odblokowano unik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767021
+    m_Localized: Odblokowano stan ognia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767022
+    m_Localized: Podniesiono drugi pistolet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767023
+    m_Localized: "\u017Bycia: {0} / {1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1584767024
+    m_Localized: 'Lives: {0} / {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794076209152
+    m_Localized: "Cel         Strza\u0142"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374976
+    m_Localized: "Pomi\u0144"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374977
+    m_Localized: "Aktywowany zmienia amunicj\u0119 na zapalaj\u0105c\u0105\nUWAGA:
+      ten tryb powoli spala energi\u0119\n\nNaci\u015Bnij [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374978
+    m_Localized: Tryb Ognisty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374979
+    m_Localized: "Aktywowany zmienia amunicj\u0119 na zapalaj\u0105c\u0105\nUWAGA:
+      Powoli zu\u017Cywa energi\u0119\n\nNaci\u015Bnij [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374980
+    m_Localized: "Zwi\u0119kszona szybkostrzelno\u015B\u0107 \nNaci\u015Bnij [E]
+      aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374981
+    m_Localized: Drugi Pistolet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374982
+    m_Localized: "Zwi\u0119kszona szybkostrzelno\u015B\u0107\n\nNaci\u015Bnij [E]
+      aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374983
+    m_Localized: "Zwi\u0119kszenie zdrowia oraz energii\nNaci\u015Bnij [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374984
+    m_Localized: "Rum Kotwicor\u0119kiego"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374985
+    m_Localized: "Na sta\u0142e wi\u0119ksza zdrowie i energi\u0119\n\nNaci\u015Bnij
+      [E] aby podnie\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374986
+    m_Localized: "Czujesz b\xF3l, kiedy s\u0142ona, morska woda wype\u0142nia twoje
+      \u015Bwie\u017Ce rany."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374987
+    m_Localized: "Wpadasz w panik\u0119, kt\xF3ra jednak po chwili ust\u0119puje
+      poczuciu spokoju."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374988
+    m_Localized: "Dryfujesz przez bezkresn\u0105 ciemno\u015B\u0107 poza czasem.
+      Bunt i zdrada, kt\xF3re doprowadzi\u0142y do twojej \u015Bmierci, wydaj\u0105
+      si\u0119 odleg\u0142ymi wspomnieniami."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374989
+    m_Localized: "W jaskini panuje nieprzenikniony mrok. Wahasz si\u0119 przez chwil\u0119,
+      zastanawiaj\u0105c si\u0119, czy wej\u015B\u0107 do \u015Brodka."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374990
+    m_Localized: "Teleportuje na kr\xF3tk\u0105 odleg\u0142o\u015B\u0107"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374991
+    m_Localized: '[ E ]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374992
+    m_Localized: "\u017Bycia: {0:0}/{1:0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374993
+    m_Localized: 'Zdrowie: {0}/{1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374994
+    m_Localized: 'Energia: {0}/{1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4794101374995
+    m_Localized: Press [E] to pick up
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

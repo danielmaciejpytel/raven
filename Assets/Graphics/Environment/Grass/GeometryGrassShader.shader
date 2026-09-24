@@ -8,15 +8,17 @@ Shader "Custom/GeometryGrass"
 		_BottomColor("Bottom Color", Color) = (0,1,0,1)
 		_TopColor("Top Color", Color) = (1,1,0,1)
 		_GrassHeight("Grass Height", Float) = 1
-		_GrassWidth("Grass Width", Float) = 0.06
+		_GrassWidth("Grass Width", Range(0, 5)) = 1
+		_GrassWidthRandomness("Grass Width Randomness", Range(0, 1)) = 0
 		_RandomHeight("Grass Height Randomness", Float) = 0.25
 		_WindSpeed("Wind Speed", Float) = 100
-		_WindStrength("Wind Strength", Float) = 0.05
+		_WindStrength("Wind Strength", Range(0, 5)) = 1
 		_Radius("Interactor Radius", Float) = 0.3
 		_Strength("Interactor Strength", Float) = 5
 		_Rad("Blade Radius", Range(0,1)) = 0.6
 		_BladeForward("Blade Forward Amount", Float) = 0.38
 		_BladeCurve("Blade Curvature Amount", Range(1, 4)) = 2
+		_DensityMultiplier("Grass Density (max 5)", Range(1, 5)) = 1
 		_AmbientStrength("Ambient Strength",  Range(0,1)) = 0.5
 		_MinDist("Min Distance", Float) = 40
 		_MaxDist("Max Distance", Float) = 60
@@ -36,6 +38,7 @@ Shader "Custom/GeometryGrass"
 
 #define GrassSegments 5 // segments per blade
 #define GrassBlades 4 // blades per vertex
+#define GrassMaxDensity 5 // maximum material density multiplier
 
 		// The Core.hlsl file contains definitions of frequently used HLSL
 		// macros and functions, and also contains #include references to other
@@ -79,6 +82,7 @@ Shader "Custom/GeometryGrass"
 	float _AmbientStrength;
 	half _GrassHeight;
 	half _GrassWidth;
+	float _GrassWidthRandomness;
 	half _WindSpeed;
 	float _WindStrength;
 	half _Radius, _Strength;
@@ -87,7 +91,7 @@ Shader "Custom/GeometryGrass"
 	float _RandomHeight;
 	float _BladeForward;
 	float _BladeCurve;
-
+	float _DensityMultiplier;
 	float _MinDist, _MaxDist;
 	CBUFFER_END
 
@@ -194,8 +198,8 @@ Shader "Custom/GeometryGrass"
 	}
 
 	// wind and basic grassblade setup from https://roystan.net/articles/grass-shader.html
-	// limit for vertices
-	[maxvertexcount(GrassBlades * (GrassSegments * 2 + 1))]
+	// Density increases blade count while reducing per-blade segments to stay within the D3D output limit.
+	[maxvertexcount(GrassBlades * GrassMaxDensity * 3)]
 	void geom(point v2g IN[1], inout TriangleStream<g2f> triStream)
 	{
 		// Geometry runs in a separate stage: restore this cell's instance transform.
@@ -214,7 +218,7 @@ Shader "Custom/GeometryGrass"
 		float3 v0 = IN[0].pos.xyz;
 		float3 wind1 = float3(sin(_Time.x * _WindSpeed + v0.x) + sin(_Time.x * _WindSpeed + v0.z * 2) + sin(_Time.x * _WindSpeed * 0.1 + v0.x), 0,
 			cos(_Time.x * _WindSpeed + v0.x * 2) + cos(_Time.x * _WindSpeed + v0.z));
-		wind1 *= _WindStrength;
+		wind1 *= _WindStrength * 0.025;
 
 		// Interactivity
 		float3 dis = distance(_PositionMoving, worldPos); // distance for radius
@@ -228,12 +232,20 @@ Shader "Custom/GeometryGrass"
 		float3 color = (IN[0].color).rgb;
 		// set grass height from tool, uncomment if youre not using the tool!
 		float grassHeight = _GrassHeight * IN[0].uv.y;
-		float grassWidth = _GrassWidth * IN[0].uv.x;
+		// Width is now normalized: 1.0 preserves the previous ~0.05 world-space width.
+		float grassWidth = max(_GrassWidth, 0.25) * 0.05 * IN[0].uv.x;
+		float densityMultiplier = clamp(_DensityMultiplier, 1.0, (float)GrassMaxDensity);
 		grassHeight *= clamp(rand(IN[0].pos.xyz), 1 - _RandomHeight, 1 + _RandomHeight);
 
 		// grassblades geometry
-		for (int j = 0; j < (GrassBlades * distanceFade); j++)
+		int bladeCount = (int)ceil(GrassBlades * densityMultiplier * distanceFade);
+		int segmentsPerBlade = max(1, (int)floor(GrassSegments / densityMultiplier));
+		for (int j = 0; j < bladeCount; j++)
 		{
+			float bladeWidthRandom = rand(IN[0].pos.xyz + float3(19.19 + j * 13.13, 73.37 + j * 7.17, 41.41 + j * 3.71));
+			float bladeWidthVariation = lerp(1.0, bladeWidthRandom, saturate(_GrassWidthRandomness));
+			float bladeGrassWidth = grassWidth * bladeWidthVariation;
+
 			// set rotation and radius of the blades
 			float3x3 facingRotationMatrix = AngleAxis3x3(rand(IN[0].pos.xyz) * TWO_PI + j, float3(0, 1, -0.1));
 
@@ -242,15 +254,15 @@ Shader "Custom/GeometryGrass"
 			faceNormal = mul(faceNormal, transformationMatrix);
 			float radius = j / (float)GrassBlades;
 			float offset = (1 - radius) * _Rad;
-			for (int i = 0; i < GrassSegments; i++)
+			for (int i = 0; i < segmentsPerBlade; i++)
 			{
 				// taper width, increase height;
-				float t = i / (float)GrassSegments;
+				float t = i / (float)segmentsPerBlade;
 				float segmentHeight = grassHeight * t;
-				float segmentWidth = grassWidth * (1 - t);
+				float segmentWidth = bladeGrassWidth * (1 - t);
 
 				// the first (0) grass segment is thinner
-				segmentWidth = i == 0 ? grassWidth * 0.3 : segmentWidth;
+				segmentWidth = i == 0 ? bladeGrassWidth * 0.3 : segmentWidth;
 
 				float segmentForward = pow(abs(t), _BladeCurve) * forward;
 
