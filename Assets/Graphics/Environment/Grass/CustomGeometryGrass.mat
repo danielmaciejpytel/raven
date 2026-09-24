@@ -36,7 +36,7 @@ Material:
     - _MinDist: 0
     - _Rad: 0.25
     - _Radius: 0.5
-    - _RandomHeight: 0.325
+    - _RandomHeight: 0.5
     - _Strength: 3
     - _WindSpeed: 12.5
     - _WindStrength: 1
