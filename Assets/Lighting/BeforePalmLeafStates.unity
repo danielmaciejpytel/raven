@@ -9323,9 +9323,9 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967165
+    m_Bits: 4294967293
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 1794825140}
+  m_TargetTexture: {fileID: 1183169867}
   m_TargetDisplay: 0
   m_TargetEye: 0
   m_HDR: 0
@@ -31533,6 +31533,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lightingCellSize: 8
+  meshCache: {fileID: 0}
   AdjustedColor: {r: 0.9056604, g: 0.85866857, b: 0.85866857, a: 0}
   grassLimit: 80000
   toolbarInt: 1
@@ -157369,6 +157370,7 @@ MonoBehaviour:
   brushSize: 3.4
   hitPosGizmo: {x: -23.88533, y: 0.006866932, z: 145.93076}
   hitNormal: {x: 0.051119924, y: 0.9913562, z: 0.12082891}
+  showBrushPreview: 1
 --- !u!23 &815291145
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -162613,6 +162615,43 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!84 &1183169867
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 1024
+  m_Height: 1024
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 0
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &1184397697
 GameObject:
   m_ObjectHideFlags: 0
@@ -170793,43 +170832,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!84 &1794825140
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1024
-  m_Height: 1024
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 0
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &1794835133 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5927578277673354278, guid: 72509c8700c58ff47b0bb348df5abe00, type: 3}
@@ -172245,7 +172247,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: eb250f56566a1ab44ac20b1b78c39e7c, type: 2}
+  m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
 --- !u!1001 &1919604794
 PrefabInstance:
@@ -173883,8 +173885,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Pomi\u0144"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 804bda41e74343c4fb79a2daaf58b983, type: 2}
-  m_sharedMaterial: {fileID: -6115669278693262201, guid: 804bda41e74343c4fb79a2daaf58b983, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13ce3fa0b6bb2094b8056513bf54a803, type: 2}
+  m_sharedMaterial: {fileID: 8294538149117052326, guid: 13ce3fa0b6bb2094b8056513bf54a803, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -176003,6 +176005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lightingCellSize: 8
+  meshCache: {fileID: 0}
   AdjustedColor: {r: 0.9056604, g: 0.85866857, b: 0.85866857, a: 0}
   grassLimit: 80000
   toolbarInt: 1
@@ -335343,6 +335346,7 @@ MonoBehaviour:
   brushSize: 7.08
   hitPosGizmo: {x: 254.7892, y: 25.592508, z: 276.15482}
   hitNormal: {x: -0.02811529, y: 0.9995937, z: -0.0046858815}
+  showBrushPreview: 1
 --- !u!4 &4333399252170931535
 Transform:
   m_ObjectHideFlags: 0
