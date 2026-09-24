@@ -7,6 +7,46 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Raven_Body
+    second: {fileID: 2100000, guid: dbfcf5822c9413c4ab327f2d9c5d856a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Raven_Clothes
+    second: {fileID: 2100000, guid: 1d1257410f66b424e9ae5a489ad7b336, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Raven_Eyes
+    second: {fileID: 2100000, guid: 1d3a5b67191876a4fa2bca6d539e4239, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Raven_Hair
+    second: {fileID: 2100000, guid: 0f45e216024956f47ab16d870219971f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Raven_Hands
+    second: {fileID: 2100000, guid: 89339f46e24251141bd12b7912b0df35, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Raven_Hat
+    second: {fileID: 2100000, guid: 1ca829796d82b6f45844ea873578dd56, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Raven_Necklace
+    second: {fileID: 2100000, guid: ac27fe79af50da74480987c2a98b8f43, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Raven_RedBands
+    second: {fileID: 2100000, guid: 3306f78f585fa0841bd8bf681b905eb2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Raven_Shoes
     second: {fileID: 2100000, guid: faeeecb6aba6c554bacaed5fe5179e48, type: 2}
   materials:
