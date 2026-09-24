@@ -1,6 +1,6 @@
 <h1>Raven: Skull Island</h1>
 
-![Preview](Assets/Graphics/GitHub/RavenWyspaCzaszkiLogo.png)
+![Preview](Assets/Graphics/GitHub/LogoRavenWyspaCzaszki.png)
 
 **Raven: Skull Island** is a third-person action-adventure game with puzzle-solving elements, set on a mysterious and cursed island.
 
