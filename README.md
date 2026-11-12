@@ -107,3 +107,12 @@ The recent development phase has focused heavily on the technical foundation of 
 With that foundation being progressively improved, future development can increasingly shift toward gameplay, content, visual polish, restored mechanics, and further expansion of Skull Island.
 
 The intention is to keep the spirit of the original project alive while exploring how far the game can be pushed beyond what was possible during its original development.
+
+
+## Compilation maintenance — 2026-11-12
+
+Target editor: Unity 6000.3.28f1. C# compilation was verified without launching the Editor or importing assets. All 733 current Assets source files were assigned to their 15 assemblies; package dependencies required by this check also compiled. This does not verify IL postprocessing, scenes, shaders, player builds or runtime behavior.
+
+Addressables 2.9.1 is embedded in `Packages/com.unity.addressables` with one compatibility change: `Unity.ResourceManager` grants `Unity.Localization` access to internals needed by Localization 1.5.13. The original package and licenses are preserved. Generated IDE references were repaired; local compiler reports are in `Library/compile_check`.
+
+Storage measurement (2026-11-12, logical file sizes): embedded Addressables package 10,155,506 bytes; local compilation workspace including reusable reference DLLs, logs and backups 28,989,677 bytes. Original cache retained; no disk-space saving claimed.
